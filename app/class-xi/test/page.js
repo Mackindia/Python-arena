@@ -8,6 +8,9 @@ const allQuestions = [
   // Critical Thinking (10 questions)
   {
     id: 1,
+    name: "CT-001",
+    post: 1,
+    class: "Critical Thinking",
     category: "Critical Thinking",
     question: "Statements: Importance of Yoga and exercise is being realized by all sections of the society. There is an increasing awareness about health in the society particularly among middle ages group of people.",
     options: [
@@ -21,6 +24,9 @@ const allQuestions = [
   },
   {
     id: 2,
+    name: "CT-002",
+    post: 2,
+    class: "Critical Thinking",
     category: "Critical Thinking",
     question: "Statements: All mangoes are golden in color. No golden-colored things are cheap. Conclusions: All mangoes are cheap. Golden-colored mangoes are not cheap.",
     options: [
@@ -34,6 +40,9 @@ const allQuestions = [
   },
   {
     id: 3,
+    name: "CT-003",
+    post: 3,
+    class: "Critical Thinking",
     category: "Critical Thinking",
     question: "Which of the following best describes a problem-solving mindset?",
     options: [
@@ -46,6 +55,9 @@ const allQuestions = [
   },
   {
     id: 4,
+    name: "CT-004",
+    post: 4,
+    class: "Critical Thinking",
     category: "Critical Thinking",
     question: "Argument: 'People generally wear light-coloured clothes in summer.' Which statement strengthens this argument?",
     options: [
@@ -58,6 +70,9 @@ const allQuestions = [
   },
   {
     id: 5,
+    name: "CT-005",
+    post: 5,
+    class: "Critical Thinking",
     category: "Critical Thinking",
     question: "A decision benefits 80% of people but harms 20%. What is the most logical approach?",
     options: [
@@ -70,6 +85,9 @@ const allQuestions = [
   },
   {
     id: 6,
+    name: "CT-006",
+    post: 6,
+    class: "Critical Thinking",
     category: "Critical Thinking",
     question: "A person is facing north. They turn right, then right again. Which direction are they facing?",
     options: [
@@ -82,6 +100,9 @@ const allQuestions = [
   },
   {
     id: 7,
+    name: "CT-007",
+    post: 7,
+    class: "Critical Thinking",
     category: "Critical Thinking",
     question: "You are given two solutions to a problem—one is quick but risky, the other is slow but reliable. What should you do?",
     options: [
@@ -94,6 +115,9 @@ const allQuestions = [
   },
   {
     id: 8,
+    name: "CT-008",
+    post: 8,
+    class: "Critical Thinking",
     category: "Critical Thinking",
     question: "Statements: Some books are pens. All pens are papers. No paper is plastic. Conclusion:",
     options: [
@@ -106,6 +130,9 @@ const allQuestions = [
   },
   {
     id: 9,
+    name: "CT-009",
+    post: 9,
+    class: "Critical Thinking",
     category: "Critical Thinking",
     question: "Ravi says: 'The woman is the daughter of my grandfather's only son.' Who is the woman to Ravi?",
     options: [
@@ -118,6 +145,9 @@ const allQuestions = [
   },
   {
     id: 10,
+    name: "CT-010",
+    post: 10,
+    class: "Critical Thinking",
     category: "Critical Thinking",
     question: "Statement: 'We should reduce plastic use to protect the environment.' Which assumption is implicit?",
     options: [
@@ -132,6 +162,9 @@ const allQuestions = [
   // Logic Based (10 questions)
   {
     id: 11,
+    name: "LB-001",
+    post: 11,
+    class: "Logic Based",
     category: "Logic Based",
     question: "What number should come next: 80, 10, 70, 15, 60, ...?",
     options: ["70", "100", "20", "5"],
@@ -139,6 +172,9 @@ const allQuestions = [
   },
   {
     id: 12,
+    name: "LB-002",
+    post: 12,
+    class: "Logic Based",
     category: "Logic Based",
     question: "What number comes next in the sequence: 3, 9, 27, ?, 243?",
     options: ["18", "81", "30", "15"],
@@ -146,6 +182,9 @@ const allQuestions = [
   },
   {
     id: 13,
+    name: "LB-003",
+    post: 13,
+    class: "Logic Based",
     category: "Logic Based",
     question: "I am an odd number. Take away one letter and I become even. What number am I?",
     options: ["Eleven", "Seven", "Thirteen", "Twenty-one"],
@@ -153,6 +192,9 @@ const allQuestions = [
   },
   {
     id: 14,
+    name: "LB-004",
+    post: 14,
+    class: "Logic Based",
     category: "Logic Based",
     question: "There are five apples in a basket. If you take away three, how many do you have?",
     options: ["Two", "Three", "Five", "Zero"],
@@ -160,6 +202,9 @@ const allQuestions = [
   },
   {
     id: 15,
+    name: "LB-005",
+    post: 15,
+    class: "Logic Based",
     category: "Logic Based",
     question: "Diamond is harder than Gold. Platinum is harder than diamond. Gold is softer than Platinum. If the first two statements are true, the third statement is-",
     options: ["True", "False"],
@@ -167,6 +212,9 @@ const allQuestions = [
   },
   {
     id: 16,
+    name: "LB-006",
+    post: 16,
+    class: "Logic Based",
     category: "Logic Based",
     question: "Which word does not belong with the others?",
     options: ["Index", "Glossary", "Chapter", "Book"],
@@ -174,6 +222,9 @@ const allQuestions = [
   },
   {
     id: 17,
+    name: "LB-007",
+    post: 17,
+    class: "Logic Based",
     category: "Logic Based",
     question: "CUP: LIP :: BIRD: ......",
     options: ["Grass", "Forest", "Beak", "Bush"],
@@ -181,6 +232,9 @@ const allQuestions = [
   },
   {
     id: 18,
+    name: "LB-008",
+    post: 18,
+    class: "Logic Based",
     category: "Logic Based",
     question: "Look at this series: 12, 11, 13, 12, 14, 13, … What number should come next?",
     options: ["10", "16", "13", "15"],
@@ -188,6 +242,9 @@ const allQuestions = [
   },
   {
     id: 19,
+    name: "LB-009",
+    post: 19,
+    class: "Logic Based",
     category: "Logic Based",
     question: "Find next letter: A, C, F, J, O, ?",
     options: ["T", "U", "V", "W"],
@@ -195,6 +252,9 @@ const allQuestions = [
   },
   {
     id: 20,
+    name: "LB-010",
+    post: 20,
+    class: "Logic Based",
     category: "Logic Based",
     question: "If 5 machines take 5 minutes to make 5 items, how long will 100 machines take to make 100 items?",
     options: ["5 minutes", "10 minutes", "100 minutes", "1 minute"],
@@ -204,6 +264,9 @@ const allQuestions = [
   // Situation Based (6 questions)
   {
     id: 21,
+    name: "SB-001",
+    post: 21,
+    class: "Situation Based",
     category: "Situation Based",
     question: "You hear a rumour that a teacher is going to change the strict seating plan, but you aren't sure if it's true. What is the most appropriate action?",
     options: [
@@ -216,6 +279,9 @@ const allQuestions = [
   },
   {
     id: 22,
+    name: "SB-002",
+    post: 22,
+    class: "Situation Based",
     category: "Situation Based",
     question: "A council member has not been attending meetings and is failing their classes. What is the best course of action?",
     options: [
@@ -228,6 +294,9 @@ const allQuestions = [
   },
   {
     id: 23,
+    name: "SB-003",
+    post: 23,
+    class: "Situation Based",
     category: "Situation Based",
     question: "Which of the following is an opinion?",
     options: [
@@ -240,6 +309,9 @@ const allQuestions = [
   },
   {
     id: 24,
+    name: "SB-004",
+    post: 24,
+    class: "Situation Based",
     category: "Situation Based",
     question: "A popular student promises that if elected, they will abolish homework and extend lunch times. As a candidate, you know the council cannot change these policies. What is the most constructive action?",
     options: [
@@ -252,6 +324,9 @@ const allQuestions = [
   },
   {
     id: 25,
+    name: "SB-005",
+    post: 25,
+    class: "Situation Based",
     category: "Situation Based",
     question: "How do you define 'leadership' in a student council member?",
     options: [
@@ -264,6 +339,9 @@ const allQuestions = [
   },
   {
     id: 26,
+    name: "SB-006",
+    post: 26,
+    class: "Situation Based",
     category: "Situation Based",
     question: "When considering a new school policy, what is the best first step?",
     options: [
@@ -278,6 +356,9 @@ const allQuestions = [
   // General Knowledge (8 questions)
   {
     id: 27,
+    name: "GK-001",
+    post: 27,
+    class: "General Knowledge",
     category: "General Knowledge",
     question: "India's GST collection in FY26 crossed approximately:",
     options: [
@@ -290,6 +371,9 @@ const allQuestions = [
   },
   {
     id: 28,
+    name: "GK-002",
+    post: 28,
+    class: "General Knowledge",
     category: "General Knowledge",
     question: "India recently topped the medal tally in which event?",
     options: [
@@ -302,6 +386,9 @@ const allQuestions = [
   },
   {
     id: 29,
+    name: "GK-003",
+    post: 29,
+    class: "General Knowledge",
     category: "General Knowledge",
     question: "Recently, which major expressway project was extended toward Uttarakhand?",
     options: [
@@ -314,6 +401,9 @@ const allQuestions = [
   },
   {
     id: 30,
+    name: "GK-004",
+    post: 30,
+    class: "General Knowledge",
     category: "General Knowledge",
     question: "Uttarakhand Board Class 10th pass percentage in 2026 was approximately:",
     options: [
@@ -326,6 +416,9 @@ const allQuestions = [
   },
   {
     id: 31,
+    name: "GK-005",
+    post: 31,
+    class: "General Knowledge",
     category: "General Knowledge",
     question: "Which vital maritime bottleneck connects the Persian Gulf to the Arabian Sea, frequently cited in discussions about maritime security and regional tensions?",
     options: [
@@ -338,6 +431,9 @@ const allQuestions = [
   },
   {
     id: 32,
+    name: "GK-006",
+    post: 32,
+    class: "General Knowledge",
     category: "General Knowledge",
     question: "The Russia–Ukraine war (ongoing since 2022) has recently entered which phase in 2026?",
     options: [
@@ -350,6 +446,9 @@ const allQuestions = [
   },
   {
     id: 33,
+    name: "GK-007",
+    post: 33,
+    class: "General Knowledge",
     category: "General Knowledge",
     question: "Which war is currently involving the United States and Israel against Iran?",
     options: [
@@ -362,6 +461,9 @@ const allQuestions = [
   },
   {
     id: 34,
+    name: "GK-008",
+    post: 34,
+    class: "General Knowledge",
     category: "General Knowledge",
     question: "One major global impact of current wars in the Middle East is:",
     options: [
@@ -665,9 +767,14 @@ export default function TestPage() {
                       }`}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <span className="font-semibold text-ink-50">
-                          Q{idx + 1}. {q.category}
-                        </span>
+                        <div>
+                          <span className="font-semibold text-ink-50">
+                            Q{q.post}. {q.name} - {q.class}
+                          </span>
+                          <p className="text-xs text-ink-400 mt-1">
+                            Category: {q.category} | ID: {q.id}
+                          </p>
+                        </div>
                         <span
                           className={`px-3 py-1 rounded text-sm font-bold ${
                             isCorrect
