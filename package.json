@@ -8,6 +8,7 @@
     "start": "next start",
     "preview:local": "npm run build && npm run start",
     "deploy:preview": "vercel",
+    "quick:preview": "node scripts/quick-preview.js",
     "release": "node scripts/release-confirm.js",
     "vercel:link": "vercel link"
   },
