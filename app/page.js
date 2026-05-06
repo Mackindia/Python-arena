@@ -1,5 +1,6 @@
 import HeroSection from "@/components/sections/HeroSection";
 import FeaturesSection from "@/components/sections/FeaturesSection";
+import IntelligenceChartSection from "@/components/sections/IntelligenceChartSection";
 import ChapterPreviewSection from "@/components/sections/ChapterPreviewSection";
 import AiSection from "@/components/sections/AiSection";
 import FooterSection from "@/components/sections/FooterSection";
@@ -14,6 +15,7 @@ export default function Home() {
         <HeroSection />
         <MarqueeBar />
         <FeaturesSection />
+        <IntelligenceChartSection />
         <ChapterPreviewSection />
         <AiSection />
         <FooterSection />

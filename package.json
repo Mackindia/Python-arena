@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "deploy": "vercel --prod --yes",
+    "preview:local": "npm run build && npm run start",
+    "deploy:preview": "vercel",
+    "release": "node scripts/release-confirm.js",
     "vercel:link": "vercel link"
   },
   "dependencies": {
