@@ -1,0 +1,11 @@
+{
+  "title": "Class 12 Python Placeholder Quiz",
+  "questions": [
+    {
+      "id": 1,
+      "question": "This is a placeholder question.",
+      "options": ["A", "B", "C", "D"],
+      "answer": "A"
+    }
+  ]
+}

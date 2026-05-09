@@ -1,0 +1,11 @@
+{
+  "title": "Class 6 AI Placeholder Quiz",
+  "questions": [
+    {
+      "id": 1,
+      "question": "AI can help with:",
+      "options": ["Homework planning", "Flying without power", "Stopping time", "None"],
+      "answer": "Homework planning"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "title": "Class 7 AI Placeholder Quiz",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Machine learning needs:",
+      "options": ["Magic", "Data", "Luck", "None"],
+      "answer": "Data"
+    }
+  ]
+}

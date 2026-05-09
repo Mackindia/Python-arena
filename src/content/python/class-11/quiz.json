@@ -1,0 +1,24 @@
+{
+  "title": "Class 11 Python Basics Quiz",
+  "chapter": "1-2",
+  "questions": [
+    {
+      "id": 1,
+      "question": "Which function is used to display output in Python?",
+      "options": ["echo()", "print()", "show()", "write()"],
+      "answer": "print()"
+    },
+    {
+      "id": 2,
+      "question": "Which of these is a string value?",
+      "options": ["42", "True", "\"Hello\"", "3.14"],
+      "answer": "\"Hello\""
+    },
+    {
+      "id": 3,
+      "question": "What is the type of 3.14 in Python?",
+      "options": ["int", "str", "float", "bool"],
+      "answer": "float"
+    }
+  ]
+}
