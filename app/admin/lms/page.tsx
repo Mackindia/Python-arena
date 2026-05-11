@@ -26,12 +26,27 @@ export default function AdminLmsPage() {
     loadData();
   }, []);
 
+  async function fetchWithTimeout(url: string, timeoutMs = 15000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      return await fetch(url, {
+        cache: "no-store",
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
   async function loadData() {
     try {
       setLoading(true);
+      setError("");
       const [subjectsRes, classesRes] = await Promise.all([
-        fetch("/api/lms/subjects"),
-        fetch("/api/lms/classes"),
+        fetchWithTimeout("/api/lms/subjects"),
+        fetchWithTimeout("/api/lms/classes"),
       ]);
 
       if (!subjectsRes.ok || !classesRes.ok) {
@@ -45,6 +60,11 @@ export default function AdminLmsPage() {
       setSubjects(subjectsData.subjects || []);
       setClasses(classesData.classes || []);
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        setError("Loading timed out. Please refresh the page.");
+        return;
+      }
+
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
