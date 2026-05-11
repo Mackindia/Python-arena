@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -30,6 +30,20 @@ export default function PDFViewer({
 }: PDFViewerProps) {
   const proxyUrl = `/api/pdf-view?url=${encodeURIComponent(pdfUrl)}`;
   const downloadPdfUrl = `/api/pdf-view?download=1&url=${encodeURIComponent(pdfUrl)}`;
+  const isIOSDevice = useMemo(() => {
+    if (typeof navigator === "undefined") {
+      return false;
+    }
+
+    const userAgent = navigator.userAgent || "";
+    const platform = navigator.platform || "";
+    const maxTouchPoints = navigator.maxTouchPoints || 0;
+
+    return (
+      /iPad|iPhone|iPod/i.test(userAgent) ||
+      (platform === "MacIntel" && maxTouchPoints > 1)
+    );
+  }, []);
 
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState(1);
@@ -214,8 +228,17 @@ export default function PDFViewer({
         </div>
       )}
 
+      {/* iOS Safari is more reliable with the browser's native PDF viewer. */}
+      {!hasError && isIOSDevice ? (
+        <iframe
+          title={title}
+          src={proxyUrl}
+          className="flex-1 w-full border-0 bg-white"
+        />
+      ) : null}
+
       {/* PDF canvas renderer via react-pdf — no iframes, no save/open popups */}
-      {!hasError && (
+      {!hasError && !isIOSDevice && (
         <div
           ref={scrollRef}
           className="flex-1 overflow-y-auto bg-slate-700 flex flex-col items-center py-4"
