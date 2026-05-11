@@ -1,5 +1,5 @@
 import Link from "next/link";
-import PDFViewerClient from "./PDFViewerClient";
+import { redirect } from "next/navigation";
 import { isValidHttpUrl } from "@/lib/pdf-source";
 
 type Props = {
@@ -33,19 +33,5 @@ export default async function PdfViewPage({ searchParams }: Props) {
     );
   }
 
-  return (
-    <main className="min-h-screen bg-slate-950 p-4 text-white sm:p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-4 text-lg font-semibold text-cyan-100 sm:text-xl">{title}</h1>
-        <PDFViewerClient
-          pdfUrl={pdfUrl}
-          title={title}
-          showDownloadButton
-          showFullscreenButton
-          height="82vh"
-          minHeight="520px"
-        />
-      </div>
-    </main>
-  );
+  redirect(`/api/pdf-view?url=${encodeURIComponent(pdfUrl)}`);
 }
