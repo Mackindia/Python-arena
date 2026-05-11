@@ -14,11 +14,11 @@ export default function CbsePdfCard({ title, description, thumbnailUrl, pdfUrl }
 
   const viewerUrl = hasValidPdfUrl
     ? `/pdf/view?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(title)}`
-    : pdfUrl;
+    : "";
 
   const downloadUrl = hasValidPdfUrl
     ? `/api/pdf-view?download=1&url=${encodeURIComponent(pdfUrl)}`
-    : pdfUrl;
+    : "";
 
   return (
     <div className="flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition hover:border-cyan-400/40 hover:shadow-cyan-900/20">
@@ -80,11 +80,8 @@ export default function CbsePdfCard({ title, description, thumbnailUrl, pdfUrl }
               View PDF
             </Link>
           ) : (
-            <a
-              href={viewerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-400"
+            <div className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-400"
+              aria-disabled="true"
             >
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -100,24 +97,39 @@ export default function CbsePdfCard({ title, description, thumbnailUrl, pdfUrl }
                   d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                 />
               </svg>
-              View PDF
-            </a>
+              PDF unavailable
+            </div>
           )}
-          <a
-            href={downloadUrl}
-            {...(!hasValidPdfUrl ? { download: `${title.replace(/\s+/g, "_")}.pdf` } : {})}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-400/40 bg-cyan-500/10 px-4 py-2 text-xs font-semibold text-cyan-300 transition hover:border-cyan-400/80 hover:bg-cyan-500/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-400"
-          >
-            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-              />
-            </svg>
-            Download
-          </a>
+          {hasValidPdfUrl ? (
+            <a
+              href={downloadUrl}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-400/40 bg-cyan-500/10 px-4 py-2 text-xs font-semibold text-cyan-300 transition hover:border-cyan-400/80 hover:bg-cyan-500/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-400"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              Download
+            </a>
+          ) : (
+            <div className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-xs font-semibold text-slate-500"
+              aria-disabled="true"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              Download unavailable
+            </div>
+          )}
         </div>
       </div>
     </div>
