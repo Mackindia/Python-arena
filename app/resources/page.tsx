@@ -1,4 +1,4 @@
-import PdfViewer from "@/src/components/resources/PdfViewer";
+import PdfViewerClient from "./PdfViewerClient";
 
 export default function ResourcesPage() {
   return (
@@ -25,7 +25,7 @@ export default function ResourcesPage() {
 
           <section>
             <h2 className="mb-3 text-lg font-semibold">Document Viewer</h2>
-            <PdfViewer fileUrl="https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf" />
+            <PdfViewerClient fileUrl="https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf" />
           </section>
         </div>
       </div>
