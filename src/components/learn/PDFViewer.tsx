@@ -255,6 +255,18 @@ export default function PDFViewer({
 
         {/* Action buttons */}
         <div className="flex items-center gap-2">
+          <a
+            href={proxyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open PDF directly"
+            aria-label="Open PDF directly"
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-cyan-400"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h4m0 0v4m0-4l-5 5m-5-1v6a1 1 0 001 1h6" />
+            </svg>
+          </a>
           {showDownloadButton && (
             <button
               type="button"
