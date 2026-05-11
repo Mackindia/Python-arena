@@ -4,6 +4,8 @@ import Course from "@/models/Course";
 import Quiz from "@/models/Quiz";
 import QuizResult from "@/models/QuizResult";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminAnalyticsPage() {
   await connectDB();
 

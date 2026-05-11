@@ -9,6 +9,8 @@ import Resource from "@/models/Resource";
 import AdminStatCard from "@/src/components/admin/AdminStatCard";
 import AdminSectionPanel from "@/src/components/admin/AdminSectionPanel";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminPage() {
   let userCount = 0;
   let courseCount = 0;

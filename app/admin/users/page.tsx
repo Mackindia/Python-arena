@@ -1,6 +1,8 @@
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminUsersPage() {
   await connectDB();
   const users = await User.find().sort({ createdAt: -1 }).limit(40).lean();
