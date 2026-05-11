@@ -1,8 +1,9 @@
+import mongoose from "mongoose";
 import { connectDB } from "@/lib/mongodb";
 import Subject from "@/models/lms/Subject";
 import ClassModel from "@/models/lms/Class";
 import LessonModel from "@/models/lms/Lesson";
-import LessonBookmarkModel from "@/models/lms/LessonBookmark";
+import LessonBookmarkModel, { type LessonBookmarkDocument } from "@/models/lms/LessonBookmark";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -28,6 +29,45 @@ export type GetBookmarksResult = {
   total: number;
 };
 
+type BookmarkLookup = {
+  userId: string;
+  lesson?: mongoose.Types.ObjectId | string;
+};
+
+type BookmarkCreateInput = Omit<LessonBookmarkDocument, "_id">;
+
+type ResolvedSubjectData = {
+  _id: mongoose.Types.ObjectId | string;
+  slug?: string;
+  name?: string;
+};
+
+type ResolvedClassData = {
+  _id: mongoose.Types.ObjectId | string;
+  slug?: string;
+  name?: string;
+};
+
+type ResolvedLessonData = {
+  _id: mongoose.Types.ObjectId | string;
+  slug?: string;
+  title?: string;
+  description?: string;
+  thumbnail?: string;
+  thumbnailUrl?: string;
+};
+
+type BookmarkLeanDoc = {
+  _id?: unknown;
+  lessonSlug?: string;
+  subjectSlug?: string;
+  classSlug?: string;
+  lessonTitle?: string;
+  lessonThumbnail?: string;
+  lessonDescription?: string;
+  createdAt?: Date | string;
+};
+
 // ─── Internal helpers ─────────────────────────────────────────────────────────
 
 async function resolveLesson(subjectSlug: string, classSlug: string, lessonSlug: string) {
@@ -38,22 +78,28 @@ async function resolveLesson(subjectSlug: string, classSlug: string, lessonSlug:
     .lean();
   if (!subject?._id) throw new Error("Subject not found");
 
-  const classRecord = await ClassModel.findOne({ slug: classSlug, subject: subject._id })
+  const subjectData = subject as ResolvedSubjectData;
+
+  const classRecord = await ClassModel.findOne({ slug: classSlug, subject: subjectData._id })
     .select("_id slug name")
     .lean();
   if (!classRecord?._id) throw new Error("Class not found");
 
+  const classData = classRecord as ResolvedClassData;
+
   const lesson = await LessonModel.findOne({
     slug: lessonSlug,
-    subject: subject._id,
-    class: classRecord._id,
+    subject: subjectData._id,
+    class: classData._id,
     published: true,
   })
     .select("_id slug title description thumbnail thumbnailUrl")
     .lean();
   if (!lesson?._id) throw new Error("Lesson not found");
 
-  return { subject, classRecord, lesson };
+  const lessonData = lesson as ResolvedLessonData;
+
+  return { subject: subjectData, classRecord: classData, lesson: lessonData };
 }
 
 // ─── Service functions ────────────────────────────────────────────────────────
@@ -72,7 +118,7 @@ export async function toggleLessonBookmark(
   const existing = await LessonBookmarkModel.findOne({
     userId,
     lesson: lesson._id,
-  }).lean();
+  } as BookmarkLookup).lean();
 
   if (existing) {
     await LessonBookmarkModel.deleteOne({ _id: existing._id });
@@ -90,7 +136,7 @@ export async function toggleLessonBookmark(
     lessonTitle: lesson.title ?? "",
     lessonThumbnail: (lesson.thumbnail || lesson.thumbnailUrl) ?? "",
     lessonDescription: lesson.description ?? "",
-  });
+  } as BookmarkCreateInput);
 
   return { bookmarked: true, message: "Lesson saved" };
 }
@@ -123,7 +169,7 @@ export async function isLessonBookmarked(
     .lean();
   if (!lesson?._id) return false;
 
-  const count = await LessonBookmarkModel.countDocuments({ userId, lesson: lesson._id });
+  const count = await LessonBookmarkModel.countDocuments({ userId, lesson: lesson._id } as BookmarkLookup);
   return count > 0;
 }
 
@@ -142,28 +188,35 @@ export async function getUserBookmarks(
   const skip = (safePage - 1) * safeLimit;
 
   const [docs, total] = await Promise.all([
-    LessonBookmarkModel.find({ userId })
+    LessonBookmarkModel.find({ userId } as BookmarkLookup)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(safeLimit)
       .select("lessonSlug subjectSlug classSlug lessonTitle lessonThumbnail lessonDescription createdAt")
       .lean(),
-    LessonBookmarkModel.countDocuments({ userId }),
+    LessonBookmarkModel.countDocuments({ userId } as BookmarkLookup),
   ]);
 
-  const bookmarks: BookmarkedLesson[] = docs.map((doc) => ({
-    id: String(doc._id),
-    lessonSlug: doc.lessonSlug,
-    subjectSlug: doc.subjectSlug,
-    classSlug: doc.classSlug,
-    lessonTitle: doc.lessonTitle,
-    lessonThumbnail: doc.lessonThumbnail,
-    lessonDescription: doc.lessonDescription,
-    href: `/lms/${doc.subjectSlug}/${doc.classSlug}/${doc.lessonSlug}`,
-    savedAt: doc.createdAt instanceof Date
-      ? doc.createdAt.toISOString()
-      : String(doc.createdAt),
-  }));
+  const bookmarks: BookmarkedLesson[] = docs.map((doc) => {
+    const bookmark = doc as BookmarkLeanDoc;
+    const lessonSlug = bookmark.lessonSlug || "";
+    const subjectSlug = bookmark.subjectSlug || "";
+    const classSlug = bookmark.classSlug || "";
+
+    return {
+      id: String(bookmark._id),
+      lessonSlug,
+      subjectSlug,
+      classSlug,
+      lessonTitle: bookmark.lessonTitle || "",
+      lessonThumbnail: bookmark.lessonThumbnail || "",
+      lessonDescription: bookmark.lessonDescription || "",
+      href: `/lms/${subjectSlug}/${classSlug}/${lessonSlug}`,
+      savedAt: bookmark.createdAt instanceof Date
+        ? bookmark.createdAt.toISOString()
+        : String(bookmark.createdAt || ""),
+    };
+  });
 
   return { bookmarks, total };
 }

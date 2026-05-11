@@ -31,7 +31,7 @@ export function Example1_DashboardPage() {
 "use client";
 
 import { useState } from "react";
-import { PDFViewer } from "@/src/components/learn/PDFViewer";
+import PDFViewer from "@/src/components/learn/PDFViewer";
 import { LessonProgressTracker } from "@/src/components/learn/LessonProgressTracker";
 import { LessonNavigationSidebar } from "@/src/components/learn/LessonNavigationSidebar";
 

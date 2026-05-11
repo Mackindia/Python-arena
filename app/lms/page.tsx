@@ -25,7 +25,19 @@ async function getAllSubjectsState(): Promise<LmsSubjectsState> {
       .lean();
 
     return {
-      subjects,
+      subjects: subjects.map((item) => {
+        const subject = item as {
+          slug?: string;
+          name?: string;
+          description?: string;
+        };
+
+        return {
+          slug: subject.slug || "",
+          name: subject.name || "",
+          description: subject.description || "",
+        };
+      }),
       dataError: "",
     };
   } catch (error) {
@@ -58,12 +70,7 @@ export default async function LmsPage() {
           </p>
         </header>
 
-        <LessonSearchSection
-          subjects={subjects.map((subject) => ({
-            slug: subject.slug,
-            name: subject.name,
-          }))}
-        />
+        <LessonSearchSection />
 
         {dataError ? (
           <div className="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100">

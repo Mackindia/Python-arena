@@ -4,6 +4,15 @@ import ClassModel from "@/models/lms/Class";
 import LessonModel from "@/models/lms/Lesson";
 import LmsQuizAttemptModel from "@/models/lms/QuizAttempt";
 
+type QuizAttemptLeanData = {
+  _id: unknown;
+  score?: number;
+  total?: number;
+  accuracy?: number;
+  passed?: boolean;
+  createdAt?: Date | string;
+};
+
 export type QuizAttemptSummary = {
   id: string;
   score: number;
@@ -51,12 +60,15 @@ export async function getLessonQuizAttempts(
     .select("score total accuracy passed createdAt")
     .lean();
 
-  return attempts.map((a) => ({
-    id: String(a._id),
-    score: a.score,
-    total: a.total,
-    accuracy: a.accuracy,
-    passed: a.passed ?? false,
-    createdAt: a.createdAt instanceof Date ? a.createdAt.toISOString() : String(a.createdAt),
+  return (attempts as QuizAttemptLeanData[]).map((attempt) => ({
+    id: String(attempt._id),
+    score: attempt.score ?? 0,
+    total: attempt.total ?? 0,
+    accuracy: attempt.accuracy ?? 0,
+    passed: attempt.passed ?? false,
+    createdAt:
+      attempt.createdAt instanceof Date
+        ? attempt.createdAt.toISOString()
+        : String(attempt.createdAt ?? ""),
   }));
 }

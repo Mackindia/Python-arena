@@ -1,9 +1,41 @@
 import { connectDB } from "@/lib/mongodb";
+import mongoose from "mongoose";
 import User from "@/models/User";
 import Subject from "@/models/lms/Subject";
 import ClassModel from "@/models/lms/Class";
 import LessonModel from "@/models/lms/Lesson";
 import LessonProgressModel from "@/models/lms/LessonProgress";
+
+type SubjectLeanData = {
+  _id: mongoose.Types.ObjectId | string;
+  slug?: string;
+  name?: string;
+  description?: string;
+};
+
+type ClassLeanData = {
+  _id: mongoose.Types.ObjectId | string;
+  slug?: string;
+  name?: string;
+  subject?: mongoose.Types.ObjectId | string;
+};
+
+type LessonLeanData = {
+  _id: mongoose.Types.ObjectId | string;
+  slug?: string;
+  title?: string;
+};
+
+type ProgressLeanData = {
+  lesson?: mongoose.Types.ObjectId | string;
+  completed?: boolean;
+  completedAt?: Date | null;
+  lastViewedAt?: Date | null;
+};
+
+type LastActivityLeanData = {
+  lastViewedAt?: Date | null;
+};
 
 // ============================================================================
 // Enhanced Progress Types & Utilities
@@ -85,7 +117,9 @@ export async function getClassProgress(
     throw new Error("Class not found");
   }
 
-  const subject = await Subject.findOne({ _id: classRecord.subject })
+  const classData = classRecord as ClassLeanData;
+
+  const subject = await Subject.findOne({ _id: classData.subject })
     .select("_id slug name")
     .lean();
 
@@ -93,8 +127,10 @@ export async function getClassProgress(
     throw new Error("Subject not found");
   }
 
+  const subjectData = subject as SubjectLeanData;
+
   const lessons = await LessonModel.find({
-    class: classRecord._id,
+    class: classData._id,
     published: true,
   })
     .select("_id slug title")
@@ -103,21 +139,26 @@ export async function getClassProgress(
 
   const progressRecords = await LessonProgressModel.find({
     userId,
-    class: classRecord._id,
+    class: classData._id,
   })
     .select("lesson completed completedAt lastViewedAt")
     .lean();
 
+  const progressItems = progressRecords as ProgressLeanData[];
+
   const progressMap = new Map(
-    progressRecords.map((p) => [String(p.lesson), p])
+    progressItems.map((progress) => {
+      return [String(progress.lesson), progress];
+    })
   );
 
   const lessonProgresses = lessons.map((lesson) => {
-    const progress = progressMap.get(String(lesson._id));
+    const lessonData = lesson as LessonLeanData;
+    const progress = progressMap.get(String(lessonData._id));
     return {
-      lessonId: String(lesson._id),
-      lessonSlug: lesson.slug,
-      lessonTitle: lesson.title,
+      lessonId: String(lessonData._id),
+      lessonSlug: lessonData.slug || "",
+      lessonTitle: lessonData.title || "",
       completed: progress?.completed ?? false,
       completedAt: progress?.completedAt?.toISOString() ?? null,
       lastViewedAt: progress?.lastViewedAt?.toISOString() ?? null,
@@ -126,16 +167,16 @@ export async function getClassProgress(
   });
 
   const completedCount = lessonProgresses.filter((l) => l.completed).length;
-  const lastActivity = progressRecords
+  const lastActivity = progressItems
     .filter((p) => p.lastViewedAt)
     .sort((a, b) => (b.lastViewedAt?.getTime() || 0) - (a.lastViewedAt?.getTime() || 0))[0];
 
   return {
-    classId: String(classRecord._id),
-    classSlug: classRecord.slug,
-    className: classRecord.name,
-    subjectId: String(subject._id),
-    subjectSlug: subject.slug,
+    classId: String(classData._id),
+    classSlug: classData.slug || "",
+    className: classData.name || "",
+    subjectId: String(subjectData._id),
+    subjectSlug: subjectData.slug || "",
     completedLessons: completedCount,
     totalLessons: lessons.length,
     percentage:
@@ -163,13 +204,16 @@ export async function getSubjectProgress(
     throw new Error("Subject not found");
   }
 
-  const classes = await ClassModel.find({ subject: subject._id })
+  const subjectData = subject as SubjectLeanData;
+
+  const classes = await ClassModel.find({ subject: subjectData._id })
     .select("_id slug name")
     .lean();
 
   const classProgresses = await Promise.all(
     classes.map(async (cls) => {
-      const progress = await getClassProgress(userId, cls.slug);
+      const classData = cls as ClassLeanData;
+      const progress = await getClassProgress(userId, classData.slug || "");
       return {
         classId: progress.classId,
         classSlug: progress.classSlug,
@@ -180,7 +224,7 @@ export async function getSubjectProgress(
   );
 
   const lessons = await LessonModel.find({
-    subject: subject._id,
+    subject: subjectData._id,
     published: true,
   })
     .select("_id")
@@ -188,22 +232,24 @@ export async function getSubjectProgress(
 
   const completed = await LessonProgressModel.countDocuments({
     userId,
-    subject: subject._id,
+    subject: subjectData._id,
     completed: true,
   });
 
-  const lastActivity = await LessonProgressModel.findOne({
+  const lastActivityRecord = await LessonProgressModel.findOne({
     userId,
-    subject: subject._id,
+    subject: subjectData._id,
   })
     .sort({ lastViewedAt: -1 })
     .select("lastViewedAt")
     .lean();
 
+  const lastActivity = lastActivityRecord as LastActivityLeanData | null;
+
   return {
-    subjectId: String(subject._id),
-    subjectSlug: subject.slug,
-    subjectName: subject.name,
+    subjectId: String(subjectData._id),
+    subjectSlug: subjectData.slug || "",
+    subjectName: subjectData.name || "",
     completedLessons: completed,
     totalLessons: lessons.length,
     percentage:
@@ -240,13 +286,18 @@ export async function getUserProgressDashboard(
   const totalLessons = await LessonModel.countDocuments({ published: true });
 
   const subjectProgresses = await Promise.all(
-    subjects.map((subject) => getSubjectProgress(userId, subject.slug))
+    subjects.map((subject) => {
+      const subjectData = subject as SubjectLeanData;
+      return getSubjectProgress(userId, subjectData.slug || "");
+    })
   );
 
-  const lastActivity = await LessonProgressModel.findOne({ userId })
+  const lastActivityRecord = await LessonProgressModel.findOne({ userId })
     .sort({ lastViewedAt: -1 })
     .select("lastViewedAt")
     .lean();
+
+  const lastActivity = lastActivityRecord as LastActivityLeanData | null;
 
   // Calculate streak (simple: check if active in last 7 days)
   const sevenDaysAgo = new Date();
@@ -296,7 +347,8 @@ export async function getUserProgressDashboard(
 export async function getProgressAnalytics(userId: string) {
   await connectDB();
 
-  const allProgress = await LessonProgressModel.find({ userId }).lean();
+  const allProgressRecords = await LessonProgressModel.find({ userId }).lean();
+  const allProgress = allProgressRecords as ProgressLeanData[];
   const completedProgress = allProgress.filter((p) => p.completed);
 
   // Group by date

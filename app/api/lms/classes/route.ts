@@ -27,12 +27,21 @@ export async function GET(request: NextRequest) {
       .lean();
 
     return NextResponse.json({
-      classes: classes.map((item) => ({
-        _id: String(item._id),
-        slug: item.slug,
-        name: item.name,
-        subject: String(item.subject),
-      })),
+      classes: classes.map((item) => {
+        const classItem = item as {
+          _id?: unknown;
+          slug?: string;
+          name?: string;
+          subject?: unknown;
+        };
+
+        return {
+          _id: String(classItem._id),
+          slug: classItem.slug || "",
+          name: classItem.name || "",
+          subject: String(classItem.subject || ""),
+        };
+      }),
     });
   } catch (error) {
     return NextResponse.json(

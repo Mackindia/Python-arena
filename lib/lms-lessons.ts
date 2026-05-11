@@ -19,6 +19,17 @@ export type LessonCreationInput = {
   createdBy: string;
 };
 
+type SubjectRefRecord = {
+  _id: mongoose.Types.ObjectId | string;
+  slug?: string;
+};
+
+type ClassRefRecord = {
+  _id: mongoose.Types.ObjectId | string;
+  slug?: string;
+  subject?: mongoose.Types.ObjectId | string;
+};
+
 function toSlug(value: string) {
   return value
     .toLowerCase()
@@ -113,14 +124,18 @@ export async function createLmsLesson(input: LessonCreationInput) {
     throw new Error("Subject not found");
   }
 
-  const classRecord = await resolveClassRef(input.class, String(subjectRecord._id));
+  const resolvedSubject = subjectRecord as SubjectRefRecord;
+
+  const classRecord = await resolveClassRef(input.class, String(resolvedSubject._id));
 
   if (!classRecord) {
     throw new Error("Class not found");
   }
 
-  const classSubjectId = String(classRecord.subject);
-  if (classSubjectId !== String(subjectRecord._id)) {
+  const resolvedClass = classRecord as ClassRefRecord;
+
+  const classSubjectId = String(resolvedClass.subject || "");
+  if (classSubjectId !== String(resolvedSubject._id)) {
     throw new Error("Selected class does not belong to the selected subject");
   }
 
@@ -133,11 +148,11 @@ export async function createLmsLesson(input: LessonCreationInput) {
   const extractedContent = pdfProcessing.ok ? pdfProcessing.extractedText : "";
   const finalContent = input.content?.trim() || extractedContent;
 
-  const lesson = await LessonModel.create({
+  const lesson = await (LessonModel as mongoose.Model<unknown>).create({
     title: input.title.trim(),
     slug,
-    subject: String(subjectRecord._id),
-    class: String(classRecord._id),
+    subject: String(resolvedSubject._id),
+    class: String(resolvedClass._id),
     description: input.description.trim(),
     content: finalContent,
     pdfUrl: input.pdfUrl.trim(),

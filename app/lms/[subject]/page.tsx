@@ -9,6 +9,18 @@ type Params = {
   subject: string;
 };
 
+type SubjectOverviewData = {
+  _id: unknown;
+  name?: string;
+  slug?: string;
+  description?: string;
+};
+
+type SubjectClassData = {
+  slug?: string;
+  name?: string;
+};
+
 async function getSubjectData(subjectSlug: string) {
   await connectDB();
 
@@ -18,14 +30,22 @@ async function getSubjectData(subjectSlug: string) {
     return null;
   }
 
-  const classes = await ClassModel.find({ subject: subject._id })
+  const subjectRecord = subject as SubjectOverviewData;
+
+  const classes = await ClassModel.find({ subject: subjectRecord._id })
     .select("slug name")
     .sort({ name: 1 })
     .lean();
 
   return {
-    subject,
-    classes,
+    subject: subjectRecord,
+    classes: classes.map((item) => {
+      const classRecord = item as SubjectClassData;
+      return {
+        slug: classRecord.slug || "",
+        name: classRecord.name || "",
+      };
+    }),
   };
 }
 
@@ -41,10 +61,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   return {
-    title: `${subjectData.subject.name} | Python Arena LMS`,
+    title: `${subjectData.subject.name || "Subject"} | Python Arena LMS`,
     description:
       subjectData.subject.description ||
-      `Explore ${subjectData.subject.name} classes and lessons in Python Arena LMS.`,
+      `Explore ${subjectData.subject.name || "this subject"} classes and lessons in Python Arena LMS.`,
     alternates: {
       canonical: `/lms/${subject}`,
     },
@@ -62,8 +82,8 @@ export default async function SubjectOverviewPage({ params }: { params: Promise<
   return (
     <SubjectOverviewLayout
       subject={{
-        name: subjectData.subject.name,
-        slug: subjectData.subject.slug,
+        name: subjectData.subject.name || "",
+        slug: subjectData.subject.slug || "",
         description: subjectData.subject.description || "",
       }}
       classes={subjectData.classes}

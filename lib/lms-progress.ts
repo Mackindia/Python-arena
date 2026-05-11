@@ -5,6 +5,30 @@ import ClassModel from "@/models/lms/Class";
 import LessonModel from "@/models/lms/Lesson";
 import LessonProgressModel from "@/models/lms/LessonProgress";
 
+type SubjectLeanData = {
+  _id: unknown;
+  slug?: string;
+  name?: string;
+};
+
+type ClassLeanData = {
+  _id: unknown;
+  slug?: string;
+  name?: string;
+  subject?: unknown;
+};
+
+type LessonLeanData = {
+  _id: unknown;
+  slug?: string;
+  title?: string;
+};
+
+type ProgressLeanData = {
+  _id?: unknown;
+  completedAt?: Date | null;
+};
+
 export type CompletionItem = {
   id: string;
   slug: string;
@@ -65,15 +89,16 @@ export async function getUserProgressSummary(userId: string): Promise<ProgressSu
   const completedBySubject = new Map(completedBySubjectRaw.map((row) => [String(row._id), Number(row.completed || 0)]));
 
   const byClass: CompletionItem[] = classes
-    .map((classItem) => {
+    .map((item) => {
+      const classItem = item as ClassLeanData;
       const id = String(classItem._id);
       const totalLessons = totalsByClass.get(id) || 0;
       const completedLessons = completedByClass.get(id) || 0;
 
       return {
         id,
-        slug: classItem.slug,
-        name: classItem.name,
+        slug: classItem.slug || "",
+        name: classItem.name || "",
         completedLessons,
         totalLessons,
         percent: toPercent(completedLessons, totalLessons),
@@ -83,15 +108,16 @@ export async function getUserProgressSummary(userId: string): Promise<ProgressSu
     .sort((a, b) => b.percent - a.percent || a.name.localeCompare(b.name));
 
   const bySubject: CompletionItem[] = subjects
-    .map((subjectItem) => {
+    .map((item) => {
+      const subjectItem = item as SubjectLeanData;
       const id = String(subjectItem._id);
       const totalLessons = totalsBySubject.get(id) || 0;
       const completedLessons = completedBySubject.get(id) || 0;
 
       return {
         id,
-        slug: subjectItem.slug,
-        name: subjectItem.name,
+        slug: subjectItem.slug || "",
+        name: subjectItem.name || "",
         completedLessons,
         totalLessons,
         percent: toPercent(completedLessons, totalLessons),
@@ -124,18 +150,22 @@ export async function markLessonCompleted(input: CompleteLessonInput) {
     throw new Error("Subject not found");
   }
 
+  const subjectData = subject as SubjectLeanData;
+
   if (!classRecord?._id) {
     throw new Error("Class not found");
   }
 
-  if (String(classRecord.subject) !== String(subject._id)) {
+  const classData = classRecord as ClassLeanData;
+
+  if (String(classData.subject) !== String(subjectData._id)) {
     throw new Error("Class does not belong to subject");
   }
 
   const lesson = await LessonModel.findOne({
     slug: input.lessonSlug,
-    class: classRecord._id,
-    subject: subject._id,
+    class: classData._id,
+    subject: subjectData._id,
     published: true,
   })
     .select("_id title slug")
@@ -145,19 +175,21 @@ export async function markLessonCompleted(input: CompleteLessonInput) {
     throw new Error("Lesson not found");
   }
 
+  const lessonData = lesson as LessonLeanData;
+
   const now = new Date();
 
   await LessonProgressModel.updateOne(
     {
       userId: input.userId,
-      lesson: String(lesson._id),
+      lesson: String(lessonData._id),
     },
     {
       $set: {
         userId: input.userId,
-        lesson: String(lesson._id),
-        subject: String(subject._id),
-        class: String(classRecord._id),
+        lesson: String(lessonData._id),
+        subject: String(subjectData._id),
+        class: String(classData._id),
         completed: true,
         completedAt: now,
         lastViewedAt: now,
@@ -170,11 +202,11 @@ export async function markLessonCompleted(input: CompleteLessonInput) {
     { clerkId: input.userId },
     {
       $addToSet: {
-        completedLessons: lesson.title,
+        completedLessons: lessonData.title,
       },
       $push: {
         recentLessons: {
-          $each: [lesson.title],
+          $each: [lessonData.title],
           $slice: -20,
         },
       },
@@ -194,9 +226,9 @@ export async function markLessonCompleted(input: CompleteLessonInput) {
 
   return {
     lesson: {
-      id: String(lesson._id),
-      slug: lesson.slug,
-      title: lesson.title,
+      id: String(lessonData._id),
+      slug: lessonData.slug || "",
+      title: lessonData.title || "",
     },
     progressSummary,
   };
@@ -233,8 +265,10 @@ export async function getLessonCompletionState(
     .select("_id completed completedAt")
     .lean();
 
+  const progressData = progress as ProgressLeanData | null;
+
   return {
-    completed: Boolean(progress?._id),
-    completedAt: progress?.completedAt ?? null,
+    completed: Boolean(progressData?._id),
+    completedAt: progressData?.completedAt ?? null,
   };
 }

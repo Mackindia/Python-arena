@@ -14,11 +14,19 @@ export async function GET() {
       .lean();
 
     return NextResponse.json({
-      subjects: subjects.map((subject) => ({
-        _id: String(subject._id),
-        slug: subject.slug,
-        name: subject.name,
-      })),
+      subjects: subjects.map((subject) => {
+        const subjectItem = subject as {
+          _id?: unknown;
+          slug?: string;
+          name?: string;
+        };
+
+        return {
+          _id: String(subjectItem._id),
+          slug: subjectItem.slug || "",
+          name: subjectItem.name || "",
+        };
+      }),
     });
   } catch (error) {
     return NextResponse.json(

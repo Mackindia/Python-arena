@@ -126,37 +126,49 @@ export async function searchLmsLessons(params: SearchParams): Promise<LessonSear
       .lean(),
   ]);
 
-  const items: LessonSearchItem[] = lessons
-    .map((lesson) => {
-      const subjectDoc = lesson.subject as { _id?: string; name?: string; slug?: string } | null;
-      const classDoc = lesson.class as { _id?: string; name?: string; slug?: string } | null;
+  const items: LessonSearchItem[] = [];
 
-      if (!subjectDoc?._id || !classDoc?._id || !lesson.slug) {
-        return null;
-      }
+  for (const lesson of lessons) {
+    const lessonData = lesson as {
+      _id?: unknown;
+      title?: string;
+      slug?: string;
+      description?: string;
+      thumbnail?: string;
+      pdfUrl?: string;
+      createdAt?: Date;
+      subject?: { _id?: string; name?: string; slug?: string } | null;
+      class?: { _id?: string; name?: string; slug?: string } | null;
+    };
 
-      return {
-        id: String(lesson._id),
-        title: lesson.title || "Untitled lesson",
-        slug: lesson.slug,
-        description: lesson.description || "",
-        subject: {
-          id: String(subjectDoc._id),
-          name: subjectDoc.name || "Unknown subject",
-          slug: subjectDoc.slug || "",
-        },
-        class: {
-          id: String(classDoc._id),
-          name: classDoc.name || "Unknown class",
-          slug: classDoc.slug || "",
-        },
-        thumbnail: lesson.thumbnail || "",
-        pdfUrl: lesson.pdfUrl || "",
-        href: `/lms/${subjectDoc.slug}/${classDoc.slug}/${lesson.slug}`,
-        createdAt: lesson.createdAt,
-      };
-    })
-    .filter((item): item is LessonSearchItem => item !== null);
+    const subjectDoc = lessonData.subject;
+    const classDoc = lessonData.class;
+
+    if (!subjectDoc?._id || !classDoc?._id || !lessonData.slug) {
+      continue;
+    }
+
+    items.push({
+      id: String(lessonData._id),
+      title: lessonData.title || "Untitled lesson",
+      slug: lessonData.slug,
+      description: lessonData.description || "",
+      subject: {
+        id: String(subjectDoc._id),
+        name: subjectDoc.name || "Unknown subject",
+        slug: subjectDoc.slug || "",
+      },
+      class: {
+        id: String(classDoc._id),
+        name: classDoc.name || "Unknown class",
+        slug: classDoc.slug || "",
+      },
+      thumbnail: lessonData.thumbnail || "",
+      pdfUrl: lessonData.pdfUrl || "",
+      href: `/lms/${subjectDoc.slug || ""}/${classDoc.slug || ""}/${lessonData.slug}`,
+      createdAt: lessonData.createdAt,
+    });
+  }
 
   return {
     items,

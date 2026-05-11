@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import mongoose from "mongoose";
 import { connectDB } from "@/lib/mongodb";
 import { currentUser } from "@clerk/nextjs/server";
 import { getLessonCompletionState } from "@/lib/lms-progress";
@@ -18,6 +19,17 @@ type Params = {
 type LessonNav = {
   slug: string;
   title: string;
+};
+
+type LessonPageData = {
+  _id: mongoose.Types.ObjectId | string;
+  title?: string;
+  slug?: string;
+  description?: string;
+  content?: string;
+  pdfUrl?: string;
+  thumbnail?: string;
+  thumbnailUrl?: string;
 };
 
 async function getCurrentUserSafe() {
@@ -52,10 +64,12 @@ async function getLmsLessonData(subjectSlug: string, classSlug: string, lessonSl
     return null;
   }
 
+  const lessonData = lesson as LessonPageData;
+
   // Backfill extracted text for older lessons that were uploaded before extraction was stable.
-  if (!lesson.content?.trim() && lesson.pdfUrl) {
+  if (!lessonData.content?.trim() && lessonData.pdfUrl) {
     const extraction = await processLessonPdfContent({
-      pdfUrl: lesson.pdfUrl,
+      pdfUrl: lessonData.pdfUrl,
       maxFetchBytes: 50 * 1024 * 1024,
       fetchTimeoutMs: 30_000,
     });
@@ -64,7 +78,7 @@ async function getLmsLessonData(subjectSlug: string, classSlug: string, lessonSl
       const extractedText = extraction.extractedText.trim();
 
       await LessonModel.updateOne(
-        { _id: lesson._id },
+        { _id: lessonData._id },
         {
           $set: {
             content: extractedText,
@@ -80,7 +94,7 @@ async function getLmsLessonData(subjectSlug: string, classSlug: string, lessonSl
         },
       );
 
-      lesson.content = extractedText;
+      lessonData.content = extractedText;
     }
   }
 
@@ -89,12 +103,12 @@ async function getLmsLessonData(subjectSlug: string, classSlug: string, lessonSl
     .select("slug title")
     .lean<Array<LessonNav>>();
 
-  const currentIndex = lessonSequence.findIndex((item) => item.slug === lesson.slug);
+  const currentIndex = lessonSequence.findIndex((item) => item.slug === lessonData.slug);
   const previousLesson = currentIndex > 0 ? lessonSequence[currentIndex - 1] : null;
   const nextLesson = currentIndex >= 0 && currentIndex < lessonSequence.length - 1 ? lessonSequence[currentIndex + 1] : null;
 
   return {
-    lesson,
+    lesson: lessonData,
     previousLesson,
     nextLesson,
   };
@@ -143,10 +157,10 @@ export default async function LmsLessonViewerPage({ params }: { params: Promise<
       classSlug={classSlug}
       lessonSlug={lesson}
       lesson={{
-        title: lessonData.lesson.title,
+        title: lessonData.lesson.title || "Untitled lesson",
         description: lessonData.lesson.description || "No description available for this lesson yet.",
         content: lessonData.lesson.content || "",
-        pdfUrl: lessonData.lesson.pdfUrl,
+        pdfUrl: lessonData.lesson.pdfUrl || "",
         thumbnail: lessonData.lesson.thumbnailUrl || lessonData.lesson.thumbnail || "",
       }}
       completionState={{

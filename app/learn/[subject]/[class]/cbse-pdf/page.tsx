@@ -39,13 +39,24 @@ async function fetchPdfLessons(subject: string, classSlug: string) {
       .sort({ createdAt: 1 })
       .lean();
 
-    return lessons.map((l) => ({
-      title: l.title,
-      slug: l.slug,
-      description: l.description ?? "",
-      pdfUrl: l.pdfUrl ?? "",
-      thumbnailUrl: (l.thumbnailUrl || l.thumbnail) ?? "",
-    }));
+    return lessons.map((l) => {
+      const lesson = l as {
+        title?: string;
+        slug?: string;
+        description?: string;
+        pdfUrl?: string;
+        thumbnailUrl?: string;
+        thumbnail?: string;
+      };
+
+      return {
+        title: lesson.title || "",
+        slug: lesson.slug || "",
+        description: lesson.description ?? "",
+        pdfUrl: lesson.pdfUrl ?? "",
+        thumbnailUrl: (lesson.thumbnailUrl || lesson.thumbnail) ?? "",
+      };
+    });
   } catch (error) {
     console.error("[cbse-pdf page]", error);
     return [];

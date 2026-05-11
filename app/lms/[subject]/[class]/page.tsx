@@ -11,6 +11,28 @@ type Params = {
   class: string;
 };
 
+type SubjectPageData = {
+  _id: unknown;
+  slug?: string;
+  name?: string;
+};
+
+type ClassPageData = {
+  _id: unknown;
+  slug?: string;
+  name?: string;
+  subject?: unknown;
+};
+
+type LessonCardData = {
+  slug?: string;
+  title?: string;
+  description?: string;
+  thumbnail?: string;
+  thumbnailUrl?: string;
+  published?: boolean;
+};
+
 async function getClassLessonsData(subjectSlug: string, classSlug: string) {
   await connectDB();
 
@@ -20,7 +42,9 @@ async function getClassLessonsData(subjectSlug: string, classSlug: string) {
     return null;
   }
 
-  const classRecord = await ClassModel.findOne({ slug: classSlug, subject: subject._id })
+  const subjectData = subject as SubjectPageData;
+
+  const classRecord = await ClassModel.findOne({ slug: classSlug, subject: subjectData._id })
     .select("_id slug name subject")
     .lean();
 
@@ -28,27 +52,33 @@ async function getClassLessonsData(subjectSlug: string, classSlug: string) {
     return null;
   }
 
-  const lessons = await LessonModel.find({ class: classRecord._id, published: true })
+  const classData = classRecord as ClassPageData;
+
+  const lessons = await LessonModel.find({ class: classData._id, published: true })
     .select("slug title description thumbnail thumbnailUrl published createdAt")
     .sort({ createdAt: 1 })
     .lean();
 
   return {
     subject: {
-      name: subject.name,
-      slug: subject.slug,
+      name: subjectData.name || "",
+      slug: subjectData.slug || "",
     },
     class: {
-      name: classRecord.name,
-      slug: classRecord.slug,
+      name: classData.name || "",
+      slug: classData.slug || "",
     },
-    lessons: lessons.map((lesson) => ({
-      slug: lesson.slug,
-      title: lesson.title,
-      description: lesson.description || "",
-      thumbnail: (lesson.thumbnailUrl as string | undefined) || (lesson.thumbnail as string | undefined) || "",
-      published: lesson.published || false,
-    })),
+    lessons: lessons.map((lesson) => {
+      const lessonData = lesson as LessonCardData;
+
+      return {
+        slug: lessonData.slug || "",
+        title: lessonData.title || "",
+        description: lessonData.description || "",
+        thumbnail: lessonData.thumbnailUrl || lessonData.thumbnail || "",
+        published: lessonData.published || false,
+      };
+    }),
   };
 }
 
