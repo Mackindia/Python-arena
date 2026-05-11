@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import PDFViewerClient from "./PDFViewerClient";
-import { isAllowedCloudinaryUrl } from "@/lib/cloudinary-hosts";
+import { isValidHttpUrl } from "@/lib/pdf-source";
 
 type Props = {
   searchParams: Promise<{
@@ -14,7 +14,7 @@ export default async function PdfViewPage({ searchParams }: Props) {
   const pdfUrl = params.url?.trim() || "";
   const title = params.title?.trim() || "Lesson PDF";
 
-  if (!pdfUrl || !isAllowedCloudinaryUrl(pdfUrl)) {
+  if (!pdfUrl || !isValidHttpUrl(pdfUrl)) {
     notFound();
   }
 

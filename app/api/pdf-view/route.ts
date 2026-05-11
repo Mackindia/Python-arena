@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAllowedCloudinaryHost } from "@/lib/cloudinary-hosts";
+import { isValidHttpUrl, looksLikePdfUrl } from "@/lib/pdf-source";
 
 export const runtime = "nodejs";
 
@@ -12,10 +12,6 @@ function withCors(headers?: HeadersInit) {
   merged.set("Access-Control-Allow-Headers", "Range, Content-Type");
   merged.set("Access-Control-Expose-Headers", "Content-Length, Content-Disposition, Content-Range, Accept-Ranges");
   return merged;
-}
-
-function isAllowedPdfHost(hostname: string) {
-  return isAllowedCloudinaryHost(hostname);
 }
 
 function getFileNameFromUrl(url: URL) {
@@ -43,10 +39,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Only http/https URLs are supported." }, { status: 400, headers: withCors() });
   }
 
-  if (!isAllowedPdfHost(upstreamUrl.hostname)) {
-    return NextResponse.json({ message: "Host is not allowed." }, { status: 403, headers: withCors() });
-  }
-
   try {
     const upstream = await fetch(upstreamUrl.toString(), {
       method: "GET",
@@ -59,6 +51,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { message: `Failed to fetch PDF. HTTP ${upstream.status}` },
         { status: 502, headers: withCors() },
+      );
+    }
+
+    const contentType = upstream.headers.get("content-type")?.toLowerCase() || "";
+    if (!contentType.includes("application/pdf") && !looksLikePdfUrl(upstreamUrl.toString())) {
+      return NextResponse.json(
+        { message: "Upstream URL did not return a PDF." },
+        { status: 415, headers: withCors() },
       );
     }
 
