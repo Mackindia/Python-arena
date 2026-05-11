@@ -1,0 +1,222 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, Menu, X } from "lucide-react";
+import { UserButton, useUser } from "@clerk/nextjs";
+import MegaDropdown from "@/src/components/dropdown/MegaDropdown";
+import { learnMenu, primaryNavLinks } from "@/src/data/navigation";
+
+export default function Navbar() {
+  const { isLoaded, isSignedIn } = useUser();
+  const [isLearnOpen, setIsLearnOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isMobileLearnOpen, setIsMobileLearnOpen] = useState(false);
+  const learnRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function onClickOutside(event: MouseEvent) {
+      if (!learnRef.current) {
+        return;
+      }
+      if (!learnRef.current.contains(event.target as Node)) {
+        setIsLearnOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
+
+  const handleMobileMenuClose = () => {
+    setIsMobileOpen(false);
+    setIsMobileLearnOpen(false);
+  };
+
+  return (
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:px-6 lg:px-10">
+      <div className="mx-auto max-w-7xl">
+        <div className="flex items-center justify-between gap-3">
+          <Link href="/" className="text-xs font-bold tracking-[0.2em] text-slate-900 sm:text-sm">
+            PYTHON ARENA
+          </Link>
+
+          <nav className="hidden items-center gap-1 lg:flex">
+            {primaryNavLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            <div className="relative" ref={learnRef}>
+              <button
+                type="button"
+                onClick={() => setIsLearnOpen((prev) => !prev)}
+                aria-expanded={isLearnOpen}
+                className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+              >
+                Learn
+                <ChevronDown className={`h-4 w-4 transition duration-200 ${isLearnOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              <AnimatePresence mode="wait">
+                {isLearnOpen ? <MegaDropdown categories={learnMenu} onItemClick={() => setIsLearnOpen(false)} /> : null}
+              </AnimatePresence>
+            </div>
+          </nav>
+
+          <div className="hidden items-center gap-2 lg:flex">
+            {isLoaded && isSignedIn ? (
+              <>
+              <Link href="/dashboard" className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
+                Dashboard
+              </Link>
+              <UserButton afterSignOutUrl="/" />
+              </>
+            ) : (
+              <>
+                <Link href="/sign-in" className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
+                  Sign In
+                </Link>
+                <Link href="/sign-up" className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
+
+          <button
+            type="button"
+            aria-label="Toggle menu"
+            className="rounded-lg border border-slate-300 p-2 text-slate-700 lg:hidden"
+            onClick={() => setIsMobileOpen((prev) => !prev)}
+          >
+            {isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+
+        <AnimatePresence>
+          {isMobileOpen ? (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="mt-3 overflow-hidden lg:hidden"
+            >
+              <div className="space-y-1 border-t border-slate-200 pt-3">
+                {primaryNavLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={handleMobileMenuClose}
+                    className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+
+                <div className="space-y-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileLearnOpen((prev) => !prev)}
+                    aria-expanded={isMobileLearnOpen}
+                    className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  >
+                    Learn
+                    <ChevronDown className={`h-4 w-4 transition duration-200 ${isMobileLearnOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  <AnimatePresence>
+                    {isMobileLearnOpen ? (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-2 overflow-hidden rounded-lg bg-slate-50 px-2 py-2"
+                      >
+                        {learnMenu.map((category) => (
+                          <div key={category.id} className="space-y-1">
+                            <p className="px-2 py-1 text-xs font-bold uppercase tracking-wide text-slate-500">{category.title}</p>
+                            <div className="space-y-1">
+                              {category.items.map((item) => {
+                                const isClassEntry = "subItems" in item;
+                                return isClassEntry && item.subItems?.length ? (
+                                  <div key={item.href} className="px-4">
+                                    <p className="text-xs font-semibold text-slate-600">{item.label}</p>
+                                    <div className="mt-0.5 ml-2 flex flex-wrap gap-1.5">
+                                      {item.subItems.map((sub) => (
+                                        <Link
+                                          key={sub.href}
+                                          href={sub.href}
+                                          onClick={handleMobileMenuClose}
+                                          className="inline-flex rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[11px] text-slate-600 hover:bg-slate-100"
+                                        >
+                                          {sub.label}
+                                        </Link>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    onClick={handleMobileMenuClose}
+                                    className="block rounded-lg px-4 py-1.5 text-xs text-slate-600 transition hover:bg-white hover:text-slate-900"
+                                  >
+                                    {item.label}
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </div>
+
+                <div className="border-t border-slate-200 pt-3">
+                  {isLoaded && isSignedIn ? (
+                    <div className="flex items-center justify-between gap-3 rounded-lg px-3 py-2">
+                      <Link
+                        href="/dashboard"
+                        onClick={handleMobileMenuClose}
+                        className="text-sm font-medium text-slate-700"
+                      >
+                        Dashboard
+                      </Link>
+                      <UserButton afterSignOutUrl="/" />
+                    </div>
+                  ) : (
+                    <div className="space-y-2 px-1">
+                      <Link
+                        href="/sign-in"
+                        onClick={handleMobileMenuClose}
+                        className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                      >
+                        Sign In
+                      </Link>
+
+                      <Link
+                        href="/sign-up"
+                        onClick={handleMobileMenuClose}
+                        className="block w-full rounded-lg bg-slate-900 px-3 py-2 text-left text-sm font-semibold text-white transition hover:bg-slate-800"
+                      >
+                        Sign Up
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
+    </header>
+  );
+}

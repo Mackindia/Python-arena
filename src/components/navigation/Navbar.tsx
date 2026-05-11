@@ -4,6 +4,7 @@ import { useState } from "react"
 import type { LucideIcon } from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ChevronDown, Menu, Sparkles, X } from "lucide-react"
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
 import GlassCard from "@/src/components/ui/GlassCard"
 import type { LearnMenu, NavLink } from "@/src/types/navigation"
 
@@ -86,6 +87,24 @@ export default function Navbar({
                 {item.label}
               </a>
             ))}
+
+            <SignedIn>
+              <a href="/dashboard" className="text-sm font-medium text-cyan-200 transition hover:text-cyan-300">
+                Dashboard
+              </a>
+            </SignedIn>
+
+            <SignedOut>
+              <SignInButton mode="modal" forceRedirectUrl="/dashboard" fallbackRedirectUrl="/dashboard">
+                <button className="rounded-full border border-cyan-300/30 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:bg-cyan-400/10">
+                  Sign in
+                </button>
+              </SignInButton>
+            </SignedOut>
+
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: "h-9 w-9" } }} />
+            </SignedIn>
           </nav>
 
           <button
@@ -138,6 +157,26 @@ export default function Navbar({
                     {item.label}
                   </a>
                 ))}
+
+                <SignedIn>
+                  <a href="/dashboard" className="block text-sm text-cyan-200">
+                    Dashboard
+                  </a>
+                </SignedIn>
+
+                <SignedOut>
+                  <SignInButton mode="modal" forceRedirectUrl="/dashboard" fallbackRedirectUrl="/dashboard">
+                    <button className="w-full rounded-xl border border-cyan-300/30 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:bg-cyan-400/10">
+                      Sign in
+                    </button>
+                  </SignInButton>
+                </SignedOut>
+
+                <SignedIn>
+                  <div className="pt-2">
+                    <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: "h-9 w-9" } }} />
+                  </div>
+                </SignedIn>
               </div>
             </motion.div>
           )}

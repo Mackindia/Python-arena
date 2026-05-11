@@ -1,99 +1,63 @@
-"use client"
+import { ArrowRight } from "lucide-react";
 
-import { motion } from "framer-motion"
-import { ArrowRight, Sparkles } from "lucide-react"
-import FloatingCodeCards from "@/src/components/hero/FloatingCodeCards"
-
-type HeroSectionProps = {
-  title: string
-  subtitle: string
-  primaryCta: {
-    label: string
-    href: string
-  }
-  secondaryCta: {
-    label: string
-    href: string
-  }
-  badge?: string
-}
-
-export default function HeroSection({
-  title,
-  subtitle,
-  primaryCta,
-  secondaryCta,
-  badge = "Futuristic Learning Platform",
-}: HeroSectionProps) {
+export default function HeroSection() {
   return (
-    <section id="top" className="relative overflow-hidden px-4 pb-28 pt-10 sm:px-6 lg:px-10">
-      <div className="pointer-events-none absolute inset-0">
-        <motion.div
-          className="absolute -left-14 top-20 h-72 w-72 rounded-full bg-cyan-500/20 blur-[80px]"
-          animate={{ x: [0, 40, 0], y: [0, 20, 0], scale: [1, 1.06, 1] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute right-0 top-10 h-96 w-96 rounded-full bg-indigo-500/20 blur-[100px]"
-          animate={{ x: [0, -32, 0], y: [0, -26, 0], scale: [1, 0.96, 1] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
+    <section id="top" className="px-4 pb-14 pt-8 sm:px-6 lg:px-10 lg:pt-10">
+      <div className="mx-auto grid max-w-7xl items-center gap-12 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm lg:grid-cols-2 lg:p-12">
+        <div>
+          <p className="inline-flex rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-600">
+            Futuristic Learning Platform
+          </p>
 
-      <div className="relative mx-auto max-w-7xl">
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/40 px-6 py-16 backdrop-blur-xl md:px-14 md:py-20">
-          <FloatingCodeCards />
+          <h1 className="mt-5 text-4xl font-bold leading-tight text-slate-900 sm:text-5xl">
+            Learn Python & AI From Class 6 to Class 12
+          </h1>
 
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200"
-          >
-            <Sparkles className="h-4 w-4" />
-            {badge}
-          </motion.span>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
+            Interactive coding, quizzes, projects, and AI-powered learning.
+          </p>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="max-w-4xl text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl"
-          >
-            {title}
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg"
-          >
-            {subtitle}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-9 flex flex-wrap gap-4"
-          >
+          <div className="mt-8 flex flex-wrap gap-3">
             <a
-              href={primaryCta.href}
-              className="inline-flex items-center gap-2 rounded-xl bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+              href="/learn"
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
             >
-              {primaryCta.label}
+              Start Learning
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
-              href={secondaryCta.href}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+              href="/learn"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
             >
-              {secondaryCta.label}
+              Explore Classes
             </a>
-          </motion.div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-slate-900 p-5 shadow-inner">
+          <div className="mb-4 flex items-center justify-between">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-300">Lesson Preview</p>
+            <span className="rounded-full bg-emerald-400/20 px-2.5 py-1 text-xs font-semibold text-emerald-300">Live</span>
+          </div>
+
+          <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm leading-relaxed text-slate-100">
+            <code>{`# Class 10: loops and conditions
+score = 78
+
+if score >= 60:
+    level = "Builder"
+else:
+    level = "Foundation"
+
+print(f"Current track: {level}")`}</code>
+          </pre>
+
+          <div className="mt-4 grid gap-2 text-sm text-slate-300 sm:grid-cols-2">
+            <div className="rounded-lg border border-slate-700 bg-slate-800/70 px-3 py-2">Exercises: 12</div>
+            <div className="rounded-lg border border-slate-700 bg-slate-800/70 px-3 py-2">Completion: 82%</div>
+          </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

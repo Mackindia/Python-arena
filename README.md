@@ -34,3 +34,35 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Cloudinary Integration (LMS Uploads)
+
+This LMS includes secure Cloudinary uploads for PDFs and images using server-side utilities and admin-only API access.
+
+### Environment setup
+
+Copy `.env.example` to `.env.local` and configure:
+
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+
+### Reusable utilities
+
+- `lib/cloudinary.ts`
+	- Typed Cloudinary config and upload helpers.
+	- `uploadBufferToCloudinary(buffer, options)`
+	- `uploadFileToCloudinary(file, options)`
+
+- `lib/upload-utils.ts`
+	- `parseUploadKind(value)`
+	- `validateUploadFile(file, kind)`
+	- `secureUploadToCloudinary(file, kind, folder)`
+	- Built-in PDF and image MIME/size validation.
+
+### Secure Next.js API route
+
+- `app/api/admin/upload/route.ts`
+	- App Router compatible (`runtime = "nodejs"`).
+	- Requires admin access (`requireAdminApi`).
+	- Supports `kind=pdf` and `kind=image` uploads.

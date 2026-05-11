@@ -1,0 +1,1 @@
+export { connectDB } from "../src/lib/mongodb";

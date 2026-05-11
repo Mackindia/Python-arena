@@ -1,31 +1,10 @@
 import type { LearnMenu } from "@/src/types/navigation"
+import { lmsSubjects } from "@/src/constants/lms"
 
-export const learnMenu: LearnMenu = [
-  {
-    title: "Python Basics",
-    items: ["Python Basics"],
-  },
-  {
-    title: "AI",
-    items: [
-      "Class 6",
-      "Class 7",
-      "Class 8",
-      "Class 9",
-      "Class 10",
-      "Class 11",
-      "Class 12",
-    ],
-  },
-  {
-    title: "Python",
-    items: ["Class 9", "Class 10", "Class 11", "Class 12"],
-  },
-  {
-    title: "Computer Science",
-    items: ["Computer Science"],
-  },
-]
+export const learnMenu: LearnMenu = lmsSubjects.map((subject) => ({
+  title: subject.name,
+  items: subject.classes.map((classConfig) => classConfig.label),
+}))
 
 export const topNavLinks = [
   { label: "Features", href: "#features" },
