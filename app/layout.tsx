@@ -24,6 +24,35 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const hasClerkConfig =
+    Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) &&
+    Boolean(process.env.CLERK_SECRET_KEY);
+
+  if (!hasClerkConfig) {
+    return (
+      <html
+        lang="en"
+        className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      >
+        <body className="min-h-full bg-slate-950 text-slate-100">
+          <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center justify-center px-6 text-center">
+            <h1 className="text-3xl font-bold sm:text-4xl">Deployment Configuration Required</h1>
+            <p className="mt-4 text-sm text-slate-300 sm:text-base">
+              This deployment is missing Clerk environment variables and cannot start authenticated pages.
+            </p>
+            <div className="mt-6 rounded-xl border border-slate-700 bg-slate-900/70 p-4 text-left text-sm text-slate-200">
+              <p className="font-semibold">Set these Railway variables and redeploy:</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                <li>NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY</li>
+                <li>CLERK_SECRET_KEY</li>
+              </ul>
+            </div>
+          </main>
+        </body>
+      </html>
+    );
+  }
+
   return (
     <ClerkProvider>
       <html
