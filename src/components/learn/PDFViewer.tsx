@@ -233,6 +233,12 @@ export default function PDFViewer({
         <iframe
           title={title}
           src={proxyUrl}
+          onLoad={() => setIsLoading(false)}
+          onError={() => {
+            setIsLoading(false);
+            setHasError(true);
+            setErrorMessage("Failed to load PDF in Safari viewer");
+          }}
           className="flex-1 w-full border-0 bg-white"
         />
       ) : null}
