@@ -26,6 +26,12 @@ export default function NavBar() {
           Chapters
         </a>
         <Link
+          href="/class-11-study-material"
+          className="hidden font-mono text-[10px] uppercase tracking-[0.22em] text-ink-300 transition-colors hover:text-ink-50 sm:block"
+        >
+          Class 11 study material
+        </Link>
+        <Link
           href="/class-xi/chapter-2"
           className="hidden font-mono text-[10px] uppercase tracking-[0.22em] text-ink-300 transition-colors hover:text-ink-50 sm:block"
         >

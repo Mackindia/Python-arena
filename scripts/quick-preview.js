@@ -41,6 +41,11 @@ function hasUncommittedChanges() {
   return status.length > 0;
 }
 
+function hasOriginRemote() {
+  const remoteUrl = runCapture(gitCmd, ['remote', 'get-url', 'origin']);
+  return Boolean(remoteUrl);
+}
+
 function stageProjectFiles() {
   // Stage source files only to avoid committing build/cache folders.
   runStep(gitCmd, ['add', 'app', 'components', 'lib', 'scripts', 'package.json']);
@@ -56,7 +61,11 @@ function commitPushAndPreview(commitMessage, shouldCommit) {
   if (shouldCommit) {
     stageProjectFiles();
     runStep(gitCmd, ['commit', '-m', commitMessage]);
-    runStep(gitCmd, ['push', '-u', 'origin', branch]);
+    if (hasOriginRemote()) {
+      runStep(gitCmd, ['push', '-u', 'origin', branch]);
+    } else {
+      console.log('No origin remote configured. Skipping push and continuing preview deploy.');
+    }
   } else {
     console.log('No changes detected. Skipping commit and push.');
   }
