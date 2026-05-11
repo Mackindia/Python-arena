@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import PDFViewerClient from "./PDFViewerClient";
+import { isAllowedCloudinaryUrl } from "@/lib/cloudinary-hosts";
 
 type Props = {
   searchParams: Promise<{
@@ -8,21 +9,12 @@ type Props = {
   }>;
 };
 
-function isAllowedPdfUrl(rawUrl: string) {
-  try {
-    const parsed = new URL(rawUrl);
-    return ["http:", "https:"].includes(parsed.protocol) && parsed.hostname === "res.cloudinary.com";
-  } catch {
-    return false;
-  }
-}
-
 export default async function PdfViewPage({ searchParams }: Props) {
   const params = await searchParams;
   const pdfUrl = params.url?.trim() || "";
   const title = params.title?.trim() || "Lesson PDF";
 
-  if (!pdfUrl || !isAllowedPdfUrl(pdfUrl)) {
+  if (!pdfUrl || !isAllowedCloudinaryUrl(pdfUrl)) {
     notFound();
   }
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAllowedCloudinaryHost } from "@/lib/cloudinary-hosts";
 
 export const runtime = "nodejs";
 
@@ -14,8 +15,7 @@ function withCors(headers?: HeadersInit) {
 }
 
 function isAllowedPdfHost(hostname: string) {
-  // Restrict proxying to Cloudinary assets used by this app.
-  return hostname === "res.cloudinary.com";
+  return isAllowedCloudinaryHost(hostname);
 }
 
 function getFileNameFromUrl(url: URL) {

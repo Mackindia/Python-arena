@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { isAllowedCloudinaryUrl } from "@/lib/cloudinary-hosts";
 
 type CbsePdfCardProps = {
   title: string;
@@ -9,13 +10,7 @@ type CbsePdfCardProps = {
 };
 
 export default function CbsePdfCard({ title, description, thumbnailUrl, pdfUrl }: CbsePdfCardProps) {
-  const isCloudinaryPdf = (() => {
-    try {
-      return new URL(pdfUrl).hostname === "res.cloudinary.com";
-    } catch {
-      return false;
-    }
-  })();
+  const isCloudinaryPdf = isAllowedCloudinaryUrl(pdfUrl);
 
   const viewerUrl = isCloudinaryPdf
     ? `/pdf/view?url=${encodeURIComponent(pdfUrl)}&title=${encodeURIComponent(title)}`
