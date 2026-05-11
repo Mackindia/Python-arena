@@ -11,12 +11,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-// Optimize pdfjs for mobile
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url,
-).toString();
-
 type PDFViewerProps = {
   pdfUrl: string;
   title: string;
@@ -36,7 +30,7 @@ export default function PDFViewer({
 }: PDFViewerProps) {
   const proxyUrl = `/api/pdf-view?url=${encodeURIComponent(pdfUrl)}`;
   const downloadPdfUrl = `/api/pdf-view?download=1&url=${encodeURIComponent(pdfUrl)}`;
-  
+
   const isIOSDevice = useMemo(() => {
     if (typeof navigator === "undefined") {
       return false;
@@ -51,6 +45,7 @@ export default function PDFViewer({
       (platform === "MacIntel" && maxTouchPoints > 1)
     );
   }, []);
+  const iosViewerUrl = `${proxyUrl}#page=${pageNumber}`;
 
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState(1);
@@ -62,9 +57,58 @@ export default function PDFViewer({
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const documentRef = useRef<any>(null);
-  
+
   // Page cache to avoid re-rendering
   const pageCache = useRef<Map<number, any>>(new Map());
+
+  useEffect(() => {
+    setPageNumber(1);
+    setNumPages(0);
+    setHasError(false);
+    setErrorMessage("");
+    setIsLoading(true);
+  }, [pdfUrl, isIOSDevice]);
+
+  useEffect(() => {
+    if (!isIOSDevice) {
+      return;
+    }
+
+    let cancelled = false;
+    const loadingTask = pdfjs.getDocument(proxyUrl);
+
+    loadingTask.promise
+      .then((documentProxy) => {
+        if (cancelled) {
+          return;
+        }
+
+        setNumPages(documentProxy.numPages);
+        setHasError(false);
+      })
+      .catch((error: Error) => {
+        if (cancelled) {
+          return;
+        }
+
+        setHasError(true);
+        setErrorMessage(error.message || "Failed to load PDF metadata");
+        setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      loadingTask.destroy();
+    };
+  }, [isIOSDevice, proxyUrl]);
+
+  useEffect(() => {
+    if (!isIOSDevice || hasError || numPages === 0) {
+      return;
+    }
+
+    setIsLoading(true);
+  }, [isIOSDevice, pageNumber, numPages, hasError]);
 
   // Track container width for responsive page rendering
   useEffect(() => {
@@ -275,7 +319,25 @@ export default function PDFViewer({
       )}
 
       {/* PDF canvas renderer via react-pdf with lazy page rendering */}
-      {!hasError && (
+      {!hasError && isIOSDevice && (
+        <iframe
+          key={iosViewerUrl}
+          title={title}
+          src={iosViewerUrl}
+          onLoad={() => {
+            setIsLoading(false);
+            setHasError(false);
+          }}
+          onError={() => {
+            setHasError(true);
+            setErrorMessage("Failed to load PDF in the native viewer");
+            setIsLoading(false);
+          }}
+          className="flex-1 w-full border-0 bg-white"
+        />
+      )}
+
+      {!hasError && !isIOSDevice && (
         <div
           ref={scrollRef}
           className="flex-1 overflow-y-auto bg-slate-700 flex flex-col items-center py-4"
