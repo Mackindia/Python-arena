@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAllowedCloudinaryUrl } from "@/lib/cloudinary-hosts";
 import { isValidHttpUrl, looksLikePdfUrl } from "@/lib/pdf-source";
 
 export const runtime = "nodejs";
@@ -17,6 +18,25 @@ function withCors(headers?: HeadersInit) {
 function getFileNameFromUrl(url: URL) {
   const rawName = url.pathname.split("/").pop() || "lesson";
   return rawName.toLowerCase().endsWith(".pdf") ? rawName : `${rawName}.pdf`;
+}
+
+function isCloudinaryRawUpload(url: URL) {
+  return isAllowedCloudinaryUrl(url.toString()) && url.pathname.includes("/raw/upload/");
+}
+
+function isLikelyPdfResponse(url: URL, headers: Headers) {
+  const contentType = headers.get("content-type")?.toLowerCase() || "";
+  if (contentType.includes("application/pdf")) {
+    return true;
+  }
+
+  if (looksLikePdfUrl(url.toString())) {
+    return true;
+  }
+
+  // Cloudinary raw uploads often serve PDFs as application/octet-stream
+  // without a .pdf suffix. Those assets are still valid PDF sources here.
+  return isCloudinaryRawUpload(url) && contentType.includes("application/octet-stream");
 }
 
 export async function GET(request: NextRequest) {
@@ -54,8 +74,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const contentType = upstream.headers.get("content-type")?.toLowerCase() || "";
-    if (!contentType.includes("application/pdf") && !looksLikePdfUrl(upstreamUrl.toString())) {
+    if (!isLikelyPdfResponse(upstreamUrl, upstream.headers)) {
       return NextResponse.json(
         { message: "Upstream URL did not return a PDF." },
         { status: 415, headers: withCors() },
