@@ -14,6 +14,7 @@ export default function AdminAnnouncementsPage() {
   const [items, setItems] = useState<Announcement[]>([]);
   const [error, setError] = useState("");
   const [sendingId, setSendingId] = useState("");
+  const [deletingId, setDeletingId] = useState("");
   const [form, setForm] = useState({
     title: "",
     message: "",
@@ -93,6 +94,25 @@ export default function AdminAnnouncementsPage() {
     }
   }
 
+  async function deleteAnnouncement(id: string) {
+    setDeletingId(id);
+    setError("");
+
+    const response = await fetch(`/api/admin/announcements?id=${id}`, {
+      method: "DELETE",
+    });
+
+    const data = await response.json();
+    setDeletingId("");
+
+    if (!response.ok) {
+      setError(data.message || "Failed to delete announcement");
+      return;
+    }
+
+    setItems((prev) => prev.filter((item) => item._id !== id));
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold">Announcements</h1>
@@ -129,6 +149,13 @@ export default function AdminAnnouncementsPage() {
               className="mt-3 rounded-lg border border-cyan-300/30 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-100 disabled:opacity-60"
             >
               {sendingId === item._id ? "Sending..." : "Send Email Announcement"}
+            </button>
+            <button
+              onClick={() => deleteAnnouncement(item._id)}
+              disabled={deletingId === item._id}
+              className="ml-2 mt-3 rounded-lg border border-rose-300/30 bg-rose-400/10 px-3 py-1 text-xs font-semibold text-rose-100 disabled:opacity-60"
+            >
+              {deletingId === item._id ? "Deleting..." : "Delete"}
             </button>
           </article>
         ))}

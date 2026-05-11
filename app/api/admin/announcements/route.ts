@@ -45,3 +45,34 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Failed to create announcement", error: error instanceof Error ? error.message : "Unknown" }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const access = await requireAdminApi();
+    if (!access.ok) {
+      return access.response;
+    }
+
+    const id = (request.nextUrl.searchParams.get("id") ?? "").trim();
+    if (!id) {
+      return NextResponse.json({ message: "id is required" }, { status: 400 });
+    }
+
+    await connectDB();
+    const deleted = await Announcement.findByIdAndDelete(id).lean();
+
+    if (!deleted) {
+      return NextResponse.json({ message: "Announcement not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Announcement deleted" });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        message: "Failed to delete announcement",
+        error: error instanceof Error ? error.message : "Unknown",
+      },
+      { status: 500 },
+    );
+  }
+}
