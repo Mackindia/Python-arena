@@ -34,52 +34,56 @@ type LessonCardData = {
 };
 
 async function getClassLessonsData(subjectSlug: string, classSlug: string) {
-  await connectDB();
+  try {
+    await connectDB();
 
-  const subject = await Subject.findOne({ slug: subjectSlug }).select("_id slug name").lean();
+    const subject = await Subject.findOne({ slug: subjectSlug }).select("_id slug name").lean();
 
-  if (!subject) {
+    if (!subject) {
+      return null;
+    }
+
+    const subjectData = subject as SubjectPageData;
+
+    const classRecord = await ClassModel.findOne({ slug: classSlug, subject: subjectData._id })
+      .select("_id slug name subject")
+      .lean();
+
+    if (!classRecord) {
+      return null;
+    }
+
+    const classData = classRecord as ClassPageData;
+
+    const lessons = await LessonModel.find({ class: classData._id, published: true })
+      .select("slug title description thumbnail thumbnailUrl published createdAt")
+      .sort({ createdAt: 1 })
+      .lean();
+
+    return {
+      subject: {
+        name: subjectData.name || "",
+        slug: subjectData.slug || "",
+      },
+      class: {
+        name: classData.name || "",
+        slug: classData.slug || "",
+      },
+      lessons: lessons.map((lesson) => {
+        const lessonData = lesson as LessonCardData;
+
+        return {
+          slug: lessonData.slug || "",
+          title: lessonData.title || "",
+          description: lessonData.description || "",
+          thumbnail: lessonData.thumbnailUrl || lessonData.thumbnail || "",
+          published: lessonData.published || false,
+        };
+      }),
+    };
+  } catch {
     return null;
   }
-
-  const subjectData = subject as SubjectPageData;
-
-  const classRecord = await ClassModel.findOne({ slug: classSlug, subject: subjectData._id })
-    .select("_id slug name subject")
-    .lean();
-
-  if (!classRecord) {
-    return null;
-  }
-
-  const classData = classRecord as ClassPageData;
-
-  const lessons = await LessonModel.find({ class: classData._id, published: true })
-    .select("slug title description thumbnail thumbnailUrl published createdAt")
-    .sort({ createdAt: 1 })
-    .lean();
-
-  return {
-    subject: {
-      name: subjectData.name || "",
-      slug: subjectData.slug || "",
-    },
-    class: {
-      name: classData.name || "",
-      slug: classData.slug || "",
-    },
-    lessons: lessons.map((lesson) => {
-      const lessonData = lesson as LessonCardData;
-
-      return {
-        slug: lessonData.slug || "",
-        title: lessonData.title || "",
-        description: lessonData.description || "",
-        thumbnail: lessonData.thumbnailUrl || lessonData.thumbnail || "",
-        published: lessonData.published || false,
-      };
-    }),
-  };
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {

@@ -41,77 +41,81 @@ async function getCurrentUserSafe() {
 }
 
 async function getLmsLessonData(subjectSlug: string, classSlug: string, lessonSlug: string) {
-  await connectDB();
+  try {
+    await connectDB();
 
-  const subject = await Subject.findOne({ slug: subjectSlug }).select("_id slug name").lean();
-  if (!subject) {
-    return null;
-  }
+    const subject = await Subject.findOne({ slug: subjectSlug }).select("_id slug name").lean();
+    if (!subject) {
+      return null;
+    }
 
-  const classRecord = await ClassModel.findOne({ slug: classSlug, subject: subject._id })
-    .select("_id slug name")
-    .lean();
+    const classRecord = await ClassModel.findOne({ slug: classSlug, subject: subject._id })
+      .select("_id slug name")
+      .lean();
 
-  if (!classRecord) {
-    return null;
-  }
+    if (!classRecord) {
+      return null;
+    }
 
-  const lesson = await LessonModel.findOne({ slug: lessonSlug, class: classRecord._id, published: true })
-    .select("title slug description content pdfUrl thumbnail thumbnailUrl")
-    .lean();
+    const lesson = await LessonModel.findOne({ slug: lessonSlug, class: classRecord._id, published: true })
+      .select("title slug description content pdfUrl thumbnail thumbnailUrl")
+      .lean();
 
-  if (!lesson) {
-    return null;
-  }
+    if (!lesson) {
+      return null;
+    }
 
-  const lessonData = lesson as LessonPageData;
+    const lessonData = lesson as LessonPageData;
 
-  // Backfill extracted text for older lessons that were uploaded before extraction was stable.
-  if (!lessonData.content?.trim() && lessonData.pdfUrl) {
-    const extraction = await processLessonPdfContent({
-      pdfUrl: lessonData.pdfUrl,
-      maxFetchBytes: 50 * 1024 * 1024,
-      fetchTimeoutMs: 30_000,
-    });
+    // Backfill extracted text for older lessons that were uploaded before extraction was stable.
+    if (!lessonData.content?.trim() && lessonData.pdfUrl) {
+      const extraction = await processLessonPdfContent({
+        pdfUrl: lessonData.pdfUrl,
+        maxFetchBytes: 50 * 1024 * 1024,
+        fetchTimeoutMs: 30_000,
+      });
 
-    if (extraction.ok && extraction.extractedText.trim()) {
-      const extractedText = extraction.extractedText.trim();
+      if (extraction.ok && extraction.extractedText.trim()) {
+        const extractedText = extraction.extractedText.trim();
 
-      await LessonModel.updateOne(
-        { _id: lessonData._id },
-        {
-          $set: {
-            content: extractedText,
-            pdfTextExtraction: {
-              status: "succeeded",
-              sourceUrl: extraction.sourceUrl,
-              pageCount: extraction.pageCount,
-              extractedAt: extraction.extractedAt,
-              contentLength: extractedText.length,
-              error: "",
+        await LessonModel.updateOne(
+          { _id: lessonData._id },
+          {
+            $set: {
+              content: extractedText,
+              pdfTextExtraction: {
+                status: "succeeded",
+                sourceUrl: extraction.sourceUrl,
+                pageCount: extraction.pageCount,
+                extractedAt: extraction.extractedAt,
+                contentLength: extractedText.length,
+                error: "",
+              },
             },
           },
-        },
-      );
+        );
 
-      lessonData.content = extractedText;
+        lessonData.content = extractedText;
+      }
     }
+
+    const lessonSequence = await LessonModel.find({ class: classRecord._id, published: true })
+      .sort({ createdAt: 1, title: 1 })
+      .select("slug title")
+      .lean<Array<LessonNav>>();
+
+    const currentIndex = lessonSequence.findIndex((item) => item.slug === lessonData.slug);
+    const previousLesson = currentIndex > 0 ? lessonSequence[currentIndex - 1] : null;
+    const nextLesson = currentIndex >= 0 && currentIndex < lessonSequence.length - 1 ? lessonSequence[currentIndex + 1] : null;
+
+    return {
+      lesson: lessonData,
+      previousLesson,
+      nextLesson,
+    };
+  } catch {
+    return null;
   }
-
-  const lessonSequence = await LessonModel.find({ class: classRecord._id, published: true })
-    .sort({ createdAt: 1, title: 1 })
-    .select("slug title")
-    .lean<Array<LessonNav>>();
-
-  const currentIndex = lessonSequence.findIndex((item) => item.slug === lessonData.slug);
-  const previousLesson = currentIndex > 0 ? lessonSequence[currentIndex - 1] : null;
-  const nextLesson = currentIndex >= 0 && currentIndex < lessonSequence.length - 1 ? lessonSequence[currentIndex + 1] : null;
-
-  return {
-    lesson: lessonData,
-    previousLesson,
-    nextLesson,
-  };
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {

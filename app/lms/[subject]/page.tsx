@@ -22,31 +22,35 @@ type SubjectClassData = {
 };
 
 async function getSubjectData(subjectSlug: string) {
-  await connectDB();
+  try {
+    await connectDB();
 
-  const subject = await Subject.findOne({ slug: subjectSlug }).select("name slug description").lean();
+    const subject = await Subject.findOne({ slug: subjectSlug }).select("name slug description").lean();
 
-  if (!subject) {
+    if (!subject) {
+      return null;
+    }
+
+    const subjectRecord = subject as SubjectOverviewData;
+
+    const classes = await ClassModel.find({ subject: subjectRecord._id })
+      .select("slug name")
+      .sort({ name: 1 })
+      .lean();
+
+    return {
+      subject: subjectRecord,
+      classes: classes.map((item) => {
+        const classRecord = item as SubjectClassData;
+        return {
+          slug: classRecord.slug || "",
+          name: classRecord.name || "",
+        };
+      }),
+    };
+  } catch {
     return null;
   }
-
-  const subjectRecord = subject as SubjectOverviewData;
-
-  const classes = await ClassModel.find({ subject: subjectRecord._id })
-    .select("slug name")
-    .sort({ name: 1 })
-    .lean();
-
-  return {
-    subject: subjectRecord,
-    classes: classes.map((item) => {
-      const classRecord = item as SubjectClassData;
-      return {
-        slug: classRecord.slug || "",
-        name: classRecord.name || "",
-      };
-    }),
-  };
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
