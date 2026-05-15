@@ -217,19 +217,22 @@ export default function LmsLessonUploadForm({
       const lessonData = await lessonRes.json();
       setSuccess("Lesson published successfully! Redirecting...");
 
+      // Capture subject/class at submission time — avoids stale closure in setTimeout.
+      const submittedSubject = subjects.find((s) => s._id === form.subject);
+      const submittedClass = classes.find((c) => c._id === form.class);
+
       // Redirect to published lesson page
       setTimeout(() => {
         const lesson = lessonData.lesson;
-        const selectedClass = classes.find((c) => c._id === form.class);
 
-        if (selectedSubject?.slug && selectedClass?.slug && lesson?.slug) {
-          router.push(`/lms/${selectedSubject.slug}/${selectedClass.slug}/${lesson.slug}`);
+        if (submittedSubject?.slug && submittedClass?.slug && lesson?.slug) {
+          router.push(`/lms/${submittedSubject.slug}/${submittedClass.slug}/${lesson.slug}`);
           return;
         }
 
         // Fallback to class page if lesson slug is unexpectedly unavailable.
-        if (selectedSubject?.slug && selectedClass?.slug) {
-          router.push(`/lms/${selectedSubject.slug}/${selectedClass.slug}`);
+        if (submittedSubject?.slug && submittedClass?.slug) {
+          router.push(`/lms/${submittedSubject.slug}/${submittedClass.slug}`);
           return;
         }
 

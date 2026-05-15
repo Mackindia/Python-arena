@@ -24,7 +24,9 @@ const CourseSchema = new Schema(
     slug: { type: String, required: true, unique: true, index: true },
     description: { type: String, default: "" },
     subject: { type: String, required: true, trim: true, index: true },
+    subjectSlug: { type: String, default: "", trim: true, index: true },
     classLevel: { type: String, required: true, trim: true, index: true },
+    classSlug: { type: String, default: "", trim: true, index: true },
     category: { type: String, default: "" },
     difficulty: {
       type: String,

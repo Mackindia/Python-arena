@@ -24,19 +24,49 @@ const SlugString = z
 export const LessonCreateSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters").max(200),
   slug: SlugString.optional(),
+  contentType: z.enum(["notes", "cbse-pdf", "mixed"]).optional(),
   /** Subject slug or ObjectId */
   subject: z.string().min(1, "Subject is required"),
   /** Class slug or ObjectId */
   class: z.string().min(1, "Class is required"),
-  description: z.string().min(10, "Description must be at least 10 characters").max(2000),
-  pdfUrl: HttpUrl,
-  thumbnailUrl: HttpUrl,
+  description: z.string().min(1, "Description is required").max(2000),
+  pdfUrl: HttpUrl.optional().or(z.literal("")),
+  thumbnailUrl: HttpUrl.optional().or(z.literal("")),
   /** Backward compatible field for legacy callers */
-  thumbnail: HttpUrl.optional(),
+  thumbnail: HttpUrl.optional().or(z.literal("")),
   content: z.string().max(100_000).optional(),
   published: z.boolean({ required_error: "published must be a boolean" }),
   /** Injected server-side from Clerk/MongoDB — not accepted from client */
   createdBy: MongoObjectId,
+}).superRefine((data, ctx) => {
+  const hasContent = Boolean(data.content?.trim());
+  const hasPdf = Boolean(data.pdfUrl && data.pdfUrl.trim());
+  const hasThumb = Boolean(data.thumbnailUrl && data.thumbnailUrl.trim());
+  const type = data.contentType ?? (hasPdf && hasContent ? "mixed" : hasPdf ? "cbse-pdf" : "notes");
+
+  if ((type === "notes" || type === "mixed") && !hasContent) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["content"],
+      message: "content is required for notes or mixed lessons",
+    });
+  }
+
+  if ((type === "cbse-pdf" || type === "mixed") && !hasPdf) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["pdfUrl"],
+      message: "pdfUrl is required for cbse-pdf or mixed lessons",
+    });
+  }
+
+  if ((type === "cbse-pdf" || type === "mixed") && !hasThumb) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["thumbnailUrl"],
+      message: "thumbnailUrl is required for cbse-pdf or mixed lessons",
+    });
+  }
 });
 
 export type LessonCreateInput = z.infer<typeof LessonCreateSchema>;

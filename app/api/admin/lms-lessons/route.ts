@@ -104,6 +104,7 @@ export async function GET(request: NextRequest) {
         _id?: unknown;
         title?: string;
         slug?: string;
+        contentType?: "notes" | "cbse-pdf" | "mixed";
         description?: string;
         published?: boolean;
         createdAt?: unknown;
@@ -123,6 +124,7 @@ export async function GET(request: NextRequest) {
         id: String(lessonItem._id),
         title: lessonItem.title || "",
         slug: lessonItem.slug || "",
+        contentType: lessonItem.contentType || "notes",
         description: lessonItem.description || "",
         published: Boolean(lessonItem.published),
         createdAt: lessonItem.createdAt,

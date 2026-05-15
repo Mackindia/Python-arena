@@ -147,7 +147,7 @@ export default async function LmsLessonViewerPage({ params }: { params: Promise<
     notFound();
   }
 
-  if (!lessonData.lesson.pdfUrl) {
+  if (!lessonData.lesson.pdfUrl && !lessonData.lesson.content?.trim()) {
     notFound();
   }
 

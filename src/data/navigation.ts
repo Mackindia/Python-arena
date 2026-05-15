@@ -3,18 +3,10 @@ export type NavLink = {
   href: string;
 };
 
-/** A class entry with optional sub-links (e.g. Course + CBSE PDF). */
-export type NavClassEntry = {
-  label: string;
-  /** Base href used when there are no subItems, or for the class overview. */
-  href: string;
-  subItems?: NavLink[];
-};
-
 export type LearnCategory = {
   id: string;
   title: string;
-  items: (NavClassEntry | NavLink)[];
+  items: NavLink[];
 };
 
 export const primaryNavLinks: NavLink[] = [
@@ -25,30 +17,18 @@ export const primaryNavLinks: NavLink[] = [
   { label: "Resources", href: "/resources" },
 ];
 
-function makeClassEntry(subject: string, classSlug: string, label: string): NavClassEntry {
-  const base = `/learn/${subject}/${classSlug}`;
-  return {
-    label,
-    href: base,
-    subItems: [
-      { label: "Course", href: `${base}/course` },
-      { label: "CBSE PDF", href: `${base}/cbse-pdf` },
-    ],
-  };
-}
-
 export const learnMenu: LearnCategory[] = [
   {
     id: "ai",
     title: "AI",
     items: [
-      makeClassEntry("ai", "class-6", "Class 6"),
-      makeClassEntry("ai", "class-7", "Class 7"),
-      makeClassEntry("ai", "class-8", "Class 8"),
-      makeClassEntry("ai", "class-9", "Class 9"),
-      makeClassEntry("ai", "class-10", "Class 10"),
-      makeClassEntry("ai", "class-11", "Class 11"),
-      makeClassEntry("ai", "class-12", "Class 12"),
+      { label: "Class 6", href: "/learn/ai/class-6" },
+      { label: "Class 7", href: "/learn/ai/class-7" },
+      { label: "Class 8", href: "/learn/ai/class-8" },
+      { label: "Class 9", href: "/learn/ai/class-9" },
+      { label: "Class 10", href: "/learn/ai/class-10" },
+      { label: "Class 11", href: "/learn/ai/class-11" },
+      { label: "Class 12", href: "/learn/ai/class-12" },
     ],
   },
   {
@@ -56,18 +36,18 @@ export const learnMenu: LearnCategory[] = [
     title: "Python",
     items: [
       { label: "Basics", href: "/learn/python/basics" },
-      makeClassEntry("python", "class-9", "Class 9"),
-      makeClassEntry("python", "class-10", "Class 10"),
-      makeClassEntry("python", "class-11", "Class 11"),
-      makeClassEntry("python", "class-12", "Class 12"),
+      { label: "Class 9", href: "/learn/python/class-9" },
+      { label: "Class 10", href: "/learn/python/class-10" },
+      { label: "Class 11", href: "/learn/python/class-11" },
+      { label: "Class 12", href: "/learn/python/class-12" },
     ],
   },
   {
     id: "computer-science",
     title: "Computer Science",
     items: [
-      makeClassEntry("computer-science", "class-11", "Class 11"),
-      makeClassEntry("computer-science", "class-12", "Class 12"),
+      { label: "Class 11", href: "/learn/computer-science/class-11" },
+      { label: "Class 12", href: "/learn/computer-science/class-12" },
     ],
   },
 ];

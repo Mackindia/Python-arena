@@ -24,13 +24,20 @@ export default function CbsePdfCard({ title, description, thumbnailUrl, pdfUrl }
     <div className="flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition hover:border-cyan-400/40 hover:shadow-cyan-900/20">
       {/* Thumbnail */}
       <div className="relative aspect-[4/3] w-full bg-slate-800">
-        {thumbnailUrl ? (
+        {thumbnailUrl && thumbnailUrl.includes("res.cloudinary.com") ? (
           <Image
             src={thumbnailUrl}
             alt={title}
             fill
             className="object-cover"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        ) : thumbnailUrl ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={thumbnailUrl}
+            alt={title}
+            className="h-full w-full object-cover"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">

@@ -109,7 +109,7 @@ export default function Navbar() {
               transition={{ duration: 0.2 }}
               className="mt-3 overflow-hidden lg:hidden"
             >
-              <div className="space-y-1 border-t border-slate-200 pt-3">
+              <div className="max-h-[80vh] overflow-y-auto overscroll-contain space-y-1 border-t border-slate-200 pt-3 pb-2">
                 {primaryNavLinks.map((link) => (
                   <Link
                     key={link.href}
@@ -137,41 +137,22 @@ export default function Navbar() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="space-y-2 overflow-hidden rounded-lg bg-slate-50 px-2 py-2"
+                        className="space-y-3 overflow-hidden rounded-lg bg-slate-50 px-2 py-3"
                       >
                         {learnMenu.map((category) => (
                           <div key={category.id} className="space-y-1">
                             <p className="px-2 py-1 text-xs font-bold uppercase tracking-wide text-slate-500">{category.title}</p>
-                            <div className="space-y-1">
-                              {category.items.map((item) => {
-                                const isClassEntry = "subItems" in item;
-                                return isClassEntry && item.subItems?.length ? (
-                                  <div key={item.href} className="px-4">
-                                    <p className="text-xs font-semibold text-slate-600">{item.label}</p>
-                                    <div className="mt-0.5 ml-2 flex flex-wrap gap-1.5">
-                                      {item.subItems.map((sub) => (
-                                        <Link
-                                          key={sub.href}
-                                          href={sub.href}
-                                          onClick={handleMobileMenuClose}
-                                          className="inline-flex rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[11px] text-slate-600 hover:bg-slate-100"
-                                        >
-                                          {sub.label}
-                                        </Link>
-                                      ))}
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    onClick={handleMobileMenuClose}
-                                    className="block rounded-lg px-4 py-1.5 text-xs text-slate-600 transition hover:bg-white hover:text-slate-900"
-                                  >
-                                    {item.label}
-                                  </Link>
-                                );
-                              })}
+                            <div className="space-y-0.5">
+                              {category.items.map((item) => (
+                                <Link
+                                  key={item.href}
+                                  href={item.href}
+                                  onClick={handleMobileMenuClose}
+                                  className="block rounded-lg px-4 py-1.5 text-xs text-slate-600 transition hover:bg-white hover:text-slate-900"
+                                >
+                                  {item.label}
+                                </Link>
+                              ))}
                             </div>
                           </div>
                         ))}

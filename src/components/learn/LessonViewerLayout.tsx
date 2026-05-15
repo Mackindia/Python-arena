@@ -64,21 +64,25 @@ export default function LessonViewerLayout({
               </header>
 
               <div className="mt-6 flex flex-wrap items-center gap-3">
-                <a
-                  href={downloadPdfUrl}
-                  download
-                  className="inline-flex items-center justify-center rounded-xl bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
-                >
-                  Download PDF
-                </a>
-                <a
-                  href={newTabPdfViewerUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
-                >
-                  Open in new tab
-                </a>
+                {lesson.pdfUrl && (
+                  <>
+                    <a
+                      href={downloadPdfUrl}
+                      download
+                      className="inline-flex items-center justify-center rounded-xl bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+                    >
+                      Download PDF
+                    </a>
+                    <a
+                      href={newTabPdfViewerUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
+                    >
+                      Open in new tab
+                    </a>
+                  </>
+                )}
 
                 <MarkLessonCompleteButton
                   subjectSlug={subjectSlug}

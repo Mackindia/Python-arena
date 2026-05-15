@@ -44,6 +44,7 @@ export default function PDFViewer({
       (platform === "MacIntel" && maxTouchPoints > 1)
     );
   }, []);
+  const viewerSource = isIOSDevice ? pdfUrl : proxyUrl;
 
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState(1);
@@ -232,7 +233,13 @@ export default function PDFViewer({
       {!hasError && isIOSDevice ? (
         <iframe
           title={title}
-          src={proxyUrl}
+          src={viewerSource}
+          onLoad={() => setIsLoading(false)}
+          onError={() => {
+            setIsLoading(false);
+            setHasError(true);
+            setErrorMessage("Failed to load PDF in Safari viewer");
+          }}
           className="flex-1 w-full border-0 bg-white"
         />
       ) : null}
