@@ -9,7 +9,7 @@ import MegaDropdown from "@/src/components/dropdown/MegaDropdown";
 import { learnMenu, primaryNavLinks } from "@/src/data/navigation";
 
 export default function Navbar() {
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const [isLearnOpen, setIsLearnOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobileLearnOpen, setIsMobileLearnOpen] = useState(false);
@@ -76,6 +76,11 @@ export default function Navbar() {
               <Link href="/dashboard" className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
                 Dashboard
               </Link>
+              {user?.publicMetadata?.role === "admin" && (
+                <Link href="/admin/resets" className="rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 hover:text-red-700">
+                  Resets
+                </Link>
+              )}
               <Link href="/dashboard/code" className="rounded-lg bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-200">
                 Web Editor
               </Link>

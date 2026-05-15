@@ -22,6 +22,9 @@ self.onmessage = async (event) => {
     self.pyodide.setStdout({ batched: (msg) => self.postMessage({ id, type: "stdout", text: msg + "\n" }) });
     self.pyodide.setStderr({ batched: (msg) => self.postMessage({ id, type: "stderr", text: msg + "\n" }) });
 
+    // Automatically load packages based on imports (e.g., import pandas, import numpy)
+    await self.pyodide.loadPackagesFromImports(python);
+
     await self.pyodide.runPythonAsync(python);
     self.postMessage({ id, type: "done" });
   } catch (error) {

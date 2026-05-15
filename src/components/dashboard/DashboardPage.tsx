@@ -58,6 +58,14 @@ export default async function DashboardPage() {
                 >
                   Open LMS
                 </Link>
+                {clerkUser?.publicMetadata?.role === "admin" && (
+                  <Link
+                    href="/admin/resets"
+                    className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-200 transition hover:bg-red-500/20"
+                  >
+                    Manage Resets
+                  </Link>
+                )}
                 <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: "h-10 w-10" } }} />
               </div>
             </div>
@@ -116,6 +124,14 @@ export default async function DashboardPage() {
                 >
                   Open LMS
                 </Link>
+                {user.role === "admin" && (
+                  <Link
+                    href="/admin/resets"
+                    className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-200 transition hover:bg-red-500/20"
+                  >
+                    Manage Resets
+                  </Link>
+                )}
                 <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: "h-10 w-10" } }} />
               </div>
 

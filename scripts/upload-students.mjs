@@ -32,7 +32,7 @@ if (!CLERK_SECRET_KEY) {
   process.exit(1);
 }
 
-const csvPath = resolve(__dirname, "../students.csv");
+const csvPath = resolve(__dirname, "../students_new.csv");
 
 if (!fs.existsSync(csvPath)) {
   console.error("❌ students.csv not found in the root directory!");

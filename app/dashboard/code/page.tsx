@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
+import MediaLibrary from "@/src/components/media/MediaLibrary";
 
 // Types
 interface Program {
@@ -24,7 +25,7 @@ export default function CodeEditorPage() {
   const [cssCode, setCssCode] = useState("h1 {\n  color: #0ea5e9;\n}");
   const [jsCode, setJsCode] = useState("");
   
-  const [activeTab, setActiveTab] = useState<"html" | "css" | "js">("html");
+  const [activeTab, setActiveTab] = useState<"html" | "css" | "js" | "media">("html");
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -185,27 +186,39 @@ export default function CodeEditorPage() {
               >
                 JS
               </button>
+              <button 
+                onClick={() => setActiveTab("media")}
+                className={`px-6 py-2 text-sm font-medium ${activeTab === 'media' ? 'border-b-2 border-cyan-500 text-cyan-400' : 'text-slate-400 hover:text-white'}`}
+              >
+                Media
+              </button>
             </div>
             
-            {/* Monaco Editor */}
+            {/* Monaco Editor or Media Library */}
             <div className="flex-1 pt-4">
-              <Editor
-                height="100%"
-                theme="vs-dark"
-                language={activeTab === "html" ? "html" : activeTab === "css" ? "css" : "javascript"}
-                value={activeTab === "html" ? htmlCode : activeTab === "css" ? cssCode : jsCode}
-                onChange={(value) => {
-                  if (activeTab === "html") setHtmlCode(value || "");
-                  if (activeTab === "css") setCssCode(value || "");
-                  if (activeTab === "js") setJsCode(value || "");
-                }}
-                options={{
-                  minimap: { enabled: false },
-                  fontSize: 14,
-                  wordWrap: "on",
-                  padding: { top: 16 },
-                }}
-              />
+              {activeTab === "media" ? (
+                <div className="h-full p-6 overflow-y-auto">
+                  <MediaLibrary />
+                </div>
+              ) : (
+                <Editor
+                  height="100%"
+                  theme="vs-dark"
+                  language={activeTab === "html" ? "html" : activeTab === "css" ? "css" : "javascript"}
+                  value={activeTab === "html" ? htmlCode : activeTab === "css" ? cssCode : jsCode}
+                  onChange={(value) => {
+                    if (activeTab === "html") setHtmlCode(value || "");
+                    if (activeTab === "css") setCssCode(value || "");
+                    if (activeTab === "js") setJsCode(value || "");
+                  }}
+                  options={{
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    wordWrap: "on",
+                    padding: { top: 16 },
+                  }}
+                />
+              )}
             </div>
           </div>
 
