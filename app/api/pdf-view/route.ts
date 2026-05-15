@@ -39,7 +39,15 @@ function isLikelyPdfResponse(url: URL, headers: Headers) {
   return isCloudinaryRawUpload(url) && contentType.includes("application/octet-stream");
 }
 
+import { auth } from "@clerk/nextjs/server";
+
 export async function GET(request: NextRequest) {
+  // Check if user is authenticated (either Gmail or Admission No)
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized. Please log in to view resources." }, { status: 401, headers: withCors() });
+  }
+
   const source = request.nextUrl.searchParams.get("url")?.trim();
   const download = request.nextUrl.searchParams.get("download") === "1";
   const range = request.headers.get("range");
