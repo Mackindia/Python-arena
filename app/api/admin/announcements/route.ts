@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
       message: body.message,
       targetRoles: Array.isArray(body.targetRoles) && body.targetRoles.length ? body.targetRoles : ["student", "teacher", "admin"],
       level: body.level ?? "info",
+      targetClass: body.targetClass ?? "All", // Added support for class targeting
       isActive: body.isActive ?? true,
       createdBy: access.ctx.userId,
     });

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import ClerkUserSync from "@/src/components/auth/ClerkUserSync";
 import Navbar from "@/src/components/navbar/Navbar";
+import NoticeBoard from "@/src/components/dashboard/NoticeBoard";
 import Footer from "@/src/components/footer/Footer";
 import "./globals.css";
 
@@ -64,6 +65,7 @@ export default function RootLayout({
         <body className="min-h-full flex flex-col">
           <ClerkUserSync />
           <Navbar />
+          <NoticeBoard />
           <main className="flex-1">{children}</main>
           <Footer />
         </body>
