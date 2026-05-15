@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { connectDB } from "@/lib/mongodb";
 import { Media } from "@/src/models/Media";
-import { unlink } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import cloudinary from "@/src/lib/cloudinary";
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -25,10 +23,22 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Asset not found" }, { status: 404 });
     }
 
-    // Delete file from disk
-    const filePath = join(process.cwd(), "public", asset.fileUrl);
-    if (existsSync(filePath)) {
-      await unlink(filePath);
+    // Delete from Cloudinary
+    // Extract public_id from URL
+    // URL looks like: https://res.cloudinary.com/cloudname/image/upload/v123/student_uploads/userid/filename.jpg
+    try {
+      const urlParts = asset.fileUrl.split("/");
+      const fileNameWithExt = urlParts[urlParts.length - 1];
+      const publicIdWithFolder = `student_uploads/${userId}/${fileNameWithExt.split(".")[0]}`;
+      
+      let resourceType: "image" | "video" | "raw" = "raw";
+      if (asset.fileType === "image") resourceType = "image";
+      else if (asset.fileType === "audio" || asset.fileType === "video") resourceType = "video";
+
+      await cloudinary.uploader.destroy(publicIdWithFolder, { resource_type: resourceType });
+    } catch (err) {
+      console.error("Cloudinary delete failed:", err);
+      // We continue deleting from DB anyway
     }
 
     // Delete from DB

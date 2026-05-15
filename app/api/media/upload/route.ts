@@ -2,11 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { connectDB } from "@/lib/mongodb";
 import { Media } from "@/src/models/Media";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import cloudinary from "@/src/lib/cloudinary";
 
-const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+const MAX_TOTAL_STORAGE = 20 * 1024 * 1024; // 20MB Total
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,46 +27,52 @@ export async function POST(req: NextRequest) {
     const userAssets = await Media.find({ userId });
     const currentTotalSize = userAssets.reduce((acc, asset) => acc + (asset.fileSize || 0), 0);
 
-    if (currentTotalSize + file.size > MAX_FILE_SIZE) {
+    if (currentTotalSize + file.size > MAX_TOTAL_STORAGE) {
       return NextResponse.json({ 
         error: `Storage limit exceeded. You have used ${(currentTotalSize / (1024 * 1024)).toFixed(2)}MB of your 20MB limit.` 
       }, { status: 400 });
     }
 
-    // Prepare file data
+    // Convert file to Buffer for Cloudinary
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Determine file type
+    // Determine resource type for Cloudinary
+    let resourceType: "image" | "video" | "raw" = "raw";
     let fileType = "other";
-    if (file.type.startsWith("image/")) fileType = "image";
-    else if (file.type.startsWith("audio/")) fileType = "audio";
-    else if (file.type.startsWith("video/")) fileType = "video";
-
-    // Create unique filename to avoid overwrites
-    const timestamp = Date.now();
-    const safeName = file.name.replace(/[^a-z0-9.]/gi, "_").toLowerCase();
-    const fileName = `${timestamp}_${safeName}`;
     
-    // Define public path
-    const relativeDir = `/uploads/${userId}`;
-    const uploadDir = join(process.cwd(), "public", "uploads", userId);
-    const filePath = join(uploadDir, fileName);
-    const fileUrl = `${relativeDir}/${fileName}`;
-
-    // Ensure directory exists
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
+    if (file.type.startsWith("image/")) {
+      resourceType = "image";
+      fileType = "image";
+    } else if (file.type.startsWith("audio/")) {
+      resourceType = "video"; // Cloudinary treats audio as video type
+      fileType = "audio";
+    } else if (file.type.startsWith("video/")) {
+      resourceType = "video";
+      fileType = "video";
     }
 
-    // Write file to disk
-    await writeFile(filePath, buffer);
+    // Upload to Cloudinary using a Promise wrapper for the stream
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: resourceType,
+          folder: `student_uploads/${userId}`,
+          public_id: file.name.split('.')[0] + "_" + Date.now(),
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(buffer);
+    }) as any;
 
     // Save to MongoDB
     const media = await Media.create({
       userId,
       fileName: file.name,
-      fileUrl,
+      fileUrl: uploadResult.secure_url, // Permanent HTTPS link
       fileType,
       fileSize: file.size,
     });
@@ -79,7 +83,7 @@ export async function POST(req: NextRequest) {
     }, { status: 201 });
 
   } catch (error: any) {
-    console.error("Upload error:", error);
-    return NextResponse.json({ error: "Internal server error: " + error.message }, { status: 500 });
+    console.error("Cloudinary upload error:", error);
+    return NextResponse.json({ error: "Upload failed: " + error.message }, { status: 500 });
   }
 }
