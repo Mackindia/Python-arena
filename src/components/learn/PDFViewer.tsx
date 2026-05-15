@@ -30,6 +30,7 @@ export default function PDFViewer({
 }: PDFViewerProps) {
   const proxyUrl = `/api/pdf-view?url=${encodeURIComponent(pdfUrl)}`;
   const downloadPdfUrl = `/api/pdf-view?download=1&url=${encodeURIComponent(pdfUrl)}`;
+
   const isIOSDevice = useMemo(() => {
     if (typeof navigator === "undefined") {
       return false;
@@ -45,6 +46,7 @@ export default function PDFViewer({
     );
   }, []);
   const viewerSource = isIOSDevice ? pdfUrl : proxyUrl;
+  const iosViewerUrl = `${viewerSource}#page=${pageNumber}`;
 
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState(1);
@@ -55,6 +57,59 @@ export default function PDFViewer({
   const [containerWidth, setContainerWidth] = useState(600);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const documentRef = useRef<any>(null);
+
+  // Page cache to avoid re-rendering
+  const pageCache = useRef<Map<number, any>>(new Map());
+
+  useEffect(() => {
+    setPageNumber(1);
+    setNumPages(0);
+    setHasError(false);
+    setErrorMessage("");
+    setIsLoading(true);
+  }, [pdfUrl, isIOSDevice]);
+
+  useEffect(() => {
+    if (!isIOSDevice) {
+      return;
+    }
+
+    let cancelled = false;
+    const loadingTask = pdfjs.getDocument(proxyUrl);
+
+    loadingTask.promise
+      .then((documentProxy) => {
+        if (cancelled) {
+          return;
+        }
+
+        setNumPages(documentProxy.numPages);
+        setHasError(false);
+      })
+      .catch((error: Error) => {
+        if (cancelled) {
+          return;
+        }
+
+        setHasError(true);
+        setErrorMessage(error.message || "Failed to load PDF metadata");
+        setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      loadingTask.destroy();
+    };
+  }, [isIOSDevice, proxyUrl]);
+
+  useEffect(() => {
+    if (!isIOSDevice || hasError || numPages === 0) {
+      return;
+    }
+
+    setIsLoading(true);
+  }, [isIOSDevice, pageNumber, numPages, hasError]);
 
   // Track container width for responsive page rendering
   useEffect(() => {
@@ -71,6 +126,8 @@ export default function PDFViewer({
     setNumPages(numPages);
     setIsLoading(false);
     setHasError(false);
+    // Clear cache on new PDF load
+    pageCache.current.clear();
   };
 
   const handleLoadError = (error: Error) => {
@@ -87,6 +144,25 @@ export default function PDFViewer({
     link.click();
     document.body.removeChild(link);
   };
+
+  // Preload next page in background for instant navigation
+  useEffect(() => {
+    if (!documentRef.current || pageNumber >= numPages || isLoading) return;
+    
+    const nextPageNum = pageNumber + 1;
+    if (nextPageNum <= numPages && !pageCache.current.has(nextPageNum)) {
+      // Preload next page asynchronously
+      setTimeout(() => {
+        if (documentRef.current) {
+          try {
+            documentRef.current.getPage?.(nextPageNum);
+          } catch {
+            // Silent fail on preload
+          }
+        }
+      }, 200);
+    }
+  }, [pageNumber, numPages, isLoading]);
 
   // Prevent page scrolling while in-app fullscreen is active.
   useEffect(() => {
@@ -121,6 +197,20 @@ export default function PDFViewer({
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [isFullscreenActive]);
+
+  // Keyboard shortcuts for page navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight" && pageNumber < numPages) {
+        setPageNumber(p => Math.min(p + 1, numPages));
+      } else if (e.key === "ArrowLeft" && pageNumber > 1) {
+        setPageNumber(p => Math.max(p - 1, 1));
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [pageNumber, numPages]);
 
   return (
     <div
@@ -166,6 +256,18 @@ export default function PDFViewer({
 
         {/* Action buttons */}
         <div className="flex items-center gap-2">
+          <a
+            href={proxyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open PDF directly"
+            aria-label="Open PDF directly"
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-cyan-400"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h4m0 0v4m0-4l-5 5m-5-1v6a1 1 0 001 1h6" />
+            </svg>
+          </a>
           {showDownloadButton && (
             <button
               type="button"
@@ -229,40 +331,49 @@ export default function PDFViewer({
         </div>
       )}
 
-      {/* iOS Safari is more reliable with the browser's native PDF viewer. */}
-      {!hasError && isIOSDevice ? (
+      {/* PDF canvas renderer via react-pdf with lazy page rendering */}
+      {!hasError && isIOSDevice && (
         <iframe
+          key={iosViewerUrl}
           title={title}
-          src={viewerSource}
-          onLoad={() => setIsLoading(false)}
-          onError={() => {
+          src={iosViewerUrl}
+          onLoad={() => {
             setIsLoading(false);
+            setHasError(false);
+          }}
+          onError={() => {
             setHasError(true);
             setErrorMessage("Failed to load PDF in Safari viewer");
+            setIsLoading(false);
           }}
           className="flex-1 w-full border-0 bg-white"
         />
-      ) : null}
+      )}
 
-      {/* PDF canvas renderer via react-pdf — no iframes, no save/open popups */}
       {!hasError && !isIOSDevice && (
         <div
           ref={scrollRef}
           className="flex-1 overflow-y-auto bg-slate-700 flex flex-col items-center py-4"
         >
           <Document
+            ref={documentRef}
             file={proxyUrl}
             onLoadSuccess={handleLoadSuccess}
             onLoadError={handleLoadError}
             loading={null}
             error={null}
           >
+            {/* Only render current page for performance, not all pages */}
             <Page
               pageNumber={pageNumber}
               width={containerWidth || 600}
               renderTextLayer
               renderAnnotationLayer
-              loading={null}
+              loading={
+                <div className="flex justify-center py-4">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-400/30 border-t-cyan-400" />
+                </div>
+              }
               error={null}
             />
           </Document>
