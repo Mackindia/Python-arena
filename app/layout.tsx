@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import ClerkUserSync from "@/src/components/auth/ClerkUserSync";
+import Navbar from "@/src/components/navbar/Navbar";
+import Footer from "@/src/components/footer/Footer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -61,7 +63,9 @@ export default function RootLayout({
       >
         <body className="min-h-full flex flex-col">
           <ClerkUserSync />
-          {children}
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
         </body>
       </html>
     </ClerkProvider>

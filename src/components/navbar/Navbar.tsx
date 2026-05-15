@@ -76,6 +76,12 @@ export default function Navbar() {
               <Link href="/dashboard" className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
                 Dashboard
               </Link>
+              <Link href="/dashboard/code" className="rounded-lg bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-200">
+                Web Editor
+              </Link>
+              <Link href="/dashboard/python" className="rounded-lg bg-blue-100 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-200">
+                Python Editor
+              </Link>
               <UserButton afterSignOutUrl="/" />
               </>
             ) : (
@@ -163,15 +169,31 @@ export default function Navbar() {
 
                 <div className="border-t border-slate-200 pt-3">
                   {isLoaded && isSignedIn ? (
-                    <div className="flex items-center justify-between gap-3 rounded-lg px-3 py-2">
+                    <div className="flex flex-col gap-2 rounded-lg px-3 py-2">
+                      <div className="flex items-center justify-between">
+                        <Link
+                          href="/dashboard"
+                          onClick={handleMobileMenuClose}
+                          className="text-sm font-medium text-slate-700"
+                        >
+                          Dashboard
+                        </Link>
+                        <UserButton afterSignOutUrl="/" />
+                      </div>
                       <Link
-                        href="/dashboard"
+                        href="/dashboard/code"
                         onClick={handleMobileMenuClose}
                         className="text-sm font-medium text-slate-700"
                       >
-                        Dashboard
+                        Web Editor
                       </Link>
-                      <UserButton afterSignOutUrl="/" />
+                      <Link
+                        href="/dashboard/python"
+                        onClick={handleMobileMenuClose}
+                        className="text-sm font-medium text-slate-700"
+                      >
+                        Python Editor
+                      </Link>
                     </div>
                   ) : (
                     <div className="space-y-2 px-1">
