@@ -27,6 +27,28 @@ export default function PythonEditorPage() {
   const workerRef = useRef<Worker | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
+  const [currentTime, setCurrentTime] = useState("");
+
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+
+      setCurrentTime(
+        now.toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })
+      );
+    };
+
+    updateClock();
+
+    const timer = setInterval(updateClock, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
@@ -235,7 +257,13 @@ export default function PythonEditorPage() {
             {saveStatus === "unsaved" && <span className="text-xs text-amber-400">Unsaved changes</span>}
           </div>
           
-          <div className="flex space-x-3">
+          <div className="flex items-center space-x-3">
+              {currentTime && (
+                <div className="bg-black/30 border border-cyan-500/20 px-4 py-2 rounded-xl text-cyan-300 font-mono text-sm shadow-lg">
+                  🕒 {currentTime}
+                </div>
+              )}
+
               {isRunning ? (
                 <button 
                   onClick={stopExecution}

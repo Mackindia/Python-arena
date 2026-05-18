@@ -28,6 +28,28 @@ export default function CodeEditorPage() {
   const [activeTab, setActiveTab] = useState<"html" | "css" | "js" | "media">("html");
 
   const [isLoading, setIsLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState("");
+
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+
+      setCurrentTime(
+        now.toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })
+      );
+    };
+
+    updateClock();
+
+    const timer = setInterval(updateClock, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
@@ -152,13 +174,21 @@ export default function CodeEditorPage() {
             className="border-b border-transparent bg-transparent text-lg font-bold text-white transition focus:border-cyan-500 outline-none"
           />
           
-          <button 
-            onClick={handleSave}
-            disabled={isLoading}
-            className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:opacity-50"
-          >
-            {isLoading ? "Saving..." : "Save Project"}
-          </button>
+          <div className="flex items-center space-x-3">
+            {currentTime && (
+              <div className="bg-black/30 border border-cyan-500/20 px-4 py-2 rounded-xl text-cyan-300 font-mono text-sm shadow-lg">
+                🕒 {currentTime}
+              </div>
+            )}
+            
+            <button 
+              onClick={handleSave}
+              disabled={isLoading}
+              className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:opacity-50"
+            >
+              {isLoading ? "Saving..." : "Save Project"}
+            </button>
+          </div>
         </div>
 
         {/* Editor and Preview Split */}

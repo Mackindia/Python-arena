@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import AppCard from "@/src/components/ui/AppCard";
 import AppButton from "@/src/components/ui/AppButton";
 import AppAlert from "@/src/components/ui/AppAlert";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 type ResetRequest = {
@@ -18,6 +18,7 @@ export default function AdminResetsPage() {
   const [requests, setRequests] = useState<ResetRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [processingAction, setProcessingAction] = useState<"approve" | "reject" | null>(null);
 
   const fetchRequests = async () => {
     try {
@@ -39,6 +40,7 @@ export default function AdminResetsPage() {
 
   const handleApprove = async (id: string, username: string) => {
     setProcessingId(id);
+    setProcessingAction("approve");
     try {
       const res = await fetch("/api/reset-password/approve", {
         method: "POST",
@@ -60,6 +62,33 @@ export default function AdminResetsPage() {
       toast.error("An unexpected error occurred");
     } finally {
       setProcessingId(null);
+      setProcessingAction(null);
+    }
+  };
+
+  const handleReject = async (id: string) => {
+    setProcessingId(id);
+    setProcessingAction("reject");
+    try {
+      const res = await fetch("/api/reset-password/reject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId: id }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success("Password reset request cancelled successfully");
+        setRequests(requests.filter(r => r._id !== id));
+      } else {
+        toast.error(data.error || "Failed to cancel request");
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setProcessingId(null);
+      setProcessingAction(null);
     }
   };
 
@@ -101,15 +130,29 @@ export default function AdminResetsPage() {
                       Requested on: {new Date(request.createdAt).toLocaleString()}
                     </p>
                   </div>
-                  <AppButton
-                    onClick={() => handleApprove(request._id, request.username)}
-                    disabled={processingId === request._id}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white"
-                  >
-                    {processingId === request._id ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : "Approve Reset"}
-                  </AppButton>
+                  <div className="flex items-center gap-3">
+                    <AppButton
+                      onClick={() => handleReject(request._id)}
+                      disabled={processingId === request._id}
+                      className="bg-rose-950/40 border border-rose-800/80 text-rose-300 hover:bg-rose-900/60"
+                    >
+                      {processingId === request._id && processingAction === "reject" ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <XCircle className="h-4 w-4 mr-2" />
+                      )}
+                      Cancel Request
+                    </AppButton>
+                    <AppButton
+                      onClick={() => handleApprove(request._id, request.username)}
+                      disabled={processingId === request._id}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white"
+                    >
+                      {processingId === request._id && processingAction === "approve" ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : "Approve Reset"}
+                    </AppButton>
+                  </div>
                 </div>
               </AppCard>
             ))}
@@ -119,3 +162,4 @@ export default function AdminResetsPage() {
     </div>
   );
 }
+
