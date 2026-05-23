@@ -20,6 +20,8 @@ export async function requireAdminApi() {
 
   return {
     ok: true as const,
+    userId: ctx.userId,
+    role: ctx.role,
     ctx,
   };
 }

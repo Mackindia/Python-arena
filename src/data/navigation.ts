@@ -15,6 +15,7 @@ export const primaryNavLinks: NavLink[] = [
   { label: "Videos", href: "/videos" },
   { label: "Practice", href: "/practice" },
   { label: "Resources", href: "/resources" },
+  { label: "Online Class", href: "/online-class" },
 ];
 
 export const learnMenu: LearnCategory[] = [

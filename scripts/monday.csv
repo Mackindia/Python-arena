@@ -1,0 +1,4 @@
+class,section,group,period_no,subject,teacher_id,teacher_name
+11,A,MAIN,1,Physics,T101,John Doe
+11,A,MAIN,2,Chemistry,T102,Jane Smith
+11,A,MAIN,3,Maths,T103,Alan Turing

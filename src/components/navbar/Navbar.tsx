@@ -9,7 +9,33 @@ import MegaDropdown from "@/src/components/dropdown/MegaDropdown";
 import { learnMenu, primaryNavLinks } from "@/src/data/navigation";
 
 export default function Navbar() {
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { isLoaded: isClerkLoaded, isSignedIn: isClerkSignedIn, user } = useUser();
+  const [dbUser, setDbUser] = useState<any>(null);
+  const [isDbLoaded, setIsDbLoaded] = useState(false);
+
+  useEffect(() => {
+    async function fetchDbUser() {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            setDbUser(data.user);
+          } else {
+            setDbUser(null);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching user session", err);
+      } finally {
+        setIsDbLoaded(true);
+      }
+    }
+    fetchDbUser();
+  }, [isClerkSignedIn]);
+
+  const isSignedIn = isClerkSignedIn || !!dbUser;
+  const isLoaded = isClerkLoaded && isDbLoaded;
   const [isLearnOpen, setIsLearnOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobileLearnOpen, setIsMobileLearnOpen] = useState(false);
@@ -87,7 +113,34 @@ export default function Navbar() {
               <Link href="/dashboard/python" className="rounded-lg bg-blue-100 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-200">
                 Python Editor
               </Link>
-              <UserButton afterSignOutUrl="/" />
+              {dbUser && dbUser.role === "admin" && (
+                <>
+                  <Link href="/admin/users" className="rounded-lg px-3 py-2 text-sm font-medium text-purple-600 transition hover:bg-purple-50 hover:text-purple-700">
+                    User Mgmt
+                  </Link>
+                  <Link href="/admin/timetable" className="rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 transition hover:bg-indigo-50 hover:text-indigo-700">
+                    Timetable Mgmt
+                  </Link>
+                </>
+              )}
+              {dbUser && !dbUser.isClerk ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-slate-700">
+                    Hi, {dbUser.fullName}
+                  </span>
+                  <button
+                    onClick={async () => {
+                      await fetch("/api/auth/logout", { method: "POST" });
+                      window.location.href = "/";
+                    }}
+                    className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <UserButton afterSignOutUrl="/" />
+              )}
               </>
             ) : (
               <>
@@ -183,8 +236,38 @@ export default function Navbar() {
                         >
                           Dashboard
                         </Link>
-                        <UserButton afterSignOutUrl="/" />
+                        {dbUser && !dbUser.isClerk ? (
+                          <button
+                            onClick={async () => {
+                              await fetch("/api/auth/logout", { method: "POST" });
+                              window.location.href = "/";
+                            }}
+                            className="rounded-lg border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+                          >
+                            Sign Out
+                          </button>
+                        ) : (
+                          <UserButton afterSignOutUrl="/" />
+                        )}
                       </div>
+                      {dbUser && dbUser.role === "admin" && (
+                        <>
+                          <Link
+                            href="/admin/users"
+                            onClick={handleMobileMenuClose}
+                            className="text-sm font-medium text-purple-600"
+                          >
+                            User Mgmt
+                          </Link>
+                          <Link
+                            href="/admin/timetable"
+                            onClick={handleMobileMenuClose}
+                            className="text-sm font-medium text-indigo-600"
+                          >
+                            Timetable Mgmt
+                          </Link>
+                        </>
+                      )}
                       <Link
                         href="/dashboard/code"
                         onClick={handleMobileMenuClose}

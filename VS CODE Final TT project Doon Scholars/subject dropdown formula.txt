@@ -1,0 +1,6 @@
+=FILTER(
+load_master!$A:$A,
+(load_master!$B:$B=4)*
+(load_master!$C:$C="B")*
+(load_master!$F:$F>0)
+)

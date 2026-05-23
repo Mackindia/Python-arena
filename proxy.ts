@@ -1,7 +1,8 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isProtectedRoute = createRouteMatcher([
-  "/dashboard(.*)", 
+  "/dashboard/((?!documents).*)",  // all /dashboard/* except /dashboard/documents
+  "/dashboard$",                   // /dashboard itself still protected
   "/admin(.*)", 
   "/teacher(.*)",
   "/learn(.*)",

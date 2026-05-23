@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getDashboardData } from "@/lib/user-sync";
+import { cookies } from "next/headers";
 
 const DASHBOARD_DATA_TIMEOUT_MS = 4000;
 
@@ -25,6 +26,11 @@ function formatList(items: string[], fallback: string) {
 export default async function DashboardPage() {
   const { userId } = await auth();
   if (!userId) {
+    const cookieStore = await cookies();
+    const localUserId = cookieStore.get("local_user_id")?.value;
+    if (localUserId) {
+      redirect("/online-class");
+    }
     redirect("/sign-in?redirect_url=/dashboard");
   }
 

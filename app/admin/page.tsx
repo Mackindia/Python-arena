@@ -94,6 +94,7 @@ export default async function AdminPage() {
     { label: "Manage Lessons", href: "/admin/lessons", meta: "Create, update, and publish lesson content" },
     { label: "Manage Subjects", href: "/admin/courses", meta: "Organize subject and class curriculum structure" },
     { label: "Students", href: "/admin/users", meta: "Review learner profiles and engagement" },
+    { label: "Timetable System", href: "/admin/timetable", meta: "Manage school classes timetable and teacher slots" },
     { label: "Analytics", href: "/admin/analytics", meta: "Track platform and LMS performance" },
   ];
 

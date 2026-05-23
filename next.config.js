@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   turbopack: {
-    root: process.cwd(),
+    root: __dirname,
   },
   typescript: {
     // Temporary: unblock deployment while remaining TS issues are fixed.

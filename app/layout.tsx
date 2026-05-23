@@ -36,8 +36,9 @@ export default function RootLayout({
       <html
         lang="en"
         className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+        suppressHydrationWarning
       >
-        <body className="min-h-full bg-slate-950 text-slate-100">
+        <body className="min-h-full bg-slate-950 text-slate-100" suppressHydrationWarning>
           <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center justify-center px-6 text-center">
             <h1 className="text-3xl font-bold sm:text-4xl">Deployment Configuration Required</h1>
             <p className="mt-4 text-sm text-slate-300 sm:text-base">
@@ -61,8 +62,9 @@ export default function RootLayout({
       <html
         lang="en"
         className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+        suppressHydrationWarning
       >
-        <body className="min-h-full flex flex-col">
+        <body className="min-h-full flex flex-col" suppressHydrationWarning>
           <ClerkUserSync />
           <Navbar />
           <NoticeBoard />

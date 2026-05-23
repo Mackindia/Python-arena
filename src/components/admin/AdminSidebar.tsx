@@ -3,9 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { adminSidebarLinks } from "@/src/constants/admin";
+import type { AppRole } from "@/lib/rbac";
 
-export default function AdminSidebar() {
+type AdminSidebarProps = {
+  role: AppRole;
+};
+
+export default function AdminSidebar({ role }: AdminSidebarProps) {
   const pathname = usePathname();
+  const links = role === "admin"
+    ? adminSidebarLinks
+    : adminSidebarLinks.filter((section) => section.href !== "/admin/private");
 
   return (
     <aside className="w-full shrink-0 rounded-[28px] border border-white/10 bg-slate-900/80 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.35)] ring-1 ring-white/5 backdrop-blur sm:p-5 lg:sticky lg:top-6 lg:w-80 lg:self-start">
@@ -26,7 +34,7 @@ export default function AdminSidebar() {
         </div>
 
         <nav className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-1">
-        {adminSidebarLinks.map((section) => {
+        {links.map((section) => {
           const active = pathname === section.href || (section.href !== "/admin" && pathname.startsWith(section.href));
           const Icon = section.icon;
 
