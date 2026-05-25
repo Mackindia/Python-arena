@@ -6,6 +6,8 @@ import initialTimetables from '../data/timetables.json';
 import initialTeachers from '../data/teachers.json';
 import initialTeacherSlotUsage from '../data/teacher_slot_usage.json';
 import initialTeacherMapping from '../data/teacher_mapping.json';
+import { checkTeacherCollision as engineCheckTeacherCollision } from '../services/collisionEngine';
+import { generateTeacherUsageGrid } from '../services/derivedViewEngine';
 
 const TimetableContext = createContext();
 
@@ -100,6 +102,22 @@ export const TimetableProvider = ({ children }) => {
   useEffect(() => {
     if (Object.keys(timetables).length > 0) {
       localStorage.setItem('timetables', JSON.stringify(timetables));
+      
+      // Dynamically update teachers list based on assigned timetables
+      const dynamicTeachers = new Set([...initialTeachers]);
+      Object.values(timetables).forEach(schedule => {
+        schedule.forEach(slot => {
+          if (slot.teacher) {
+            slot.teacher.split(',').forEach(t => {
+              const cleanT = t.trim();
+              if (cleanT && cleanT.toLowerCase() !== 'nan' && cleanT !== '0') {
+                dynamicTeachers.add(cleanT);
+              }
+            });
+          }
+        });
+      });
+      setTeachers(Array.from(dynamicTeachers).sort());
     }
   }, [timetables]);
 
@@ -133,30 +151,15 @@ export const TimetableProvider = ({ children }) => {
     localStorage.setItem('teacherSubjectMap', JSON.stringify(teacherSubjectMap));
   }, [teacherSubjectMap]);
 
-  // Logic: Check for teacher collision
-  // A teacher cannot be in two different classes at the same day and period
-  // Supports comma-separated teachers (e.g., 'SA,SS' will clash with 'SA')
+  // Logic: Check for teacher collision using the engine
   const checkTeacherCollision = (teacherStr, day, period, currentClass) => {
     if (!teacherStr) return false;
-    
     const currentTeachers = teacherStr.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
     if (currentTeachers.length === 0) return false;
     
-    for (const [classId, schedule] of Object.entries(timetables)) {
-      if (classId === currentClass) continue; // Skip current class
-      
-      const conflictSlot = schedule.find(
-        slot => slot.day === day && parseInt(slot.period) === parseInt(period)
-      );
-      
-      if (conflictSlot && conflictSlot.teacher) {
-        const conflictTeachers = conflictSlot.teacher.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
-        const hasOverlap = currentTeachers.some(t => conflictTeachers.includes(t));
-        
-        if (hasOverlap) {
-          return classId; // Return the class where the collision occurs
-        }
-      }
+    for (const t of currentTeachers) {
+      const collisionClass = engineCheckTeacherCollision(t, day, period, currentClass, timetables);
+      if (collisionClass) return collisionClass;
     }
     return false;
   };
@@ -468,38 +471,7 @@ export const TimetableProvider = ({ children }) => {
 
   // Get teacher slot usage: compute from current timetables
   const getTeacherSlotUsage = () => {
-    // Always compute fresh from timetables to ensure conflicts are detected
-    const usage = {};
-    
-    // Initialize for all teachers
-    teachers.forEach(teacher => {
-      usage[teacher] = {};
-      ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
-        usage[teacher][day] = {};
-        for (let period = 1; period <= 8; period++) {
-          usage[teacher][day][period] = 0;
-        }
-      });
-    });
-    
-    // Count assignments from current timetables
-    Object.entries(timetables).forEach(([, schedule]) => {
-      schedule.forEach(slot => {
-        if (slot.teacher && slot.teacher.trim()) {
-          const assignedTeachers = slot.teacher.split(',').map(t => t.trim());
-          assignedTeachers.forEach(t => {
-            if (usage[t] && usage[t][slot.day]) {
-              const period = slot.period;
-              if (usage[t][slot.day][period] !== undefined) {
-                usage[t][slot.day][period]++;
-              }
-            }
-          });
-        }
-      });
-    });
-    
-    return usage;
+    return generateTeacherUsageGrid(timetables, teachers);
   };
 
   return (

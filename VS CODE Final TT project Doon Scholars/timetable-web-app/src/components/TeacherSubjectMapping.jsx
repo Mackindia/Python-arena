@@ -61,10 +61,29 @@ const TeacherSubjectMapping = () => {
     const parsed = parseCSVConfig();
     setConfig(parsed);
     
-    if (Object.keys(teacherSubjectMap).length === 0) {
-      setTeacherSubjectMap(parsed.initialData);
-    }
-  }, [teacherSubjectMap]);
+    // Always merge in the CSV teacher initials if they are missing from the current state!
+    // This fixes the issue where old cached browser data prevents initials from loading.
+    setTeacherSubjectMap(prev => {
+      const nextMap = { ...prev };
+      let hasChanges = false;
+      
+      Object.keys(parsed.initialData).forEach(subj => {
+        if (!nextMap[subj]) {
+          nextMap[subj] = { ...parsed.initialData[subj] };
+          hasChanges = true;
+        } else {
+          Object.keys(parsed.initialData[subj]).forEach(col => {
+            if (!nextMap[subj][col]) {
+              nextMap[subj][col] = parsed.initialData[subj][col];
+              hasChanges = true;
+            }
+          });
+        }
+      });
+      
+      return hasChanges ? nextMap : prev;
+    });
+  }, []); // Run ONLY once on mount
 
   const handleCellChange = (subject, col, value) => {
     setTeacherSubjectMap(prev => ({
@@ -111,14 +130,27 @@ const TeacherSubjectMapping = () => {
     <div style={{ paddingBottom: '3rem' }}>
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h1 className="page-title">Teacher Subject Mapping</h1>
-        <button 
-          className="btn btn-primary" 
-          onClick={pushToTimetable}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#2563eb', color: 'white', padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 600 }}
-        >
-          <Save size={18} />
-          Sync to Timetable
-        </button>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button 
+            className="btn btn-outline" 
+            onClick={() => {
+              if (window.confirm("This will reset all your current mappings back to the original CSV file. Are you sure?")) {
+                setTeacherSubjectMap(config.initialData);
+              }
+            }}
+            style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #cbd5e1', cursor: 'pointer', fontWeight: 600, background: '#fff' }}
+          >
+            Reset to CSV
+          </button>
+          <button 
+            className="btn btn-primary" 
+            onClick={pushToTimetable}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#2563eb', color: 'white', padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+          >
+            <Save size={18} />
+            Sync to Timetable
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

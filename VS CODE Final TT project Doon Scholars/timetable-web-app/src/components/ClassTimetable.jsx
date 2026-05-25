@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { autoAssignTeacher } from '../services/allocationEngine';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 const ClassTimetable = () => {
-  const { timetables, classes, updateSlot, checkTeacherCollision, loadMaster, teachers } = useTimetable();
+  const { timetables, classes, updateSlot, checkTeacherCollision, loadMaster, teachers, teacherSubjectMap } = useTimetable();
   const [selectedClass, setSelectedClass] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [notification, setNotification] = useState(null);
@@ -26,7 +27,25 @@ const ClassTimetable = () => {
     let subject = currentSubject || '';
     let teacher = currentTeacher || '';
 
-    if (field === 'subject') subject = value;
+    if (field === 'subject') {
+      subject = value;
+      // Auto-assign teacher using centralized engine
+      if (value && teacherSubjectMap) {
+        const assignment = autoAssignTeacher(value, selectedClass, day, period, teacherSubjectMap, timetables);
+        
+        if (assignment.status !== 'empty') {
+          teacher = assignment.teacher;
+          
+          if (assignment.status === 'success') {
+            setNotification({ type: 'success', message: assignment.message });
+          } else if (assignment.status === 'partial_conflict') {
+            setNotification({ type: 'warning', message: assignment.message });
+          } else if (assignment.status === 'full_conflict') {
+            setNotification({ type: 'error', message: assignment.message });
+          }
+        }
+      }
+    }
     if (field === 'teacher') teacher = value;
 
     // Check collision if updating teacher
@@ -109,6 +128,13 @@ const ClassTimetable = () => {
         </div>
       </div>
 
+      <datalist id="class-subject-list">
+        {uniqueSubjects.map(sub => <option key={sub} value={sub} />)}
+      </datalist>
+      <datalist id="class-teacher-list">
+        {teachers.map(t => <option key={t} value={t} />)}
+      </datalist>
+
       <div className="card">
         {classes.length === 0 ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
@@ -138,24 +164,22 @@ const ClassTimetable = () => {
                     >
                       {editMode ? (
                         <div className="edit-slot">
-                          <select 
+                          <input 
+                            type="text"
+                            list="class-subject-list"
                             value={slot?.subject || ''} 
                             onChange={(e) => handleSlotUpdate(day, p, 'subject', e.target.value, slot?.subject, slot?.teacher)}
-                          >
-                            <option value="">- Subject -</option>
-                            {uniqueSubjects.map(sub => (
-                              <option key={sub} value={sub}>{sub}</option>
-                            ))}
-                          </select>
-                          <select 
+                            style={{ fontSize: '0.8rem', padding: '2px', width: '100%' }}
+                            placeholder="- Subject -"
+                          />
+                          <input 
+                            type="text"
+                            list="class-teacher-list"
                             value={slot?.teacher || ''} 
                             onChange={(e) => handleSlotUpdate(day, p, 'teacher', e.target.value, slot?.subject, slot?.teacher)}
-                          >
-                            <option value="">- Teacher -</option>
-                            {teachers.map(t => (
-                              <option key={t} value={t}>{t}</option>
-                            ))}
-                          </select>
+                            style={{ fontSize: '0.8rem', padding: '2px', width: '100%' }}
+                            placeholder="- Teacher -"
+                          />
                         </div>
                       ) : (
                         <>

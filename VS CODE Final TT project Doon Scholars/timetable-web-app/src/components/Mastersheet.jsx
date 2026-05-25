@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { useNavigate } from 'react-router-dom';
 import { Plus, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { autoAssignTeacher } from '../services/allocationEngine';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 const Mastersheet = () => {
-  const { timetables, classes, checkTeacherCollision, updateSlot, teachers, loadMaster } = useTimetable();
+  const { timetables, classes, checkTeacherCollision, updateSlot, teachers, loadMaster, teacherSubjectMap } = useTimetable();
   const [selectedDay, setSelectedDay] = useState('Mon');
   const [editMode, setEditMode] = useState(false);
   const [notification, setNotification] = useState(null);
@@ -23,7 +24,6 @@ const Mastersheet = () => {
     return numA - numB;
   });
 
-  // Get all unique subjects across the school
   const allSubjects = [...new Set([
     ...loadMaster.map(l => l.subject),
     'Library', 'Games', 'Music', 'Dance', 'Art', 'Computer', 'PE', 'CCA', 'VE'
@@ -33,10 +33,28 @@ const Mastersheet = () => {
     let subject = currentSubject || '';
     let teacher = currentTeacher || '';
 
-    if (field === 'subject') subject = value;
+    if (field === 'subject') {
+      subject = value;
+      // Auto-assign teacher using centralized engine
+      if (value && teacherSubjectMap) {
+        const assignment = autoAssignTeacher(value, cls, day, period, teacherSubjectMap, timetables);
+        
+        if (assignment.status !== 'empty') {
+          teacher = assignment.teacher;
+          
+          if (assignment.status === 'success') {
+            setNotification({ type: 'success', message: assignment.message });
+          } else if (assignment.status === 'partial_conflict') {
+            setNotification({ type: 'warning', message: assignment.message });
+          } else if (assignment.status === 'full_conflict') {
+            setNotification({ type: 'error', message: assignment.message });
+          }
+        }
+      }
+    }
     if (field === 'teacher') teacher = value;
 
-    // Check collision if updating teacher
+    // Check collision if updating teacher manually
     if (field === 'teacher' && value) {
       const collisionClass = checkTeacherCollision(value, day, period, cls);
       if (collisionClass) {
@@ -142,6 +160,13 @@ const Mastersheet = () => {
         </div>
       </div>
 
+      <datalist id="subject-list">
+        {allSubjects.map(sub => <option key={sub} value={sub} />)}
+      </datalist>
+      <datalist id="teacher-list">
+        {teachers.map(t => <option key={t} value={t} />)}
+      </datalist>
+
       <div className="card" style={{ overflowX: 'auto' }}>
         <div className="master-grid" style={{ gridTemplateColumns: `80px repeat(${PERIODS.length}, minmax(${editMode ? '140px' : '1fr'}, 1fr))` }}>
           {/* Header Row */}
@@ -167,26 +192,22 @@ const Mastersheet = () => {
                   >
                     {editMode ? (
                       <div className="edit-slot" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <select 
+                        <input 
+                          type="text"
+                          list="subject-list"
                           value={slot?.subject || ''} 
                           onChange={(e) => handleSlotUpdate(cls, selectedDay, p, 'subject', e.target.value, slot?.subject, slot?.teacher)}
-                          style={{ fontSize: '0.8rem', padding: '2px' }}
-                        >
-                          <option value="">- Sub -</option>
-                          {allSubjects.map(sub => (
-                            <option key={sub} value={sub}>{sub}</option>
-                          ))}
-                        </select>
-                        <select 
+                          style={{ fontSize: '0.8rem', padding: '2px', width: '100%' }}
+                          placeholder="- Sub -"
+                        />
+                        <input 
+                          type="text"
+                          list="teacher-list"
                           value={slot?.teacher || ''} 
                           onChange={(e) => handleSlotUpdate(cls, selectedDay, p, 'teacher', e.target.value, slot?.subject, slot?.teacher)}
-                          style={{ fontSize: '0.8rem', padding: '2px' }}
-                        >
-                          <option value="">- Tr -</option>
-                          {teachers.map(t => (
-                            <option key={t} value={t}>{t}</option>
-                          ))}
-                        </select>
+                          style={{ fontSize: '0.8rem', padding: '2px', width: '100%' }}
+                          placeholder="- Tr -"
+                        />
                       </div>
                     ) : (
                       <>

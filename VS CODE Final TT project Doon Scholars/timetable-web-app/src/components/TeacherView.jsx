@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { User, Activity } from 'lucide-react';
+import { generateTeacherTimetable } from '../services/derivedViewEngine';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -22,15 +23,19 @@ const TeacherView = () => {
 
     if (!selectedTeacher) return schedule;
 
-    Object.entries(timetables).forEach(([classId, classSchedule]) => {
-      classSchedule.forEach(slot => {
-        if (slot.teacher === selectedTeacher) {
-          schedule[slot.day][parseInt(slot.period)] = {
-            classId,
-            subject: slot.subject
-          };
-        }
-      });
+    const engineSchedule = generateTeacherTimetable(timetables, selectedTeacher);
+    
+    engineSchedule.forEach(slot => {
+      const p = parseInt(slot.period);
+      if (schedule[slot.day][p]) {
+        schedule[slot.day][p].classId += `, ${slot.classId}`;
+        schedule[slot.day][p].subject += `, ${slot.subject}`;
+      } else {
+        schedule[slot.day][p] = {
+          classId: slot.classId,
+          subject: slot.subject
+        };
+      }
     });
 
     return schedule;
@@ -43,7 +48,9 @@ const TeacherView = () => {
   let totalClasses = 0;
   DAYS.forEach(day => {
     PERIODS.forEach(p => {
-      if (schedule[day][p]) totalClasses++;
+      if (schedule[day][p]) {
+        totalClasses += schedule[day][p].classId.split(',').length;
+      }
     });
   });
 

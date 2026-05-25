@@ -22,18 +22,23 @@ def extract_teacher_mapping():
         
         mapping = df.to_dict(orient='records')
         
-        # Clean keys and values
-        clean_mapping = []
+        # Clean keys and values and format as nested dict
+        clean_mapping = {}
         for row in mapping:
-            clean_row = {}
-            for k, v in row.items():
-                if pd.notna(k):
-                    val = v if pd.notna(v) else ""
-                    clean_row[str(k).strip()] = str(val).strip()
+            # Look for the subject key which could be 'Subject' or similar
+            subject_key = next((k for k in row.keys() if str(k).strip().lower() == 'subject'), None)
             
-            # Only add if there's an actual teacher name/ID
-            if any(clean_row.values()):
-                clean_mapping.append(clean_row)
+            if subject_key and pd.notna(row[subject_key]):
+                subject_name = str(row[subject_key]).strip()
+                if subject_name:
+                    clean_mapping[subject_name] = {}
+                    
+                    for k, v in row.items():
+                        k_str = str(k).strip()
+                        if k_str != subject_key and pd.notna(k) and pd.notna(v):
+                            val = str(v).strip()
+                            if val:
+                                clean_mapping[subject_name][k_str] = val
                 
         output_path = os.path.join('timetable-web-app', 'src', 'data', 'teacher_mapping.json')
         with open(output_path, 'w') as f:
