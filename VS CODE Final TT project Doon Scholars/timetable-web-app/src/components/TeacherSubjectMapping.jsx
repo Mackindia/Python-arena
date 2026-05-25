@@ -1,15 +1,68 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { Save } from 'lucide-react';
-import mappingConfig from '../data/teacher_mapping_config.json';
+import { rawCsvData } from '../data/csvData';
+
+const WING_DEFS = [
+  { id: 'primary', title: 'Primary Wing (Classes 1 - 5)', headerColor: '#4ade80', rowColor: '#f0fdf4', match: (cls) => ['1','2','3','4','5'].includes(cls) },
+  { id: 'middle', title: 'Middle Wing (Classes 6 - 8)', headerColor: '#60a5fa', rowColor: '#eff6ff', match: (cls) => ['6','7','8'].includes(cls) },
+  { id: 'secondary', title: 'Secondary Wing (Classes 9 - 10)', headerColor: '#94a3b8', rowColor: '#f1f5f9', match: (cls) => ['9','10'].includes(cls) },
+  { id: 'senior', title: 'Senior Secondary Wing (Classes 11 - 12)', headerColor: '#fb923c', rowColor: '#ffedd5', match: (cls) => ['11','12'].includes(cls) }
+];
+
+const parseCSVConfig = () => {
+  const rows = rawCsvData.split('\n').filter(r => r.trim());
+  const dataRows = rows.slice(1);
+  
+  const wings = {
+    primary: { subjects: new Set(), columns: new Set() },
+    middle: { subjects: new Set(), columns: new Set() },
+    secondary: { subjects: new Set(), columns: new Set() },
+    senior: { subjects: new Set(), columns: new Set() }
+  };
+  
+  const mapForUI = {};
+
+  dataRows.forEach(row => {
+    const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+    if (!matches || matches.length < 4) return;
+    
+    let [subject, cls, section, teacher] = matches.map(m => m.replace(/^"|"$/g, '').trim());
+    
+    const wingDef = WING_DEFS.find(w => w.match(cls));
+    if (wingDef) {
+      const classId = `${cls}${section}`.toUpperCase();
+      
+      wings[wingDef.id].subjects.add(subject);
+      wings[wingDef.id].columns.add(classId);
+      
+      if (!mapForUI[subject]) mapForUI[subject] = {};
+      mapForUI[subject][classId] = teacher;
+    }
+  });
+
+  const finalConfig = WING_DEFS.map(w => ({
+    title: w.title,
+    headerColor: w.headerColor,
+    rowColor: w.rowColor,
+    columns: Array.from(wings[w.id].columns),
+    subjects: Array.from(wings[w.id].subjects)
+  })).filter(w => w.columns.length > 0);
+
+  return { wings: finalConfig, initialData: mapForUI };
+};
 
 const TeacherSubjectMapping = () => {
   const { teacherSubjectMap, setTeacherSubjectMap, timetables, updateTeacherForSubject } = useTimetable();
+  const [config, setConfig] = useState(null);
 
-  // Initialize with snapshot data if empty
+  // Parse CSV and Initialize
   useEffect(() => {
-    if (Object.keys(teacherSubjectMap).length === 0 && mappingConfig.wings && mappingConfig.wings.length > 0) {
-      setTeacherSubjectMap(mappingConfig.initialData || {});
+    const parsed = parseCSVConfig();
+    setConfig(parsed);
+    
+    if (Object.keys(teacherSubjectMap).length === 0) {
+      setTeacherSubjectMap(parsed.initialData);
     }
   }, [teacherSubjectMap]);
 
@@ -36,7 +89,10 @@ const TeacherSubjectMapping = () => {
         let subj = slot.subject.toLowerCase();
         
         for (const mSubj of Object.keys(teacherSubjectMap)) {
-          if (subj === mSubj.toLowerCase() || subj.includes(mSubj.toLowerCase())) {
+          // Splitting by slash handles groups like "Bio/Eco/Phy_Edu" matching "Biology"
+          const mSubjParts = mSubj.toLowerCase().split('/');
+          
+          if (mSubjParts.some(p => subj.includes(p) || p.includes(subj))) {
             const mappedTeacher = teacherSubjectMap[mSubj][normalizedId];
             if (mappedTeacher) {
               updateTeacherForSubject(classId, slot.subject, mappedTeacher);
@@ -49,11 +105,7 @@ const TeacherSubjectMapping = () => {
     alert(`Successfully synced ${count} slots to the live Timetable!`);
   };
 
-  if (Object.keys(teacherSubjectMap).length === 0) return <div>Loading Matrix...</div>;
-
-  if (!mappingConfig.wings || mappingConfig.wings.length === 0) {
-    return <div style={{ padding: '2rem' }}>Please run the extraction script to load the CSV first.</div>;
-  }
+  if (!config) return <div>Loading Matrix...</div>;
 
   return (
     <div style={{ paddingBottom: '3rem' }}>
@@ -70,7 +122,7 @@ const TeacherSubjectMapping = () => {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-        {mappingConfig.wings.map((wing, wIdx) => (
+        {config.wings.map((wing, wIdx) => (
           <div key={wIdx} style={{ border: '1px solid #cbd5e1', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
             <div style={{ background: wing.headerColor, color: 'white', padding: '0.75rem 1rem', fontWeight: 'bold', fontSize: '1.1rem' }}>
               {wing.title}

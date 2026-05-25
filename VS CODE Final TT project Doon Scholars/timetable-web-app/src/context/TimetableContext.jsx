@@ -6,7 +6,6 @@ import initialTimetables from '../data/timetables.json';
 import initialTeachers from '../data/teachers.json';
 import initialTeacherSlotUsage from '../data/teacher_slot_usage.json';
 import initialTeacherMapping from '../data/teacher_mapping.json';
-import initialSubjectMap from '../data/teacher_subject_map.json';
 
 const TimetableContext = createContext();
 
@@ -64,7 +63,7 @@ export const TimetableProvider = ({ children }) => {
     if (savedTSMap) {
       setTeacherSubjectMap(JSON.parse(savedTSMap));
     } else {
-      setTeacherSubjectMap(initialSubjectMap);
+      setTeacherSubjectMap({});
     }
     
     setTeachers(initialTeachers);
