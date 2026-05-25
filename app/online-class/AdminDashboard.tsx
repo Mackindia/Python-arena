@@ -1,8 +1,30 @@
 "use client";
 
+import { useState } from "react";
 import GlassCard from "../../components/ui/GlassCard";
 
-export default function AdminDashboard({ liveSessions }: any) {
+export default function AdminDashboard({ liveSessions, settings }: any) {
+  const [startDate, setStartDate] = useState(settings?.startDate || "");
+  const [endDate, setEndDate] = useState(settings?.endDate || "");
+  const [isActive, setIsActive] = useState(settings?.isActive ?? false);
+  const [saving, setSaving] = useState(false);
+
+  const saveSettings = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/online-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ startDate, endDate, isActive }),
+      });
+      if (res.ok) alert("Settings saved! Online classes will only appear within these dates.");
+    } catch (e) {
+      alert("Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-5xl p-6">
       <div className="mb-8 flex items-center justify-between">
@@ -16,6 +38,7 @@ export default function AdminDashboard({ liveSessions }: any) {
         </div>
       </div>
 
+      <h2 className="text-xl font-bold text-white mb-4">Current Live Rooms</h2>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {liveSessions.length === 0 ? (
           <div className="col-span-full p-8 text-center text-slate-500">

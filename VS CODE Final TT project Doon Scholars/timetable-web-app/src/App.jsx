@@ -7,6 +7,8 @@ import ClassTimetable from './components/ClassTimetable';
 import TeacherView from './components/TeacherView';
 import LoadMaster from './components/LoadMaster';
 import ClassSectionManager from './components/ClassSectionManager';
+import SubstitutionManager from './components/SubstitutionManager';
+import TeacherSubjectMapping from './components/TeacherSubjectMapping';
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
               <Route path="/manage-classes" element={<ClassSectionManager />} />
               <Route path="/classes" element={<ClassTimetable />} />
               <Route path="/teachers" element={<TeacherView />} />
+              <Route path="/teacher-mapping" element={<TeacherSubjectMapping />} />
+              <Route path="/substitutions" element={<SubstitutionManager />} />
               <Route path="/load-master" element={<LoadMaster />} />
             </Routes>
           </main>

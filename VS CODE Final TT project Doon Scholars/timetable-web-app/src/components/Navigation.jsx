@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Calendar, Users, BookOpen, LayoutGrid, Settings, Layers } from 'lucide-react';
+import { Calendar, Users, BookOpen, LayoutGrid, Settings, Layers, UserMinus, FileSpreadsheet } from 'lucide-react';
 
 const Navigation = () => {
   return (
@@ -34,6 +34,16 @@ const Navigation = () => {
         <NavLink to="/load-master" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
           <Settings size={20} />
           <span>Load Master</span>
+        </NavLink>
+
+        <NavLink to="/teacher-mapping" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
+          <FileSpreadsheet size={20} />
+          <span>Teacher Mapping</span>
+        </NavLink>
+
+        <NavLink to="/substitutions" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
+          <UserMinus size={20} />
+          <span>Substitution Maker</span>
         </NavLink>
       </div>
     </div>

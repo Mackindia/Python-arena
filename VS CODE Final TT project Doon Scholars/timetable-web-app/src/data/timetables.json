@@ -4,289 +4,289 @@
       "day": "Mon",
       "period": 1,
       "subject": "Library",
-      "teacher": "SZ"
+      "teacher": "SP"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "English_Lit",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Maths",
-      "teacher": "MP"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "GK",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "EVS",
-      "teacher": "MG"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "A/C",
-      "teacher": "NM"
+      "teacher": "MP"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "Hindi_Lit",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "Dance",
-      "teacher": "NP"
+      "teacher": "SL"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "Maths",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Computer",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "EVS",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "Dance",
-      "teacher": "NM"
+      "teacher": "SL"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "English_Lit",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "EVS",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Library",
-      "teacher": "SZ"
+      "teacher": "SP"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "Hindi_Lit",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Skating",
-      "teacher": "MG"
+      "teacher": "SZ"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "English_Lit",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "A/C",
-      "teacher": "NM"
+      "teacher": "MP"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "EVS",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Music",
-      "teacher": "SZ"
+      "teacher": "MG"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Hindi_Lit",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Maths",
-      "teacher": "MG,SL,SZ,MP"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "STEM_Junior",
-      "teacher": "NM"
+      "teacher": "NP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "English_Lang",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Maths",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Hindi_Lang",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "EVS",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "English_Lang",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "Computer",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Games",
-      "teacher": "NM"
+      "teacher": "SZ"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Hindi_Lang",
-      "teacher": "NM"
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Music",
-      "teacher": ""
+      "teacher": "MG"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "EVS",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Skating",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "CCA",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "EVS",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "GK",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "1b": [
@@ -294,13 +294,13 @@
       "day": "Mon",
       "period": 1,
       "subject": "Library",
-      "teacher": "SZ"
+      "teacher": "SP"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "Dance",
-      "teacher": "TP"
+      "teacher": "SL"
     },
     {
       "day": "Mon",
@@ -312,7 +312,7 @@
       "day": "Mon",
       "period": 4,
       "subject": "Maths",
-      "teacher": "MP"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
@@ -342,7 +342,7 @@
       "day": "Tue",
       "period": 1,
       "subject": "Dance",
-      "teacher": "TP"
+      "teacher": "SL"
     },
     {
       "day": "Tue",
@@ -354,7 +354,7 @@
       "day": "Tue",
       "period": 3,
       "subject": "A/C",
-      "teacher": "TP"
+      "teacher": "MP"
     },
     {
       "day": "Tue",
@@ -372,13 +372,13 @@
       "day": "Tue",
       "period": 6,
       "subject": "EVS",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Library",
-      "teacher": "TP"
+      "teacher": "SP"
     },
     {
       "day": "Tue",
@@ -390,13 +390,13 @@
       "day": "Wed",
       "period": 1,
       "subject": "Skating",
-      "teacher": "TP"
+      "teacher": "SZ"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Maths",
-      "teacher": "NP"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
@@ -408,13 +408,13 @@
       "day": "Wed",
       "period": 4,
       "subject": "A/C",
-      "teacher": "TP"
+      "teacher": "MP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "English_Lit",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
@@ -426,13 +426,13 @@
       "day": "Wed",
       "period": 7,
       "subject": "Maths",
-      "teacher": "MG,SL,SZ,MP"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "EVS",
-      "teacher": "MG"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
@@ -444,7 +444,7 @@
       "day": "Thu",
       "period": 2,
       "subject": "English_Lang",
-      "teacher": "MG"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
@@ -468,13 +468,13 @@
       "day": "Thu",
       "period": 6,
       "subject": "Games",
-      "teacher": "TP"
+      "teacher": "SZ"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "English_Lang",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
@@ -486,97 +486,97 @@
       "day": "Fri",
       "period": 1,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "STEM_Junior",
-      "teacher": ""
+      "teacher": "NP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Skating",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "EVS",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "CCA",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Music",
-      "teacher": ""
+      "teacher": "MG"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Music",
-      "teacher": ""
+      "teacher": "MG"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "EVS",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "GK",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "2a": [
@@ -584,103 +584,103 @@
       "day": "Mon",
       "period": 1,
       "subject": "Maths",
-      "teacher": "NP"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "English_Lit",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Dance",
-      "teacher": "SU"
+      "teacher": "SL"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "EVS",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "Hindi_Lit",
-      "teacher": "SP"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "Maths",
-      "teacher": "MP"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "GK",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "EVS",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "Maths",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "English_Lit",
-      "teacher": "SP"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Dance",
-      "teacher": "NP"
+      "teacher": "SL"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "GK",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Hindi_Lit",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "A/C",
-      "teacher": "SU"
+      "teacher": "MP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Computer",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "EVS",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Computer",
-      "teacher": "NP"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
@@ -692,181 +692,181 @@
       "day": "Wed",
       "period": 3,
       "subject": "EVS",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Hindi_Lit",
-      "teacher": "MG"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Library",
-      "teacher": "SU"
+      "teacher": "SP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "A/C",
-      "teacher": "SU"
+      "teacher": "MP"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Maths",
-      "teacher": "SL,MG,SZ,MP"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "English_Lit",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "English_Lang",
-      "teacher": "MG"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Library",
-      "teacher": "SU"
+      "teacher": "SP"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Computer",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "EVS",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "English_Lang",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "Hindi_Lang",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Maths",
-      "teacher": "SU"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Skating",
-      "teacher": "SU"
+      "teacher": "SZ"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "STEM_Junior",
-      "teacher": ""
+      "teacher": "NP"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Music",
-      "teacher": ""
+      "teacher": "MG"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "EVS",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "CCA",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Music",
-      "teacher": ""
+      "teacher": "MG"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "Skating",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "EVS",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "2b": [
@@ -874,289 +874,289 @@
       "day": "Mon",
       "period": 1,
       "subject": "Computer",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "Maths",
-      "teacher": "SP"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "English_Lit",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 4,
-      "subject": "Maths",
-      "teacher": "PB"
+      "subject": "EVS",
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "Hindi_Lang",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 6,
-      "subject": "EVS",
-      "teacher": "NP"
+      "subject": "Maths",
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "Hindi_Lit",
-      "teacher": "MP"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "EVS",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 1,
-      "subject": "EVS",
-      "teacher": "PB"
+      "subject": "Hindi_Lit",
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Maths",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "English_Lit",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "Games",
-      "teacher": "PB"
+      "teacher": "SZ"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Dance",
-      "teacher": "SP"
+      "teacher": "SL"
     },
     {
       "day": "Tue",
       "period": 6,
-      "subject": "Hindi_Lit",
-      "teacher": "PB"
+      "subject": "EVS",
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "A/C",
-      "teacher": "PB"
+      "teacher": "MP"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "Computer",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 1,
-      "subject": "EVS",
-      "teacher": "SZ"
+      "subject": "Hindi_Lit",
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Library",
-      "teacher": "PB"
+      "teacher": "SP"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "Maths",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "English_Lit",
-      "teacher": "NP"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 5,
-      "subject": "Hindi_Lit",
-      "teacher": "MG"
+      "subject": "EVS",
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Computer",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "A/C",
-      "teacher": "MG,SL,SZ,MP"
+      "teacher": "MP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "GK",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "GK",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Maths",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 3,
-      "subject": "English_Lang",
-      "teacher": "SL"
+      "subject": "EVS",
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "Hindi_Lang",
-      "teacher": "PB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "Library",
-      "teacher": "PB"
+      "teacher": "SP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "English_Lang",
-      "teacher": "MG"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
-      "subject": "EVS",
-      "teacher": "PB"
+      "subject": "English_Lang",
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Hindi_Lang",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Skating",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "STEM_Junior",
-      "teacher": ""
+      "teacher": "NP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Music",
-      "teacher": ""
+      "teacher": "MG"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "EVS",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "CCA",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Sat",
       "period": 1,
-      "subject": "EVS",
-      "teacher": ""
+      "subject": "Hindi_Lang",
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Dance",
-      "teacher": ""
+      "teacher": "SL"
     },
     {
       "day": "Sat",
       "period": 4,
-      "subject": "Hindi_Lang",
-      "teacher": ""
+      "subject": "EVS",
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "Music",
-      "teacher": ""
+      "teacher": "MG"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Skating",
-      "teacher": ""
+      "teacher": "SZ"
     }
   ],
   "3a": [
@@ -1164,31 +1164,31 @@
       "day": "Mon",
       "period": 1,
       "subject": "Games",
-      "teacher": "VR"
+      "teacher": "SZ"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "English_Lit",
-      "teacher": "MP"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Science",
-      "teacher": "AN"
+      "teacher": "VR"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "Music",
-      "teacher": "DK"
+      "teacher": "MG"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "Maths",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
@@ -1200,253 +1200,253 @@
       "day": "Mon",
       "period": 7,
       "subject": "Dance",
-      "teacher": "NP"
+      "teacher": "SL"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "Hindi_Lit",
-      "teacher": "NT"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "Science",
-      "teacher": "MG"
+      "teacher": "VR"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "English_Lit",
-      "teacher": "AN"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Games",
-      "teacher": "DK"
+      "teacher": "SZ"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "STEM_Junior",
-      "teacher": "MB"
+      "teacher": "NP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "SSt",
-      "teacher": "NP"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "Hindi_Lit",
-      "teacher": "DK"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Dance",
-      "teacher": "AN"
+      "teacher": "SL"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "Maths",
-      "teacher": "VR"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Science",
-      "teacher": "AN"
+      "teacher": "VR"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "A/C",
-      "teacher": "VR"
+      "teacher": "MP"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "English_Lit",
-      "teacher": "MP"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Maths",
-      "teacher": "NT"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Hindi_Lit",
-      "teacher": "DK"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "SSt",
-      "teacher": "NP"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Computer",
-      "teacher": "NT"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "VE",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "Music",
-      "teacher": "VR"
+      "teacher": "MG"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "English_Lang",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Maths",
-      "teacher": "AN"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "Hindi_Lang",
-      "teacher": "DK"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "Computer",
-      "teacher": "SP"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "Maths",
-      "teacher": "NT"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "English_Lang",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Science",
-      "teacher": "NT"
+      "teacher": "VR"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "A/C",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Skating",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Library",
-      "teacher": ""
+      "teacher": "SP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "GK",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "3b": [
@@ -1454,7 +1454,7 @@
       "day": "Mon",
       "period": 1,
       "subject": "English_Lit",
-      "teacher": "NT"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
@@ -1466,13 +1466,13 @@
       "day": "Mon",
       "period": 3,
       "subject": "A/C",
-      "teacher": "MG"
+      "teacher": "MP"
     },
     {
       "day": "Mon",
       "period": 4,
-      "subject": "Maths_VR",
-      "teacher": "NP"
+      "subject": "Maths",
+      "teacher": "TP"
     },
     {
       "day": "Mon",
@@ -1484,259 +1484,259 @@
       "day": "Mon",
       "period": 6,
       "subject": "Hindi_Lit",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "Games",
-      "teacher": "VR"
+      "teacher": "SZ"
     },
     {
       "day": "Mon",
       "period": 8,
-      "subject": "Maths_VR",
-      "teacher": "KB"
+      "subject": "Maths",
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "English_Lit",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Science",
-      "teacher": "MG"
+      "teacher": "VR"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "SSt",
-      "teacher": "VR"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "GK",
-      "teacher": "NP"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Games",
-      "teacher": "NT"
+      "teacher": "SZ"
     },
     {
       "day": "Tue",
       "period": 6,
-      "subject": "Maths_VR",
-      "teacher": "MB"
+      "subject": "Maths",
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Hindi_Lit",
-      "teacher": "VR"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "Dance",
-      "teacher": "SP"
+      "teacher": "SL"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "SSt",
-      "teacher": "MP"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Science",
-      "teacher": "NT"
+      "teacher": "VR"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "Music",
-      "teacher": "VR"
+      "teacher": "MG"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Computer",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "SSt",
-      "teacher": "SL"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Hindi_Lang",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 7,
-      "subject": "Maths_VR",
-      "teacher": "MB"
+      "subject": "Maths",
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "English_Lit",
-      "teacher": "VR"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "English_Lang",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Music",
-      "teacher": "VR"
+      "teacher": "MG"
     },
     {
       "day": "Thu",
       "period": 3,
-      "subject": "Maths_VR",
-      "teacher": "NP"
+      "subject": "Maths",
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "Computer",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "SSt",
-      "teacher": "SZ"
+      "teacher": "NT"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "Hindi_Lang",
-      "teacher": "DK"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Science",
-      "teacher": "NT"
+      "teacher": "VR"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Library",
-      "teacher": "NP"
+      "teacher": "SP"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "A/C",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Dance",
-      "teacher": ""
+      "teacher": "SL"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 8,
-      "subject": "Maths_VR",
-      "teacher": ""
+      "subject": "Maths",
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Hindi_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Skating",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Sat",
       "period": 6,
-      "subject": "Maths_DK",
-      "teacher": ""
+      "subject": "Maths",
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "STEM_Junior",
-      "teacher": ""
+      "teacher": "NP"
     }
   ],
   "4a": [
@@ -1744,115 +1744,115 @@
       "day": "Mon",
       "period": 1,
       "subject": "Science",
-      "teacher": "SL"
+      "teacher": "VR"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "Hindi_Lit",
-      "teacher": "MG"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "English_Lit",
-      "teacher": "NP"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "SSt",
-      "teacher": "VR"
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "Games",
-      "teacher": "AN"
+      "teacher": "SZ"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "Maths",
-      "teacher": "DK"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "Computer",
-      "teacher": "NT"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "GK",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "Skating",
-      "teacher": "SL"
+      "teacher": "SZ"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Maths",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Hindi_Lit",
-      "teacher": "MG"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "English_Lit",
-      "teacher": "NT"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Maths",
-      "teacher": "AN"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "Games",
-      "teacher": "VR"
+      "teacher": "SZ"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Science",
-      "teacher": "DK"
+      "teacher": "VR"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "SSt",
-      "teacher": "NP"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Dance",
-      "teacher": "MB"
+      "teacher": "SL"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Music",
-      "teacher": "MP"
+      "teacher": "MG"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "STEM_Junior",
-      "teacher": "AN"
+      "teacher": "NP"
     },
     {
       "day": "Wed",
@@ -1864,43 +1864,43 @@
       "day": "Wed",
       "period": 5,
       "subject": "English_Lit",
-      "teacher": "NT"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Maths",
-      "teacher": "AN"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "SSt",
-      "teacher": "DK"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "Hindi_Lit",
-      "teacher": "NP"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "Dance",
-      "teacher": "SP"
+      "teacher": "SL"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Hindi_Lang",
-      "teacher": "DK"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Music",
-      "teacher": "MP"
+      "teacher": "MG"
     },
     {
       "day": "Thu",
@@ -1912,121 +1912,121 @@
       "day": "Thu",
       "period": 5,
       "subject": "English_Lang",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "Science",
-      "teacher": "AN"
+      "teacher": "VR"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Maths",
-      "teacher": "RD"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Computer",
-      "teacher": "VR"
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "A/C",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Library",
-      "teacher": ""
+      "teacher": "SP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "A/C",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     }
   ],
   "4b": [
@@ -2034,289 +2034,289 @@
       "day": "Mon",
       "period": 1,
       "subject": "Hindi_Lit",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "Maths",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Skating",
-      "teacher": "NT"
+      "teacher": "SZ"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "English_Lit",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "Science",
-      "teacher": "DK"
+      "teacher": "VR"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "Music",
-      "teacher": "SP"
+      "teacher": "MG"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "SSt",
-      "teacher": "KB"
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "STEM_Junior",
-      "teacher": "VR"
+      "teacher": "NP"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "Computer",
-      "teacher": "DK"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "English_Lit",
-      "teacher": "SL"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Science",
-      "teacher": "NT"
+      "teacher": "VR"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "Maths",
-      "teacher": "VR"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Hindi_Lit",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "Maths",
-      "teacher": "NP"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "SSt",
-      "teacher": "MB"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "Games",
-      "teacher": "NT"
+      "teacher": "SZ"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "English_Lang",
-      "teacher": "NT"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Hindi_Lit",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "SSt",
-      "teacher": "KB"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Games",
-      "teacher": "DK"
+      "teacher": "SZ"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Maths",
-      "teacher": "MP"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Library",
-      "teacher": "MP"
+      "teacher": "SP"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "English_Lit",
-      "teacher": "VR"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "Science",
-      "teacher": "SL"
+      "teacher": "VR"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "Maths",
-      "teacher": "DK"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Dance",
-      "teacher": "MB"
+      "teacher": "SL"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "SSt",
-      "teacher": "KB"
+      "teacher": "NT"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "Science",
-      "teacher": "MG"
+      "teacher": "VR"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "English_Lang",
-      "teacher": "VR"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "Computer",
-      "teacher": "MP"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Hindi_Lang",
-      "teacher": "NP"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "SSt",
-      "teacher": "KB"
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "GK",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "A/C",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Dance",
-      "teacher": ""
+      "teacher": "SL"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "Music",
-      "teacher": ""
+      "teacher": "MG"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "A/C",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "5a": [
@@ -2324,79 +2324,79 @@
       "day": "Mon",
       "period": 1,
       "subject": "SSt",
-      "teacher": "MB"
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "Computer",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Hindi_Lang",
-      "teacher": "VR"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "Maths",
-      "teacher": "MG"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "Library",
-      "teacher": "KB"
+      "teacher": "SP"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "Skating",
-      "teacher": "SL"
+      "teacher": "SZ"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "Science",
-      "teacher": "NG"
+      "teacher": "VR"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "English_Lit",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 1,
-      "subject": "Maths",
-      "teacher": "SZ"
+      "subject": "Hindi_Lit",
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "SSt",
-      "teacher": "VR"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Computer",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "GK",
-      "teacher": "SL"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Science",
-      "teacher": "NG"
+      "teacher": "VR"
     },
     {
       "day": "Tue",
@@ -2408,205 +2408,205 @@
       "day": "Tue",
       "period": 7,
       "subject": "English_Lit",
-      "teacher": "NP"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 8,
-      "subject": "Hindi_Lit",
-      "teacher": "MG"
+      "subject": "Maths",
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Hindi_Lit",
-      "teacher": "VR"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "English_Lit",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "Science",
-      "teacher": "NT"
+      "teacher": "VR"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Music",
-      "teacher": "NG"
+      "teacher": "MG"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "VE",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Dance",
-      "teacher": "NG"
+      "teacher": "SL"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Maths",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "Games",
-      "teacher": "MP"
+      "teacher": "SZ"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "Games",
-      "teacher": "NG"
+      "teacher": "SZ"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Science",
-      "teacher": "NP"
+      "teacher": "VR"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "English_Lang",
-      "teacher": "NT"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "Dance",
-      "teacher": "MP"
+      "teacher": "SL"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "Maths",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "SSt",
-      "teacher": "MB"
+      "teacher": "NT"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Computer",
-      "teacher": "VR"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Music",
-      "teacher": "MB"
+      "teacher": "MG"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "A/C",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "STEM_Junior",
-      "teacher": ""
+      "teacher": "NP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "A/C",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "Hindi_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "5b": [
@@ -2614,289 +2614,289 @@
       "day": "Mon",
       "period": 1,
       "subject": "Music",
-      "teacher": "SP"
+      "teacher": "MG"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "Maths",
-      "teacher": "SL"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "SSt",
-      "teacher": "SB"
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "GK",
-      "teacher": "PR"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "English_Lit",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "Maths",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "Hindi_Lit",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "Skating",
-      "teacher": "NG"
+      "teacher": "SZ"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "SSt",
-      "teacher": "MP"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Science",
-      "teacher": "SB"
+      "teacher": "VR"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Maths",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "Hindi_Lang",
-      "teacher": "PR"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "STEM_Junior",
-      "teacher": "SL"
+      "teacher": "NP"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "English_Lit",
-      "teacher": "NG"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Music",
-      "teacher": "KB"
+      "teacher": "MG"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "English_Lit",
-      "teacher": "MB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Library",
-      "teacher": "PR"
+      "teacher": "SP"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Dance",
-      "teacher": "AN"
+      "teacher": "SL"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "Science",
-      "teacher": "SB"
+      "teacher": "VR"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "SSt",
-      "teacher": "MB"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Games",
-      "teacher": "NP"
+      "teacher": "SZ"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "English_Lang",
-      "teacher": "SB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Hindi_Lit",
-      "teacher": "NG"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "Maths",
-      "teacher": "KB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "A/C",
-      "teacher": "KB"
+      "teacher": "MP"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Science",
-      "teacher": "MP"
+      "teacher": "VR"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Games",
-      "teacher": "PR"
+      "teacher": "SZ"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "SSt",
-      "teacher": "MB"
+      "teacher": "NT"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "Dance",
-      "teacher": "NP"
+      "teacher": "SL"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "Maths",
-      "teacher": "NP"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "English_Lang",
-      "teacher": "SB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Hindi_Lit",
-      "teacher": "NG"
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "A/C",
-      "teacher": ""
+      "teacher": "MP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "6a": [
@@ -2904,289 +2904,289 @@
       "day": "Mon",
       "period": 1,
       "subject": "A/C",
-      "teacher": "RD"
+      "teacher": "MP"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "SST",
-      "teacher": "PR"
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "English_Lit",
-      "teacher": "NG"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "Dance",
-      "teacher": "SB"
-    },
-    {
-      "day": "Mon",
-      "period": 5,
-      "subject": "Maths",
-      "teacher": "GA"
-    },
-    {
-      "day": "Mon",
-      "period": 6,
-      "subject": "F/S",
-      "teacher": "MG"
-    },
-    {
-      "day": "Mon",
-      "period": 7,
-      "subject": "Hindi_Lit",
-      "teacher": "SH"
-    },
-    {
-      "day": "Mon",
-      "period": 8,
-      "subject": "Science",
-      "teacher": "SB"
-    },
-    {
-      "day": "Tue",
-      "period": 1,
-      "subject": "English_Lit",
-      "teacher": "RD"
-    },
-    {
-      "day": "Tue",
-      "period": 2,
-      "subject": "Computer",
-      "teacher": "GA"
-    },
-    {
-      "day": "Tue",
-      "period": 3,
-      "subject": "SST",
-      "teacher": "PR"
-    },
-    {
-      "day": "Tue",
-      "period": 4,
-      "subject": "Maths",
-      "teacher": "SZ"
-    },
-    {
-      "day": "Tue",
-      "period": 5,
-      "subject": "Skill",
-      "teacher": "SH"
-    },
-    {
-      "day": "Tue",
-      "period": 6,
-      "subject": "F/S",
-      "teacher": "RD"
-    },
-    {
-      "day": "Tue",
-      "period": 7,
-      "subject": "Hindi_Lit",
-      "teacher": "SB"
-    },
-    {
-      "day": "Tue",
-      "period": 8,
-      "subject": "Skill",
-      "teacher": "NG"
-    },
-    {
-      "day": "Wed",
-      "period": 1,
-      "subject": "English_Lit",
-      "teacher": "RD"
-    },
-    {
-      "day": "Wed",
-      "period": 2,
-      "subject": "SST",
-      "teacher": "PR"
-    },
-    {
-      "day": "Wed",
-      "period": 3,
-      "subject": "Maths",
-      "teacher": "SH"
-    },
-    {
-      "day": "Wed",
-      "period": 4,
-      "subject": "Science",
       "teacher": "SL"
     },
     {
+      "day": "Mon",
+      "period": 5,
+      "subject": "Maths",
+      "teacher": "TP"
+    },
+    {
+      "day": "Mon",
+      "period": 6,
+      "subject": "F/S",
+      "teacher": "SW,MS"
+    },
+    {
+      "day": "Mon",
+      "period": 7,
+      "subject": "Skill",
+      "teacher": "GA,SA,HSC"
+    },
+    {
+      "day": "Mon",
+      "period": 8,
+      "subject": "Science",
+      "teacher": "VR"
+    },
+    {
+      "day": "Tue",
+      "period": 1,
+      "subject": "English_Lit",
+      "teacher": "TP"
+    },
+    {
+      "day": "Tue",
+      "period": 2,
+      "subject": "Computer",
+      "teacher": "TP"
+    },
+    {
+      "day": "Tue",
+      "period": 3,
+      "subject": "SST",
+      "teacher": "NT"
+    },
+    {
+      "day": "Tue",
+      "period": 4,
+      "subject": "Maths",
+      "teacher": "TP"
+    },
+    {
+      "day": "Tue",
+      "period": 5,
+      "subject": "Skill",
+      "teacher": "GA,SA,HSC"
+    },
+    {
+      "day": "Tue",
+      "period": 6,
+      "subject": "F/S",
+      "teacher": "SW,MS"
+    },
+    {
+      "day": "Tue",
+      "period": 7,
+      "subject": "Hindi_Lit",
+      "teacher": "TP"
+    },
+    {
+      "day": "Tue",
+      "period": 8,
+      "subject": "Hindi_Lit",
+      "teacher": "TP"
+    },
+    {
+      "day": "Wed",
+      "period": 1,
+      "subject": "English_Lit",
+      "teacher": "TP"
+    },
+    {
+      "day": "Wed",
+      "period": 2,
+      "subject": "SST",
+      "teacher": "NT"
+    },
+    {
+      "day": "Wed",
+      "period": 3,
+      "subject": "Maths",
+      "teacher": "TP"
+    },
+    {
+      "day": "Wed",
+      "period": 4,
+      "subject": "Science",
+      "teacher": "VR"
+    },
+    {
       "day": "Wed",
       "period": 5,
       "subject": "Computer",
-      "teacher": "SB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Music",
-      "teacher": "SZ"
+      "teacher": "MG"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Hindi_Lit",
-      "teacher": "AR"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "Science",
-      "teacher": "NG"
+      "teacher": "VR"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "English_Lang",
-      "teacher": "RD"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Computer",
-      "teacher": "PR"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "SST",
-      "teacher": "SH"
+      "teacher": "NT"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "Games",
-      "teacher": "SP"
+      "teacher": "SZ"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "Hindi_Lang",
-      "teacher": "NG"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "English_Lang",
-      "teacher": "SB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Science",
-      "teacher": "NG"
+      "teacher": "VR"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Maths",
-      "teacher": "PR"
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "SST",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "STEM",
-      "teacher": ""
+      "teacher": "NP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "SST",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "Library",
-      "teacher": ""
+      "teacher": "SP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "GK",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "6b": [
@@ -3194,289 +3194,289 @@
       "day": "Mon",
       "period": 1,
       "subject": "Hindi_Lit",
-      "teacher": "MS"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "English_Lit",
-      "teacher": "RD"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Science",
-      "teacher": "PR"
+      "teacher": "VR"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "Computer",
-      "teacher": "SL"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "Computer",
-      "teacher": "NG"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "F/S",
-      "teacher": "AB"
+      "teacher": "SW,MS"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "Maths",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "SST",
-      "teacher": "RD"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "Music",
-      "teacher": "AR,SB"
+      "teacher": "MG"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Computer",
-      "teacher": "MS"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "English_Lit",
-      "teacher": "NG"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "SST",
-      "teacher": "AB"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Hindi_Lit",
-      "teacher": "SZ"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "F/S",
-      "teacher": "MP"
+      "teacher": "SW,MS"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Maths",
-      "teacher": "RD"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "Science",
-      "teacher": "PR"
+      "teacher": "VR"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Hindi_Lit",
-      "teacher": "NG"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "English_Lit",
-      "teacher": "RD"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "SST",
-      "teacher": "GA,SA,HSC"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Dance",
-      "teacher": "MS"
+      "teacher": "SL"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Maths",
-      "teacher": "NG"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Science",
-      "teacher": "PR"
+      "teacher": "VR"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Games",
-      "teacher": "PR"
+      "teacher": "SZ"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "English_Lang",
-      "teacher": "GA,SA,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "STEM",
-      "teacher": "PR"
+      "teacher": "NP"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Hindi_Lang",
-      "teacher": "AB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Maths",
-      "teacher": "SP"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "Science",
-      "teacher": "NG"
+      "teacher": "VR"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "Games",
-      "teacher": "RD"
+      "teacher": "SZ"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "A/C",
-      "teacher": "MS"
+      "teacher": "MP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "English_Lang",
-      "teacher": "AB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "SST",
-      "teacher": "SL"
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Skill",
-      "teacher": ""
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "GK",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "SST",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Skill",
-      "teacher": ""
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "SST",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Library",
-      "teacher": ""
+      "teacher": "SP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "7a": [
@@ -3484,289 +3484,289 @@
       "day": "Mon",
       "period": 1,
       "subject": "Maths",
-      "teacher": "NG"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "F/S",
-      "teacher": "GA,SA,HSC"
+      "teacher": "SW,MS"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Science",
-      "teacher": "SW,MS"
+      "teacher": "VR"
     },
     {
       "day": "Mon",
       "period": 4,
-      "subject": "Hindi_Lit",
-      "teacher": "NG"
+      "subject": "SSt",
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "English_Lit",
-      "teacher": "PR"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "SSt",
-      "teacher": "SH"
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 7,
-      "subject": "Computer",
-      "teacher": "SB"
+      "subject": "Hindi_Lit",
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "Computer",
-      "teacher": "SW"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "Hindi_Lit",
-      "teacher": "NG"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Music",
-      "teacher": "SW"
+      "teacher": "MG"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Skill",
-      "teacher": "SB"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "English_Lit",
-      "teacher": "SH"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Science",
-      "teacher": "MP"
+      "teacher": "VR"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "Maths",
-      "teacher": "PR"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Computer",
-      "teacher": "SL"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 8,
-      "subject": "SSt",
-      "teacher": "SW"
+      "subject": "Computer",
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Maths",
-      "teacher": "SB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Skill",
-      "teacher": "DV"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "F/S",
-      "teacher": "NG"
+      "teacher": "SW,MS"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Maths",
-      "teacher": "PR"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "SSt",
-      "teacher": "SW"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Hindi_Lit",
-      "teacher": "SL"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Science",
-      "teacher": "SH"
+      "teacher": "VR"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "English_Lang",
-      "teacher": "RD"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "Maths",
-      "teacher": "SB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "English_Lit",
-      "teacher": "SH"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Science",
-      "teacher": "NG"
+      "teacher": "VR"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "Hindi_Lang",
-      "teacher": "AR,GA"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "A/C",
-      "teacher": "SW"
+      "teacher": "MP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "SSt",
-      "teacher": "PR"
+      "teacher": "NT"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Dance",
-      "teacher": "DV"
+      "teacher": "SL"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "English_Lang",
-      "teacher": "SP"
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "GK",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "STEM",
-      "teacher": ""
+      "teacher": "NP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Library",
-      "teacher": ""
+      "teacher": "SP"
     }
   ],
   "7b": [
@@ -3774,289 +3774,289 @@
       "day": "Mon",
       "period": 1,
       "subject": "F/S",
-      "teacher": "GA"
+      "teacher": "SW,MS"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "Skill",
-      "teacher": "SW"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Hindi_Lit",
-      "teacher": "SH"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "Science",
-      "teacher": "SW,SH"
+      "teacher": "VR"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "STEM",
-      "teacher": "AB"
+      "teacher": "NP"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "Maths",
-      "teacher": "PR"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "SSt",
-      "teacher": "SL"
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "English_Lit",
-      "teacher": "SD"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 1,
-      "subject": "English_Lang",
-      "teacher": "GA,SA,HSC"
+      "subject": "Science",
+      "teacher": "VR"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "SSt",
-      "teacher": "PR"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Music",
-      "teacher": "SD"
+      "teacher": "MG"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "Science",
-      "teacher": "SW"
+      "teacher": "VR"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "English_Lang",
-      "teacher": "RD"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "Hindi_Lang",
-      "teacher": "SH"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Maths",
-      "teacher": "MP"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 8,
-      "subject": "VE",
-      "teacher": "AB"
+      "subject": "English_Lang",
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Computer",
-      "teacher": "DV"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "English_Lang",
-      "teacher": "SD"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "Hindi_Lang",
-      "teacher": "SW"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "F/S",
-      "teacher": "SH"
+      "teacher": "SW,MS"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Science",
-      "teacher": "SP"
+      "teacher": "VR"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "SSt",
-      "teacher": "GA"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Dance",
-      "teacher": "AB"
+      "teacher": "SL"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "Maths",
-      "teacher": "PR"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "Skill",
-      "teacher": "SH"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "SSt",
-      "teacher": "DV"
+      "teacher": "NT"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Maths",
-      "teacher": "AB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "English_Lang",
-      "teacher": "SW"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "GK",
-      "teacher": "SD"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "Hindi_Lang",
-      "teacher": "GA"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "A/C",
-      "teacher": "PR"
+      "teacher": "MP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Science",
-      "teacher": "SD"
+      "teacher": "VR"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Fri",
       "period": 2,
-      "subject": "Maths",
-      "teacher": ""
+      "subject": "VE",
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "English_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Hindi_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Library",
-      "teacher": ""
+      "teacher": "SP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
-      "subject": "Science",
-      "teacher": ""
+      "subject": "Maths",
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Hindi_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Science",
-      "teacher": ""
+      "teacher": "VR"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "English_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "8a": [
@@ -4064,289 +4064,289 @@
       "day": "Mon",
       "period": 1,
       "subject": "SSt",
-      "teacher": "MP"
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "Chemistry",
-      "teacher": "DV"
+      "teacher": "AB"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "English_Lit",
-      "teacher": "GA,SA,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "Biology",
-      "teacher": "GA"
+      "teacher": "SB"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "Hindi_Lang",
-      "teacher": "SW"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "Games",
-      "teacher": "GA"
+      "teacher": "SZ"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "Maths",
-      "teacher": "SD"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "Library",
-      "teacher": "SH"
+      "teacher": "SP"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "STEM",
-      "teacher": "SW,SH"
+      "teacher": "NP"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Chemistry",
-      "teacher": "SH"
+      "teacher": "AB"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Hindi_Lit",
-      "teacher": "GA"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "SSt",
-      "teacher": "SD"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Music",
-      "teacher": "SW"
+      "teacher": "MG"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "Maths",
-      "teacher": "SD"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "English_Lang",
-      "teacher": "SW"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "SSt",
-      "teacher": "SB"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "A/C",
-      "teacher": "SL"
+      "teacher": "MP"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Games",
-      "teacher": "SH"
+      "teacher": "SZ"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "Skill",
-      "teacher": "SD"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Computer",
-      "teacher": "SW"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "English_Lit",
-      "teacher": "RD"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Computer",
-      "teacher": "SW,SH"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Maths",
-      "teacher": "SW"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "Hindi_Lit",
-      "teacher": "SD"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "F/S",
-      "teacher": "SD"
+      "teacher": "SW,MS"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Hindi_Lang",
-      "teacher": "RD"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Computer",
-      "teacher": "SD"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "Physics",
-      "teacher": "RD"
+      "teacher": "AB"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "English_Lang",
-      "teacher": "SH"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "Maths",
-      "teacher": "SL"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "English_Lang",
-      "teacher": "GA,SA,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Biology",
-      "teacher": "RD"
+      "teacher": "SB"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Dance",
-      "teacher": ""
+      "teacher": "SL"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Hindi_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "F/S",
-      "teacher": ""
+      "teacher": "SW,MS"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "English_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Physics",
-      "teacher": ""
+      "teacher": "AB"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Skill",
-      "teacher": ""
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "GK",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "8b": [
@@ -4354,169 +4354,169 @@
       "day": "Mon",
       "period": 1,
       "subject": "Biology",
-      "teacher": "AR,SD"
+      "teacher": "SB"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "A/C",
-      "teacher": "MS"
+      "teacher": "MP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Skill",
-      "teacher": "DV"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "English_Lit",
-      "teacher": "AG"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "Hindi_Lang",
-      "teacher": "AR"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "SSt",
-      "teacher": "SW"
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "Chemistry",
-      "teacher": "RD"
+      "teacher": "AB"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "Maths",
-      "teacher": "SL"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "Games",
-      "teacher": "SW,SH"
+      "teacher": "SZ"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "English_Lang",
-      "teacher": "RD"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Hindi_Lang",
-      "teacher": "MS"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "Skill",
-      "teacher": "AR"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Maths",
-      "teacher": "AB"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "SSt",
-      "teacher": "SW"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Maths",
-      "teacher": "AG"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "Biology",
-      "teacher": "RD"
+      "teacher": "SB"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "STEM",
-      "teacher": "SW"
+      "teacher": "NP"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Hindi_Lang",
-      "teacher": "AR"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "Games",
-      "teacher": "AR"
+      "teacher": "SZ"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Maths",
-      "teacher": "SP"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Computer",
-      "teacher": "AG"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "English_Lang",
-      "teacher": "SW,SH"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "SSt",
-      "teacher": "MS"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "Dance",
-      "teacher": "SW"
+      "teacher": "SL"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "F/S",
-      "teacher": "SW"
+      "teacher": "SW,MS"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "SSt",
-      "teacher": "MS"
+      "teacher": "NT"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Hindi_Lit",
-      "teacher": "AG"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "VE",
-      "teacher": "SL"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
@@ -4528,115 +4528,115 @@
       "day": "Thu",
       "period": 6,
       "subject": "English_Lang",
-      "teacher": "RD"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Maths",
-      "teacher": "MG"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "SSt",
-      "teacher": "AB"
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "English_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Computer",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Library",
-      "teacher": ""
+      "teacher": "SP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "F/S",
-      "teacher": ""
+      "teacher": "SW,MS"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "Hindi_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "English_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Hindi_Lit",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "GK",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Physics",
-      "teacher": ""
+      "teacher": "AB"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Music",
-      "teacher": ""
+      "teacher": "MG"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Chemistry",
-      "teacher": ""
+      "teacher": "AB"
     }
   ],
   "9a": [
@@ -4644,289 +4644,289 @@
       "day": "Mon",
       "period": 1,
       "subject": "English_Lit",
-      "teacher": "AB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "Maths",
-      "teacher": "SB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Games",
-      "teacher": "AG"
+      "teacher": "SZ"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "Hindi_Lit",
-      "teacher": "MN"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "Physics",
-      "teacher": "SD"
+      "teacher": "AB"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "English_Lit",
-      "teacher": "MS"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "SSt",
-      "teacher": "SS"
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "VE",
-      "teacher": "AG"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "SSt",
-      "teacher": "AB"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Games",
-      "teacher": "SS"
+      "teacher": "SZ"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Maths",
-      "teacher": "SL"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "Hindi_Lang",
-      "teacher": "AG"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Physics",
-      "teacher": "GA,HSC"
+      "teacher": "AB"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "English_Lit",
-      "teacher": "GA,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Skill",
-      "teacher": "MN"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "Skill",
-      "teacher": "MS"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Chemistry",
-      "teacher": "GA,HSC"
+      "teacher": "AB"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Biology",
-      "teacher": "GA,HSC"
+      "teacher": "SB"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "Maths",
-      "teacher": "SS"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "English_Lang",
-      "teacher": "AG"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Physics",
-      "teacher": "MS"
+      "teacher": "AB"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Hindi_Lit",
-      "teacher": "AB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "SSt",
-      "teacher": "MN"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "Maths",
-      "teacher": "SP"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "Chemistry",
-      "teacher": "GA,HSC"
+      "teacher": "AB"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "SSt",
-      "teacher": "AG"
+      "teacher": "NT"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Dance",
-      "teacher": "MS"
+      "teacher": "SL"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "Maths",
-      "teacher": "SS"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "Computer/HSC",
-      "teacher": "SB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "Computer/HSC",
-      "teacher": "MN"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "English_Lang",
-      "teacher": "AR,SD"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Hindi_Lit",
-      "teacher": "AR,DV,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Computer/HSC",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Computer/HSC",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "Chemistry",
-      "teacher": ""
+      "teacher": "AB"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Library",
-      "teacher": ""
+      "teacher": "SP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Computer/HSC",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Biology",
-      "teacher": ""
+      "teacher": "SB"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "STEM",
-      "teacher": ""
+      "teacher": "NP"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Skill",
-      "teacher": ""
+      "teacher": "GA,SA,HSC"
     }
   ],
   "9b": [
@@ -4934,61 +4934,61 @@
       "day": "Mon",
       "period": 1,
       "subject": "Maths",
-      "teacher": "SB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "Hindi_Lit",
-      "teacher": "AG"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "STEM",
-      "teacher": "MN"
+      "teacher": "NP"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "Computer/HSC",
-      "teacher": "SS"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "Dance",
-      "teacher": "SH"
+      "teacher": "SL"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "Biology",
-      "teacher": "SD"
+      "teacher": "SB"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "English_Lit",
-      "teacher": "AB"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "Games",
-      "teacher": "MN"
+      "teacher": "SZ"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "Maths",
-      "teacher": "SS"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Hindi_Lit",
-      "teacher": "AG"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
@@ -5000,223 +5000,223 @@
       "day": "Tue",
       "period": 4,
       "subject": "SSt",
-      "teacher": "GA,HSC"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "English_Lit",
-      "teacher": "MN"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "Computer/HSC",
-      "teacher": "SP"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Skill",
-      "teacher": "SH"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "Skill",
-      "teacher": "AG"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Biology",
-      "teacher": "SH"
+      "teacher": "SB"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Maths",
-      "teacher": "AG"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "English_Lit",
-      "teacher": "AB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "SSt",
-      "teacher": "SD"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Hindi_Lang",
-      "teacher": "SS"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Physics",
-      "teacher": "MN"
+      "teacher": "AB"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Chemistry",
-      "teacher": "SP"
+      "teacher": "AB"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "English_lang",
-      "teacher": "SS"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "SSt",
-      "teacher": "AG"
+      "teacher": "NT"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Maths",
-      "teacher": "GA,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Chemistry",
-      "teacher": "GA,HSC"
+      "teacher": "AB"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "Computer/HSC",
-      "teacher": "DV"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "English_lang",
-      "teacher": "MN"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "VE",
-      "teacher": "SH"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Hindi_Lit",
-      "teacher": "SS"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Maths",
-      "teacher": "AR,DV,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Chemistry",
-      "teacher": ""
+      "teacher": "AB"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Physics",
-      "teacher": ""
+      "teacher": "AB"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "English_lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "Library",
-      "teacher": ""
+      "teacher": "SP"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Computer/HSC",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Computer/HSC",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "English_lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Skill",
-      "teacher": ""
+      "teacher": "GA,SA,HSC"
     }
   ],
   "10a": [
@@ -5224,289 +5224,289 @@
       "day": "Mon",
       "period": 1,
       "subject": "Chemistry",
-      "teacher": "AG"
+      "teacher": "AB"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "Physics",
-      "teacher": "SS"
+      "teacher": "AB"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Maths",
-      "teacher": "SD"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 4,
       "subject": "SSt",
-      "teacher": "MS"
+      "teacher": "NT"
     },
     {
       "day": "Mon",
       "period": 5,
       "subject": "English_Lit",
-      "teacher": "RN"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 6,
       "subject": "Maths",
-      "teacher": "MN"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "Games",
-      "teacher": "DV,AR,HSC"
+      "teacher": "SZ"
     },
     {
       "day": "Mon",
       "period": 8,
       "subject": "Hindi_Lit",
-      "teacher": "DV,AR,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 1,
       "subject": "Library",
-      "teacher": "AG"
+      "teacher": "SP"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Physics",
-      "teacher": "AR,HSC"
+      "teacher": "AB"
     },
     {
       "day": "Tue",
       "period": 3,
       "subject": "Chemistry",
-      "teacher": "SS"
+      "teacher": "AB"
     },
     {
       "day": "Tue",
       "period": 4,
       "subject": "English_Lit",
-      "teacher": "MN"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "SSt",
-      "teacher": "MS"
+      "teacher": "NT"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "Maths",
-      "teacher": "AB"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 7,
       "subject": "Hindi_Lang",
-      "teacher": "DV,AR,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 8,
       "subject": "English_Lit",
-      "teacher": "DV,AR,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "Maths",
-      "teacher": "MS"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "SSt",
-      "teacher": "SB"
+      "teacher": "NT"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "Physics",
-      "teacher": "DV"
+      "teacher": "AB"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Hindi_Lit",
-      "teacher": "MN"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "VE",
-      "teacher": "AR,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "English_Lang",
-      "teacher": "AR,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Skill",
-      "teacher": "SS"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "Skill",
-      "teacher": "AG"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "Maths",
-      "teacher": "SL"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Computer/HSC",
-      "teacher": "SB"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "SSt",
-      "teacher": "MN"
+      "teacher": "NT"
     },
     {
       "day": "Thu",
       "period": 4,
       "subject": "English_Lang",
-      "teacher": "MS"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 5,
       "subject": "Hindi_Lit",
-      "teacher": "AR,HSC"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 6,
       "subject": "Chemistry",
-      "teacher": "AR,HSC"
+      "teacher": "AB"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Skill",
-      "teacher": "AG"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Skill",
-      "teacher": "SA"
+      "teacher": "GA,SA,HSC"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Biology",
-      "teacher": ""
+      "teacher": "SB"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Computer/HSC",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "Computer/HSC",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "SSt",
-      "teacher": ""
+      "teacher": "NT"
     },
     {
       "day": "Fri",
       "period": 8,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "Dance",
-      "teacher": ""
+      "teacher": "SL"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Biology",
-      "teacher": ""
+      "teacher": "SB"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "English_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "Hindi_Lang",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Computer/HSC",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "Computer/HSC",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "Maths",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Economics_SA",
-      "teacher": ""
+      "teacher": "SA"
     }
   ],
   "11a": [
@@ -5514,19 +5514,19 @@
       "day": "Mon",
       "period": 1,
       "subject": "Physics",
-      "teacher": "MN"
+      "teacher": "AB"
     },
     {
       "day": "Mon",
       "period": 2,
       "subject": "English",
-      "teacher": "SD"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "Library",
-      "teacher": "RN,AR,SP"
+      "teacher": "SP"
     },
     {
       "day": "Mon",
@@ -5544,13 +5544,13 @@
       "day": "Mon",
       "period": 6,
       "subject": "VE",
-      "teacher": "DV"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
       "period": 7,
       "subject": "Maths/Music/Hindi",
-      "teacher": "AG,MG,MS"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
@@ -5562,13 +5562,13 @@
       "day": "Tue",
       "period": 1,
       "subject": "Physics",
-      "teacher": "MN"
+      "teacher": "AB"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "English",
-      "teacher": "SD"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
@@ -5580,19 +5580,19 @@
       "day": "Tue",
       "period": 4,
       "subject": "Food_P/AI/Lib_Sc",
-      "teacher": "SB,SA,DV"
+      "teacher": "RN,AR,SP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Food_P/AI/Lib_Sc",
-      "teacher": "SD"
+      "teacher": "RN,AR,SP"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "Bio/Eco/Phy_Edu",
-      "teacher": "AG,MG,MS"
+      "teacher": "SB,SA,DV"
     },
     {
       "day": "Tue",
@@ -5604,49 +5604,49 @@
       "day": "Tue",
       "period": 8,
       "subject": "Maths/Music/Hindi",
-      "teacher": "SD"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 1,
       "subject": "English",
-      "teacher": "AB"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 2,
       "subject": "Physics",
-      "teacher": "MN"
+      "teacher": "AB"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "Food_P/AI/Lib_Sc",
-      "teacher": "AG,MG,MS"
+      "teacher": "RN,AR,SP"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Food_P/AI/Lib_Sc",
-      "teacher": "SB,SA,DV"
+      "teacher": "RN,AR,SP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Bio/Eco/Phy_Edu",
-      "teacher": "AB"
+      "teacher": "SB,SA,DV"
     },
     {
       "day": "Wed",
       "period": 6,
       "subject": "Games",
-      "teacher": "SD"
+      "teacher": "SZ"
     },
     {
       "day": "Wed",
       "period": 7,
       "subject": "Maths/Music/Hindi",
-      "teacher": "SB,SA,DV"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
@@ -5657,146 +5657,146 @@
     {
       "day": "Thu",
       "period": 1,
-      "subject": "English",
-      "teacher": "MN"
+      "subject": "Physics",
+      "teacher": "AB"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "Physics",
-      "teacher": "SD"
+      "teacher": "AB"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Food_P/AI/Lib_Sc",
+      "teacher": "RN,AR,SP"
+    },
+    {
+      "day": "Thu",
+      "period": 4,
+      "subject": "Bio/Eco/Phy_Edu",
       "teacher": "SB,SA,DV"
     },
     {
       "day": "Thu",
-      "period": 4,
-      "subject": "Bio/Eco/Phy_Edu",
+      "period": 5,
+      "subject": "Physics",
       "teacher": "AB"
     },
     {
       "day": "Thu",
-      "period": 5,
-      "subject": "Physics",
-      "teacher": "AG,MG,MS"
-    },
-    {
-      "day": "Thu",
       "period": 6,
       "subject": "Maths/Music/Hindi",
-      "teacher": "DV"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 7,
       "subject": "Chemistry",
-      "teacher": "MN"
+      "teacher": "AB"
     },
     {
       "day": "Thu",
       "period": 8,
-      "subject": "Physics",
-      "teacher": "AG,MG,MS"
+      "subject": "English",
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Chemistry",
-      "teacher": ""
+      "teacher": "AB"
     },
     {
       "day": "Fri",
       "period": 2,
-      "subject": "English",
-      "teacher": ""
+      "subject": "Chemistry",
+      "teacher": "AB"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Maths/Music/Hindi",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Bio/Eco/Phy_Edu",
-      "teacher": ""
+      "teacher": "SB,SA,DV"
     },
     {
       "day": "Fri",
       "period": 5,
       "subject": "Chemistry",
-      "teacher": ""
+      "teacher": "AB"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "Physics",
-      "teacher": ""
+      "teacher": "AB"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "Bio/Eco/Phy_Edu",
-      "teacher": ""
+      "teacher": "SB,SA,DV"
     },
     {
       "day": "Fri",
       "period": 8,
-      "subject": "Chemistry",
-      "teacher": ""
+      "subject": "English",
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "English",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "Physics",
-      "teacher": ""
+      "teacher": "AB"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Bio/Eco/Phy_Edu",
-      "teacher": ""
+      "teacher": "SB,SA,DV"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "Chemistry",
-      "teacher": ""
+      "teacher": "AB"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Maths/Music/Hindi",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "Games",
-      "teacher": ""
+      "teacher": "SZ"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "English",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Maths/Music/Hindi",
-      "teacher": ""
+      "teacher": "TP"
     }
   ],
   "11b": [
@@ -5810,13 +5810,13 @@
       "day": "Mon",
       "period": 2,
       "subject": "Games",
-      "teacher": "MN"
+      "teacher": "SZ"
     },
     {
       "day": "Mon",
       "period": 3,
       "subject": "English",
-      "teacher": "RN,AR,SP"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
@@ -5840,7 +5840,7 @@
       "day": "Mon",
       "period": 7,
       "subject": "Maths/Music/Hindi",
-      "teacher": "AG,MG,MS"
+      "teacher": "TP"
     },
     {
       "day": "Mon",
@@ -5852,13 +5852,13 @@
       "day": "Tue",
       "period": 1,
       "subject": "English",
-      "teacher": "SP"
+      "teacher": "TP"
     },
     {
       "day": "Tue",
       "period": 2,
       "subject": "Accounts/HIST",
-      "teacher": "MN"
+      "teacher": "SA,SS"
     },
     {
       "day": "Tue",
@@ -5870,19 +5870,19 @@
       "day": "Tue",
       "period": 4,
       "subject": "Food_P/AI/Lib_Sc",
-      "teacher": "SB,SA,DV"
+      "teacher": "RN,AR,SP"
     },
     {
       "day": "Tue",
       "period": 5,
       "subject": "Food_P/AI/Lib_Sc",
-      "teacher": "SA,SS"
+      "teacher": "RN,AR,SP"
     },
     {
       "day": "Tue",
       "period": 6,
       "subject": "Bio/Eco/Phy_Edu",
-      "teacher": "AG,MG,MS"
+      "teacher": "SB,SA,DV"
     },
     {
       "day": "Tue",
@@ -5894,7 +5894,7 @@
       "day": "Tue",
       "period": 8,
       "subject": "Maths/Music/Hindi",
-      "teacher": "SA,SS"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
@@ -5906,25 +5906,25 @@
       "day": "Wed",
       "period": 2,
       "subject": "English",
-      "teacher": "SA,SS"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 3,
       "subject": "Food_P/AI/Lib_Sc",
-      "teacher": "AG,MG,MS"
+      "teacher": "RN,AR,SP"
     },
     {
       "day": "Wed",
       "period": 4,
       "subject": "Food_P/AI/Lib_Sc",
-      "teacher": "SB,SA,DV"
+      "teacher": "RN,AR,SP"
     },
     {
       "day": "Wed",
       "period": 5,
       "subject": "Bio/Eco/Phy_Edu",
-      "teacher": "DV"
+      "teacher": "SB,SA,DV"
     },
     {
       "day": "Wed",
@@ -5936,157 +5936,157 @@
       "day": "Wed",
       "period": 7,
       "subject": "Maths/Music/Hindi",
-      "teacher": "SB,SA,DV"
+      "teacher": "TP"
     },
     {
       "day": "Wed",
       "period": 8,
       "subject": "BSt/Pol_Sc",
-      "teacher": "MN"
+      "teacher": "SA,SS"
     },
     {
       "day": "Thu",
       "period": 1,
       "subject": "Library",
-      "teacher": "SA,SS"
+      "teacher": "SP"
     },
     {
       "day": "Thu",
       "period": 2,
       "subject": "English",
-      "teacher": "MN"
+      "teacher": "TP"
     },
     {
       "day": "Thu",
       "period": 3,
       "subject": "Food_P/AI/Lib_Sc",
+      "teacher": "RN,AR,SP"
+    },
+    {
+      "day": "Thu",
+      "period": 4,
+      "subject": "Bio/Eco/Phy_Edu",
       "teacher": "SB,SA,DV"
     },
     {
       "day": "Thu",
-      "period": 4,
-      "subject": "Bio/Eco/Phy_Edu",
-      "teacher": "MN"
-    },
-    {
-      "day": "Thu",
       "period": 5,
       "subject": "BSt/Pol_Sc",
-      "teacher": "AG,MG,MS"
-    },
-    {
-      "day": "Thu",
-      "period": 6,
-      "subject": "Maths/Music/Hindi",
       "teacher": "SA,SS"
     },
     {
       "day": "Thu",
+      "period": 6,
+      "subject": "Maths/Music/Hindi",
+      "teacher": "TP"
+    },
+    {
+      "day": "Thu",
       "period": 7,
       "subject": "Accounts/HIST",
-      "teacher": "RN"
+      "teacher": "SA,SS"
     },
     {
       "day": "Thu",
       "period": 8,
       "subject": "Accounts/HIST",
-      "teacher": "AG,MG,MS"
+      "teacher": "SA,SS"
     },
     {
       "day": "Fri",
       "period": 1,
       "subject": "Accounts/HIST",
-      "teacher": ""
+      "teacher": "SA,SS"
     },
     {
       "day": "Fri",
       "period": 2,
       "subject": "Accounts/HIST",
-      "teacher": ""
+      "teacher": "SA,SS"
     },
     {
       "day": "Fri",
       "period": 3,
       "subject": "Maths/Music/Hindi",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 4,
       "subject": "Bio/Eco/Phy_Edu",
-      "teacher": ""
+      "teacher": "SB,SA,DV"
     },
     {
       "day": "Fri",
       "period": 5,
-      "subject": "Games",
-      "teacher": ""
+      "subject": "English",
+      "teacher": "TP"
     },
     {
       "day": "Fri",
       "period": 6,
       "subject": "BSt/Pol_Sc",
-      "teacher": ""
+      "teacher": "SA,SS"
     },
     {
       "day": "Fri",
       "period": 7,
       "subject": "Bio/Eco/Phy_Edu",
-      "teacher": ""
+      "teacher": "SB,SA,DV"
     },
     {
       "day": "Fri",
       "period": 8,
-      "subject": "English",
-      "teacher": ""
+      "subject": "Games",
+      "teacher": "SZ"
     },
     {
       "day": "Sat",
       "period": 1,
       "subject": "BSt/Pol_Sc",
-      "teacher": ""
+      "teacher": "SA,SS"
     },
     {
       "day": "Sat",
       "period": 2,
       "subject": "English",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 3,
       "subject": "Bio/Eco/Phy_Edu",
-      "teacher": ""
+      "teacher": "SB,SA,DV"
     },
     {
       "day": "Sat",
       "period": 4,
       "subject": "English",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 5,
       "subject": "Maths/Music/Hindi",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 6,
       "subject": "Accounts/HIST",
-      "teacher": ""
+      "teacher": "SA,SS"
     },
     {
       "day": "Sat",
       "period": 7,
       "subject": "VE",
-      "teacher": ""
+      "teacher": "TP"
     },
     {
       "day": "Sat",
       "period": 8,
       "subject": "Maths/Music/Hindi",
-      "teacher": ""
+      "teacher": "TP"
     }
   ]
 }

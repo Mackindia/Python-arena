@@ -33,6 +33,13 @@ export default function OnlineSchedulerPage() {
     PERIODS.map(p => ({ period_no: p, subject: "", teacher_id: "", teacher_name: "" }))
   );
 
+  // Settings State
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [isActive, setIsActive] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
+
   // Check admin status and load teachers
   useEffect(() => {
     async function init() {
@@ -44,7 +51,7 @@ export default function OnlineSchedulerPage() {
           return;
         }
         setAdminChecked(true);
-        await Promise.all([fetchTeachers(), fetchPeriods()]);
+        await Promise.all([fetchTeachers(), fetchPeriods(), fetchSettings()]);
       } catch (err) {
         router.push("/online-class");
       }
@@ -88,6 +95,20 @@ export default function OnlineSchedulerPage() {
       }
     } catch (err) {
       console.error("Failed to fetch bell timings");
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch("/api/admin/online-settings");
+      const data = await res.json();
+      if (data.settings) {
+        setStartDate(data.settings.startDate || "");
+        setEndDate(data.settings.endDate || "");
+        setIsActive(data.settings.isActive ?? false);
+      }
+    } catch (err) {
+      console.error("Failed to fetch settings");
     }
   };
 
@@ -194,6 +215,28 @@ export default function OnlineSchedulerPage() {
     }
   };
 
+  const handleSaveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      const res = await fetch("/api/admin/online-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ startDate, endDate, isActive })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("Global Calendar Settings saved successfully!");
+        setShowSettingsModal(false);
+      } else {
+        alert("Error saving settings: " + data.error);
+      }
+    } catch (err) {
+      alert("Failed to save settings.");
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   if (!adminChecked || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
@@ -215,6 +258,13 @@ export default function OnlineSchedulerPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowSettingsModal(true)}
+              className="flex items-center gap-2 rounded-xl border border-indigo-500/50 bg-indigo-500/10 px-4 py-3 text-sm font-bold text-indigo-300 transition hover:bg-indigo-500 hover:text-white"
+            >
+              <Calendar className="h-5 w-5" />
+              SET CALENDAR
+            </button>
             <button
               onClick={() => setShowBellModal(true)}
               className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm font-bold text-slate-300 transition hover:bg-slate-700 hover:text-white"
@@ -304,8 +354,6 @@ export default function OnlineSchedulerPage() {
                   >
                     <option value="">-- Unassigned Teacher --</option>
                     {teachers.map(t => {
-                      // We use teacher.teacher_id if they have a shortcode, otherwise use their clerkId/mongoId
-                      // This ensures it matches TeacherDashboard exactly.
                       const idToUse = t.teacher_id || t.clerkId || t._id.toString();
                       return (
                         <option key={t._id} value={idToUse}>
@@ -320,6 +368,48 @@ export default function OnlineSchedulerPage() {
           ))}
         </div>
       </div>
+
+      {showSettingsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
+            <h2 className="mb-2 text-xl font-bold text-white flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-indigo-400" /> Global Calendar Settings
+            </h2>
+            <p className="mb-6 text-sm text-slate-400">Online classes will ONLY appear on the Teacher and Student dashboards if the current date is between these dates and the system is Active.</p>
+            
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Start Date</label>
+                <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-white outline-none focus:border-indigo-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">End Date</label>
+                <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-white outline-none focus:border-indigo-500" />
+              </div>
+              <div className="flex items-center gap-3 mt-4 pt-4 border-t border-slate-800">
+                <input type="checkbox" id="activeToggle" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="h-5 w-5 rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-slate-900" />
+                <label htmlFor="activeToggle" className="text-sm font-bold text-emerald-400 cursor-pointer">System is Active (Students can see classes)</label>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 border-t border-slate-800 pt-4">
+              <button
+                onClick={() => setShowSettingsModal(false)}
+                className="rounded-xl border border-slate-700 px-4 py-2.5 text-sm font-bold text-slate-400 transition hover:bg-slate-800 hover:text-white"
+              >
+                CANCEL
+              </button>
+              <button
+                onClick={handleSaveSettings}
+                disabled={savingSettings}
+                className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-500 disabled:opacity-50"
+              >
+                {savingSettings ? "SAVING..." : "APPLY CALENDAR"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showBellModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">

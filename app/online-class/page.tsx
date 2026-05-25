@@ -13,6 +13,8 @@ import StudentDashboard from "./StudentDashboard";
 import TeacherDashboard from "./TeacherDashboard";
 import AdminDashboard from "./AdminDashboard";
 
+import Settings from "../../models/Settings";
+
 export default async function OnlineClassPage() {
   await connectDB();
 
@@ -35,42 +37,35 @@ export default async function OnlineClassPage() {
 
   const role = user.role || "student";
 
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const todayName = days[new Date().getDay()];
 
-  // Fetch periods
-  const periodsDoc = await Period.find({})
-    .sort({ period_no: 1 })
-    .lean();
+  // Check Global Online Class Window Settings
+  const settingsDoc = await Settings.findOne({ key: "online_class_window" }).lean();
+  const onlineSettings = settingsDoc ? settingsDoc.value : { isActive: true, startDate: "", endDate: "" };
 
+  const todayDate = new Date().toISOString().split("T")[0];
+  let isWindowActive = onlineSettings.isActive;
+  
+  if (isWindowActive && onlineSettings.startDate && todayDate < onlineSettings.startDate) {
+    isWindowActive = false;
+  }
+  if (isWindowActive && onlineSettings.endDate && todayDate > onlineSettings.endDate) {
+    isWindowActive = false;
+  }
+
+  // Fetch periods
+  const periodsDoc = await Period.find({}).sort({ period_no: 1 }).lean();
   const periods = JSON.parse(JSON.stringify(periodsDoc));
 
   // =========================
   // ADMIN
   // =========================
   if (role === "admin") {
-    const liveSessionsDoc = await ActiveSession.find({
-      is_active: true,
-    }).lean();
+    const liveSessionsDoc = await ActiveSession.find({ is_active: true }).lean();
+    const liveSessions = JSON.parse(JSON.stringify(liveSessionsDoc));
 
-    const liveSessions = JSON.parse(
-      JSON.stringify(liveSessionsDoc)
-    );
-
-    return (
-      <AdminDashboard
-        liveSessions={liveSessions}
-      />
-    );
+    return <AdminDashboard liveSessions={liveSessions} settings={onlineSettings} />;
   }
 
   // =========================
@@ -80,26 +75,25 @@ export default async function OnlineClassPage() {
     // Use the shortcode teacher_id (e.g., 'AR', 'NM') if available. Fallback to username.
     const teacherId = user.teacher_id || user.username || user.clerkId || user._id.toString();
 
-    const timetableDoc = await Timetable.find({
-      day: todayName,
-      teacher_id: teacherId,
-    })
-      .sort({ period_no: 1 })
-      .lean();
+    let timetableDoc: any[] = [];
+    let activeSessionsDoc: any[] = [];
 
-    const activeSessionsDoc =
-      await ActiveSession.find({
+    if (isWindowActive) {
+      timetableDoc = await Timetable.find({
+        day: todayName,
+        teacher_id: teacherId,
+      })
+        .sort({ period_no: 1 })
+        .lean();
+
+      activeSessionsDoc = await ActiveSession.find({
         teacher_id: teacherId,
         is_active: true,
       }).lean();
+    }
 
-    const timetable = JSON.parse(
-      JSON.stringify(timetableDoc)
-    );
-
-    const activeSessions = JSON.parse(
-      JSON.stringify(activeSessionsDoc)
-    );
+    const timetable = JSON.parse(JSON.stringify(timetableDoc));
+    const activeSessions = JSON.parse(JSON.stringify(activeSessionsDoc));
 
     const teacher = {
       teacher_id: teacherId,
@@ -128,32 +122,37 @@ export default async function OnlineClassPage() {
   const classRegex = new RegExp(`^${normalizedClass}$`, "i");
   const sectionRegex = new RegExp(`^${rawSection}$`, "i");
   
-  const studentGroup = user.group || "MAIN";
+  let studentGroups = ["MAIN"];
+  if (Array.isArray(user.group)) {
+    studentGroups = ["MAIN", ...user.group];
+  } else if (typeof user.group === "string" && user.group.trim() !== "") {
+    // If the admin typed "Commerce, Painting", split it into an array
+    studentGroups = ["MAIN", ...user.group.split(",").map((g: string) => g.trim())];
+  }
 
-  const timetableDoc = await Timetable.find({
-    class: classRegex,
-    section: sectionRegex,
-    group: { $in: ["MAIN", studentGroup] },
-    day: todayName,
-  })
-    .sort({ period_no: 1 })
-    .lean();
+  let timetableDoc: any[] = [];
+  let activeSessionsDoc: any[] = [];
 
-  const activeSessionsDoc =
-    await ActiveSession.find({
+  if (isWindowActive) {
+    timetableDoc = await Timetable.find({
       class: classRegex,
       section: sectionRegex,
-      group: { $in: ["MAIN", studentGroup] },
+      group: { $in: studentGroups },
+      day: todayName,
+    })
+      .sort({ period_no: 1 })
+      .lean();
+
+    activeSessionsDoc = await ActiveSession.find({
+      class: classRegex,
+      section: sectionRegex,
+      group: { $in: studentGroups },
       is_active: true,
     }).lean();
+  }
 
-  const timetable = JSON.parse(
-    JSON.stringify(timetableDoc)
-  );
-
-  const activeSessions = JSON.parse(
-    JSON.stringify(activeSessionsDoc)
-  );
+  const timetable = JSON.parse(JSON.stringify(timetableDoc));
+  const activeSessions = JSON.parse(JSON.stringify(activeSessionsDoc));
 
   return (
     <StudentDashboard
@@ -162,7 +161,7 @@ export default async function OnlineClassPage() {
       periods={periods}
       userClass={normalizedClass}
       userSection={rawSection}
-      userGroup={studentGroup}
+      userGroup={user.group || "MAIN"}
     />
   );
 }

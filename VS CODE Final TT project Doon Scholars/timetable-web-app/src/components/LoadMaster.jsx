@@ -3,7 +3,7 @@ import { useTimetable } from '../context/TimetableContext';
 import { Plus } from 'lucide-react';
 
 const LoadMaster = () => {
-  const { loadMaster, timetables, masterClasses, addLoadMasterEntry } = useTimetable();
+  const { loadMaster, timetables, masterClasses, addLoadMasterEntry, updateTotalLoad } = useTimetable();
   const [filterClass, setFilterClass] = useState('');
   
   // Add Subject Mapping Modal State
@@ -112,7 +112,22 @@ const LoadMaster = () => {
                   <td style={{ fontWeight: 500 }}>{row.subject}</td>
                   <td>{row.class_val}</td>
                   <td>{row.section}</td>
-                  <td>{row.total_load}</td>
+                  <td style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <button 
+                      onClick={() => updateTotalLoad(row.class_id, row.subject, -1)}
+                      style={{ padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', cursor: 'pointer' }}
+                      disabled={row.total_load <= 0}
+                    >
+                      -
+                    </button>
+                    <span style={{ minWidth: '20px', textAlign: 'center' }}>{row.total_load}</span>
+                    <button 
+                      onClick={() => updateTotalLoad(row.class_id, row.subject, 1)}
+                      style={{ padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', cursor: 'pointer' }}
+                    >
+                      +
+                    </button>
+                  </td>
                   <td>{row.actual_used}</td>
                   <td style={{ fontWeight: 600, color: row.actual_remaining < 0 ? 'var(--danger)' : (row.actual_remaining > 0 ? 'var(--warning)' : 'var(--success)') }}>
                     {row.actual_remaining}
