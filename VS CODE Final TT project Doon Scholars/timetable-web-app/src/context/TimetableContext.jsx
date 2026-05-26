@@ -26,62 +26,45 @@ export const TimetableProvider = ({ children }) => {
   const [teacherSubjectMap, setTeacherSubjectMap] = useState({});
 
   useEffect(() => {
-    // Initialize state from local storage or fallback to initial data
-    const savedTT = localStorage.getItem('timetables');
-    const savedLoad = localStorage.getItem('loadMaster');
-    const savedSlotUsage = localStorage.getItem('teacherSlotUsage');
-    
-    let currentTT = initialTimetables;
-    if (savedTT) {
-      currentTT = JSON.parse(savedTT);
-      setTimetables(currentTT);
-    } else {
-      setTimetables(initialTimetables);
-    }
+    // Helper function to safely parse JSON from localStorage
+    const safeJSONParse = (key, fallback) => {
+      const item = localStorage.getItem(key);
+      if (!item || item === "undefined" || item === "null" || item === "[object Object]") return fallback;
+      try {
+        const parsed = JSON.parse(item);
+        if (parsed === null) return fallback;
+        return parsed;
+      } catch (e) {
+        console.warn(`Corrupted localStorage data for key: ${key}. Resetting to default.`);
+        return fallback;
+      }
+    };
 
-    if (savedLoad) {
-      setLoadMaster(JSON.parse(savedLoad));
-    } else {
-      setLoadMaster(initialLoadMaster);
-    }
-    
-    if (savedSlotUsage) {
-      setTeacherSlotUsage(JSON.parse(savedSlotUsage));
-    } else {
-      setTeacherSlotUsage(initialTeacherSlotUsage);
-    }
-    
-    const savedSubstitutions = localStorage.getItem('substitutions');
-    if (savedSubstitutions) {
-      setSubstitutions(JSON.parse(savedSubstitutions));
-    }
-    
-    const savedAbsentTeachers = localStorage.getItem('absentTeachers');
-    if (savedAbsentTeachers) {
-      setAbsentTeachers(JSON.parse(savedAbsentTeachers));
-    }
-    
-    const savedTSMap = localStorage.getItem('teacherSubjectMap');
-    if (savedTSMap) {
-      setTeacherSubjectMap(JSON.parse(savedTSMap));
-    } else {
-      setTeacherSubjectMap({});
-    }
-    
-    const savedAddedTeachers = localStorage.getItem('addedTeachers');
-    const customTeachers = savedAddedTeachers ? JSON.parse(savedAddedTeachers) : [];
+    const currentTT = safeJSONParse('timetables', initialTimetables);
+    setTimetables(currentTT);
 
-    const savedDeletedTeachers = localStorage.getItem('deletedTeachers');
-    const deletedTeachersList = savedDeletedTeachers ? JSON.parse(savedDeletedTeachers) : [];
+    setLoadMaster(safeJSONParse('loadMaster', initialLoadMaster));
+    setTeacherSlotUsage(safeJSONParse('teacherSlotUsage', initialTeacherSlotUsage));
+    
+    const savedSubstitutions = safeJSONParse('substitutions', null);
+    if (savedSubstitutions) setSubstitutions(savedSubstitutions);
+    
+    const savedAbsentTeachers = safeJSONParse('absentTeachers', null);
+    if (savedAbsentTeachers) setAbsentTeachers(savedAbsentTeachers);
+    
+    setTeacherSubjectMap(safeJSONParse('teacherSubjectMap', {}));
+    
+    const customTeachers = safeJSONParse('addedTeachers', []);
+    const deletedTeachersList = safeJSONParse('deletedTeachers', []);
 
     const validInitial = initialTeachers.filter(t => !deletedTeachersList.includes(t));
     const validCustom = customTeachers.filter(t => !deletedTeachersList.includes(t));
 
     setTeachers([...new Set([...validInitial, ...validCustom])].sort());
     
-    const savedMasterClasses = localStorage.getItem('masterClasses');
+    const savedMasterClasses = safeJSONParse('masterClasses', null);
     if (savedMasterClasses) {
-      setMasterClasses(JSON.parse(savedMasterClasses));
+      setMasterClasses(savedMasterClasses);
       setClasses(Object.keys(currentTT));
     } else {
       // Derive initial master classes from currentTT

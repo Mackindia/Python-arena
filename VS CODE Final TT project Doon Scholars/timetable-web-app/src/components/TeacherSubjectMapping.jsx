@@ -53,10 +53,18 @@ const parseCSVConfig = () => {
   });
 
   const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
-  const deletedSubjectsList = savedDeletedSubjects ? JSON.parse(savedDeletedSubjects) : [];
+  let deletedSubjectsList = [];
+  try {
+    const parsed = savedDeletedSubjects ? JSON.parse(savedDeletedSubjects) : [];
+    deletedSubjectsList = Array.isArray(parsed) ? parsed : [];
+  } catch(e) {}
 
   const savedDeletedTeachers = localStorage.getItem('deletedTeachers');
-  const deletedTeachersList = savedDeletedTeachers ? JSON.parse(savedDeletedTeachers) : [];
+  let deletedTeachersList = [];
+  try {
+    const parsed = savedDeletedTeachers ? JSON.parse(savedDeletedTeachers) : [];
+    deletedTeachersList = Array.isArray(parsed) ? parsed : [];
+  } catch(e) {}
 
   const finalConfig = WING_DEFS.map(w => ({
     title: w.title,

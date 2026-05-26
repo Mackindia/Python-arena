@@ -40,31 +40,33 @@ export default function AdminTimetablePage() {
           </a>
         </div>
 
-        {/* Embedded Application or Dev Welcome */}
-        <div className="flex-1 w-full bg-slate-900 rounded-xl overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center" style={{ minHeight: 'calc(100vh - 160px)' }}>
-          {process.env.NODE_ENV === "development" ? (
-            <div className="text-center p-8">
-              <h2 className="text-3xl font-bold text-white mb-4">Welcome to Doon Scholars Timetable Management System</h2>
-              <p className="text-slate-400 mb-8 max-w-lg mx-auto">
-                You are currently in Development Mode. Please use the standalone server window (localhost:5173) that just opened to make your edits.
-              </p>
-              <a
-                href="http://localhost:5173"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500"
-              >
-                Open Development Server <ExternalLink className="h-4 w-4" />
-              </a>
+        {/* Full-Screen Launch Panel */}
+        <div className="flex-1 w-full bg-slate-900 rounded-xl overflow-hidden border border-white/10 shadow-2xl flex flex-col items-center justify-center p-8 text-center" style={{ minHeight: 'calc(100vh - 160px)' }}>
+          <div className="bg-slate-800 p-8 rounded-2xl border border-white/10 max-w-2xl w-full shadow-lg">
+            <div className="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <ExternalLink className="h-8 w-8 text-indigo-400" />
             </div>
-          ) : (
-            <iframe 
-              src={timetableUrl}
-              className="w-full h-full border-none bg-white" 
-              title="School Timetable System"
-              style={{ width: '100%', height: '100%', minHeight: '800px' }}
-            />
-          )}
+            
+            <h2 className="text-3xl font-bold text-white mb-4">Timetable Management Engine</h2>
+            
+            <p className="text-slate-400 mb-8 leading-relaxed">
+              To provide you with the maximum screen space for the 8-period Mastersheet and to ensure the <strong>Print to PDF</strong> engine works flawlessly, the Timetable System runs in a dedicated fullscreen window.
+            </p>
+
+            <a
+              href={process.env.NODE_ENV === "development" ? "http://localhost:5173" : timetableUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-3 w-full sm:w-auto rounded-xl bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-indigo-500/30 transition-all hover:bg-indigo-500 hover:scale-105 hover:shadow-indigo-500/50"
+            >
+              Launch Timetable System <ExternalLink className="h-5 w-5" />
+            </a>
+
+            <div className="mt-8 pt-8 border-t border-white/10 text-sm text-slate-500">
+              <p>Data automatically synchronizes with the main LMS database.</p>
+              <p>All updates apply instantly across the platform.</p>
+            </div>
+          </div>
         </div>
 
       </div>

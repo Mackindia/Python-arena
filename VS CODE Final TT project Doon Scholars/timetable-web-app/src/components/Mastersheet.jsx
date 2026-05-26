@@ -158,11 +158,19 @@ const Mastersheet = () => {
                 reader.onload = (event) => {
                   try {
                     const data = JSON.parse(event.target.result);
-                    if (data.timetables) localStorage.setItem('timetables', data.timetables);
-                    if (data.teacherSubjectMap) localStorage.setItem('teacherSubjectMap', data.teacherSubjectMap);
-                    if (data.addedTeachers) localStorage.setItem('addedTeachers', data.addedTeachers);
-                    if (data.deletedTeachers) localStorage.setItem('deletedTeachers', data.deletedTeachers);
-                    if (data.deletedSubjects) localStorage.setItem('deletedSubjects', data.deletedSubjects);
+                    
+                    const safeSet = (key, value) => {
+                      if (!value) return;
+                      const stringVal = typeof value === 'string' ? value : JSON.stringify(value);
+                      localStorage.setItem(key, stringVal);
+                    };
+
+                    safeSet('timetables', data.timetables);
+                    safeSet('teacherSubjectMap', data.teacherSubjectMap);
+                    safeSet('addedTeachers', data.addedTeachers);
+                    safeSet('deletedTeachers', data.deletedTeachers);
+                    safeSet('deletedSubjects', data.deletedSubjects);
+                    
                     alert('Backup Restored Successfully! The page will now reload.');
                     window.location.reload();
                   } catch (err) {
