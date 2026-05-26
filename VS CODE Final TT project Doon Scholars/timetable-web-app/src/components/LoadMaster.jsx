@@ -3,7 +3,7 @@ import { useTimetable } from '../context/TimetableContext';
 import { Plus } from 'lucide-react';
 
 const LoadMaster = () => {
-  const { loadMaster, timetables, masterClasses, addLoadMasterEntry, updateTotalLoad } = useTimetable();
+  const { loadMaster, timetables, masterClasses, addLoadMasterEntry, removeLoadMasterEntry, renameLoadMasterSubject, updateTotalLoad } = useTimetable();
   const [filterClass, setFilterClass] = useState('');
   
   // Add Subject Mapping Modal State
@@ -63,6 +63,19 @@ const LoadMaster = () => {
     return cls ? cls.sections : [];
   };
 
+  const handleRename = (classId, oldSubject) => {
+    const newName = prompt(`Enter new name for subject "${oldSubject}":`, oldSubject);
+    if (newName && newName.trim() !== '' && newName !== oldSubject) {
+      renameLoadMasterSubject(classId, oldSubject, newName);
+    }
+  };
+
+  const handleDelete = (classId, subject) => {
+    if (window.confirm(`Are you sure you want to delete the subject "${subject}" from class ${classId}?`)) {
+      removeLoadMasterEntry(classId, subject);
+    }
+  };
+
   return (
     <div>
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -104,6 +117,7 @@ const LoadMaster = () => {
                 <th>Actual Used Load</th>
                 <th>Remaining Load</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -136,6 +150,18 @@ const LoadMaster = () => {
                     {row.actual_remaining === 0 && <span className="badge badge-success" style={{ background: '#ecfdf5', color: '#065f46', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>Balanced</span>}
                     {row.actual_remaining > 0 && <span className="badge badge-warning" style={{ background: '#fffbeb', color: '#b45309', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>Underloaded</span>}
                     {row.actual_remaining < 0 && <span className="badge badge-danger" style={{ background: '#fef2f2', color: '#991b1b', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>Overloaded</span>}
+                  </td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button 
+                      onClick={() => handleRename(row.class_id, row.subject)}
+                      style={{ padding: '4px 8px', borderRadius: '4px', border: 'none', background: '#3b82f6', color: 'white', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}
+                      title="Rename this subject in Load Master and Timetable"
+                    >Rename</button>
+                    <button 
+                      onClick={() => handleDelete(row.class_id, row.subject)}
+                      style={{ padding: '4px 8px', borderRadius: '4px', border: 'none', background: '#ef4444', color: 'white', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}
+                      title="Delete this subject mapping entirely"
+                    >Delete</button>
                   </td>
                 </tr>
               ))}

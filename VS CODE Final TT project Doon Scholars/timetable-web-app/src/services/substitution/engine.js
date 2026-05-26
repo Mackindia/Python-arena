@@ -117,9 +117,8 @@ export const generateAllSubstitutions = (
           // exempt from substitution duty
           .filter(t => !['AN', 'P', 'RN'].includes(t.id))
 
-          // max 7 periods
+          // max 3 arrangements AND total periods < 8
           .filter(t => {
-
             const usage =
               teacherUsage?.[
                 t.id
@@ -128,9 +127,7 @@ export const generateAllSubstitutions = (
               ] || {}
 
             const baseLoad =
-
               Object.entries(usage)
-
                 .filter(([_, value]) =>
                   value
                 ).length
@@ -140,15 +137,11 @@ export const generateAllSubstitutions = (
                 t.id
               ].length
 
-            return (
-              baseLoad +
-              extraLoad
-            ) < 7
+            return extraLoad < 3 && (baseLoad + extraLoad) < 8;
           })
 
           // fairness
           .sort((a,b) => {
-
             const usageA =
               teacherUsage?.[
                 a.id
@@ -163,33 +156,35 @@ export const generateAllSubstitutions = (
                 selectedDayName
               ] || {}
 
-            const loadA =
-
+            const baseLoadA =
               Object.entries(usageA)
-
                 .filter(([_, value]) =>
                   value
                 ).length
 
-              +
-
-              assignedMap[a.id]
-                .length
-
-            const loadB =
-
+            const baseLoadB =
               Object.entries(usageB)
-
                 .filter(([_, value]) =>
                   value
                 ).length
 
-              +
+            const extraLoadA =
+              assignedMap[
+                a.id
+              ].length
 
-              assignedMap[b.id]
-                .length
+            const extraLoadB =
+              assignedMap[
+                b.id
+              ].length
 
-            return loadA - loadB
+            // Sort by extraLoad first (distribute arrangements evenly)
+            if (extraLoadA !== extraLoadB) {
+              return extraLoadA - extraLoadB;
+            }
+
+            // Sort by baseLoad (prefer teachers with fewer own classes / free for maximum periods)
+            return baseLoadA - baseLoadB;
           })
 
       const assignedTeacher =

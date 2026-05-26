@@ -120,10 +120,23 @@ const SubstitutionEngineUI = ({
       })
       // exempt from substitution duty
       .filter(t => !['AN', 'P', 'RN'].includes(normalizeTeacherId(t)))
-      .map(t => ({ name: t, load: getTeacherDailyLoad(t) }))
-      // strictly enforce max 7 periods per day
-      .filter(t => t.load < 7)
-      .sort((a,b) => a.load - b.load);
+      .map(t => {
+        const tId = normalizeTeacherId(t);
+        const usage = stableTeacherUsage?.[tId]?.[selectedDayName] || {};
+        const baseLoad = Object.entries(usage).filter(([_, value]) => value).length;
+        const extraLoad = dailySubstitutions.filter(
+          s => normalizeTeacherId(s.substituteTeacher) === tId
+        ).length;
+        return { name: t, baseLoad, extraLoad, load: baseLoad + extraLoad };
+      })
+      // strictly enforce max 3 arrangements AND total periods < 8
+      .filter(t => t.extraLoad < 3 && t.load < 8)
+      .sort((a, b) => {
+        if (a.extraLoad !== b.extraLoad) {
+          return a.extraLoad - b.extraLoad;
+        }
+        return a.baseLoad - b.baseLoad;
+      });
   };
 
   // =========================================
@@ -162,38 +175,147 @@ const SubstitutionEngineUI = ({
   // =========================================
 
   return (
-    <div className="card" style={{ padding: '1rem', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-      <h2 className="text-2xl font-bold mb-4" style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-        Automatic Substitution Engine
-      </h2>
+    <div className="card printable-card printable-area" style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+      <style>{`
+        @media print {
+          @page {
+            size: portrait !important;
+            margin: 8mm !important;
+          }
+          body {
+            background: white !important;
+            color: black !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+          /* Override general visibility rules from index.css print block */
+          body * {
+            visibility: hidden !important;
+          }
+          .printable-area, .printable-area * {
+            visibility: visible !important;
+          }
+          .printable-area {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            display: block !important;
+          }
+          nav, .no-print, button, select, input {
+            display: none !important;
+          }
+          .printable-card {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+          }
+          .print-only-header {
+            display: block !important;
+          }
+          .substitution-group-card {
+            border: 1px solid #cbd5e1 !important;
+            margin-bottom: 12px !important;
+            padding: 8px !important;
+            page-break-inside: avoid;
+            background: #fff !important;
+            border-radius: 6px !important;
+          }
+          .substitution-title {
+            font-size: 14px !important;
+            color: #b91c1c !important;
+            margin-bottom: 6px !important;
+            margin-top: 0 !important;
+            font-weight: bold !important;
+          }
+          .sub-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 11px !important;
+          }
+          .sub-table th {
+            background-color: #f3f4f6 !important;
+            color: #000 !important;
+            font-weight: bold !important;
+            padding: 4px 6px !important;
+            border: 1px solid #cbd5e1 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          .sub-table td {
+            padding: 4px 6px !important;
+            border: 1px solid #cbd5e1 !important;
+          }
+        }
+      `}</style>
+
+      {/* Print-only Header */}
+      <div className="print-only-header" style={{ display: 'none' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 8px 0', textAlign: 'center', color: '#1e3a8a' }}>
+          Doon Scholars ERP - Daily Substitution Arrangements
+        </h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', borderBottom: '2px solid #1e3a8a', paddingBottom: '6px', marginBottom: '15px' }}>
+          <span><strong>Date:</strong> {selectedDate}</span>
+          <span><strong>Day:</strong> {selectedDayName}</span>
+        </div>
+      </div>
+
+      <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', margin: 0 }}>
+          Automatic Substitution Engine
+        </h2>
+        {Object.keys(groupedSubstitutions).length > 0 && (
+          <button
+            onClick={() => window.print()}
+            style={{
+              background: '#2563eb',
+              color: 'white',
+              border: 'none',
+              padding: '0.5rem 1.25rem',
+              borderRadius: '6px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+              transition: 'background-color 0.2s',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+            }}
+            onMouseOver={(e) => e.target.style.background = '#1d4ed8'}
+            onMouseOut={(e) => e.target.style.background = '#2563eb'}
+          >
+            Print / PDF Arrangements
+          </button>
+        )}
+      </div>
 
       {Object.keys(groupedSubstitutions).length === 0 ? (
-        <div style={{ color: '#6b7280', fontWeight: '500' }}>
-          No substitutions generated
+        <div style={{ color: '#6b7280', fontWeight: '500', textAlign: 'center', padding: '2rem 0' }}>
+          No substitutions generated. Make sure to select absent teachers above.
         </div>
       ) : (
         Object.entries(groupedSubstitutions).map(([teacher, subs]) => (
-          <div key={teacher} style={{ marginBottom: '2rem', border: '1px solid #e5e7eb', borderRadius: '0.75rem', padding: '1rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#dc2626' }}>
-              {teacher} Absent
+          <div key={teacher} className="substitution-group-card" style={{ marginBottom: '1rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem', padding: '0.75rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', backgroundColor: '#fafafa' }}>
+            <h3 className="substitution-title" style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#dc2626', marginTop: 0 }}>
+              {teacher} ({getTeacherFullName(teacher)}) Absent
             </h3>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <table className="sub-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
                 <tr style={{ backgroundColor: '#f3f4f6' }}>
-                  <th style={{ padding: '0.5rem', borderBottom: '2px solid #e5e7eb' }}>Period</th>
-                  <th style={{ padding: '0.5rem', borderBottom: '2px solid #e5e7eb' }}>Class</th>
-                  <th style={{ padding: '0.5rem', borderBottom: '2px solid #e5e7eb' }}>Subject</th>
-                  <th style={{ padding: '0.5rem', borderBottom: '2px solid #e5e7eb' }}>Substitute</th>
+                  <th style={{ padding: '0.35rem 0.5rem', borderBottom: '2px solid #e5e7eb', fontSize: '0.85rem' }}>Period</th>
+                  <th style={{ padding: '0.35rem 0.5rem', borderBottom: '2px solid #e5e7eb', fontSize: '0.85rem' }}>Class</th>
+                  <th style={{ padding: '0.35rem 0.5rem', borderBottom: '2px solid #e5e7eb', fontSize: '0.85rem' }}>Subject</th>
+                  <th style={{ padding: '0.35rem 0.5rem', borderBottom: '2px solid #e5e7eb', fontSize: '0.85rem' }}>Substitute Arrangement</th>
                 </tr>
               </thead>
               <tbody>
                 {subs.map(sub => (
                   <tr key={sub.slotId}>
-                    <td style={{ padding: '0.5rem', borderBottom: '1px solid #e5e7eb', textAlign: 'center', fontWeight: 'bold' }}>{sub.period}</td>
-                    <td style={{ padding: '0.5rem', borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>{sub.classId.toUpperCase()}</td>
-                    <td style={{ padding: '0.5rem', borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>{sub.subject}</td>
-                    <td style={{ padding: '0.5rem', borderBottom: '1px solid #e5e7eb' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <td style={{ padding: '0.35rem 0.5rem', borderBottom: '1px solid #e5e7eb', textAlign: 'center', fontWeight: 'bold', fontSize: '0.8rem' }}>{sub.period}</td>
+                    <td style={{ padding: '0.35rem 0.5rem', borderBottom: '1px solid #e5e7eb', textAlign: 'center', fontSize: '0.8rem' }}>{sub.classId.toUpperCase()}</td>
+                    <td style={{ padding: '0.35rem 0.5rem', borderBottom: '1px solid #e5e7eb', textAlign: 'center', fontSize: '0.8rem' }}>{sub.subject}</td>
+                    <td style={{ padding: '0.35rem 0.5rem', borderBottom: '1px solid #e5e7eb', fontSize: '0.8rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <span
                           style={{
                             fontWeight: "bold",
@@ -203,7 +325,8 @@ const SubstitutionEngineUI = ({
                           {sub.substituteTeacher === "UNASSIGNED" ? sub.substituteTeacher : `${sub.substituteTeacher} ${getTeacherFullName(sub.substituteTeacher) !== sub.substituteTeacher ? '- ' + getTeacherFullName(sub.substituteTeacher) : ''}`}
                         </span>
                         <select
-                          style={{ border: '1px solid #d1d5db', borderRadius: '4px', padding: '0.25rem 0.5rem', fontSize: '0.875rem' }}
+                          className="no-print"
+                          style={{ border: '1px solid #d1d5db', borderRadius: '4px', padding: '0.15rem 0.35rem', fontSize: '0.75rem', background: '#fff' }}
                           defaultValue=""
                           onChange={(e) => {
                             if (!e.target.value) return;
@@ -279,9 +402,9 @@ const SubstitutionManager = () => {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem' }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>Advanced Substitution Manager</h1>
+      <h1 className="no-print" style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>Advanced Substitution Manager</h1>
       
-      <div className="card" style={{ marginBottom: '1.5rem', borderLeft: '4px solid #3b82f6', padding: '1rem', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+      <div className="card no-print" style={{ marginBottom: '1.5rem', borderLeft: '4px solid #3b82f6', padding: '1rem', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
         <h3 style={{ margin: '0 0 1rem 0' }}>STEP 1 — Select Date</h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <CalendarIcon size={20} color="#3b82f6" />
@@ -295,7 +418,7 @@ const SubstitutionManager = () => {
         </div>
       </div>
 
-      <div className="card" style={{ marginBottom: '1.5rem', borderLeft: '4px solid #ef4444', padding: '1rem', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+      <div className="card no-print" style={{ marginBottom: '1.5rem', borderLeft: '4px solid #ef4444', padding: '1rem', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
         <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Users size={20} color="#ef4444" /> STEP 2 — Select Absent Teachers
         </h3>

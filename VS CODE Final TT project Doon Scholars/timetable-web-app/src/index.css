@@ -371,20 +371,32 @@ select:focus, input:focus {
     margin-bottom: 2rem;
   }
   
-  /* Reset grid borders for better printing */
-  .timetable-grid {
+  /* Reset grid borders and squeeze for better printing */
+  .timetable-grid, .master-grid {
     min-width: 100% !important;
+    max-width: 100% !important;
     border: 1px solid #000;
+    grid-template-columns: 50px repeat(8, minmax(0, 1fr)) !important;
+    gap: 1px !important;
   }
   
   .grid-cell {
     border: 1px solid #ccc;
     background-color: transparent !important;
+    padding: 0.2rem !important;
+    min-height: auto !important;
   }
   
+  .slot-subject {
+    font-size: 0.7rem !important;
+    margin-bottom: 0.1rem !important;
+  }
+
   .slot-teacher {
     background-color: transparent !important;
     color: #333 !important;
+    font-size: 0.65rem !important;
+    padding: 0 !important;
   }
 
   /* Force Landscape Mode for Timetables */

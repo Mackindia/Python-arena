@@ -35,7 +35,9 @@ time.sleep(1)
 
 # Step 2: Start Python HTTP server in background
 print("\nStep 2: Starting Python HTTP server...")
-dist_path = r"c:\Users\admin\Desktop\Final TT project Doon Scholars\timetable-web-app\dist"
+# Dynamically find the path relative to this script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+dist_path = os.path.join(script_dir, "timetable-web-app", "dist")
 
 if not os.path.exists(dist_path):
     print(f"Error: Directory does not exist: {dist_path}")

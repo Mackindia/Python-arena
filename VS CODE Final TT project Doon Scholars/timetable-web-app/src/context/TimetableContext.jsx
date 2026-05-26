@@ -8,6 +8,42 @@ import initialTeacherSlotUsage from '../data/teacher_slot_usage.json';
 import initialTeacherMapping from '../data/teacher_mapping.json';
 import { checkTeacherCollision as engineCheckTeacherCollision } from '../services/collisionEngine';
 import { generateTeacherUsageGrid } from '../services/derivedViewEngine';
+import { rawCsvData } from '../data/csvData';
+
+const parseCSVInitialData = () => {
+  try {
+    const rows = rawCsvData.split('\n').filter(r => r.trim());
+    const dataRows = rows.slice(1);
+    const mapForUI = {};
+
+    dataRows.forEach(row => {
+      const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+      if (!matches || matches.length < 4) return;
+      
+      let [rawSubject, cls, section, rawTeacher] = matches.map(m => m.replace(/^"|"$/g, '').trim());
+      const classId = `${cls}${section}`.toUpperCase();
+      
+      const subjectTokens = (rawSubject.toUpperCase() === 'A/C' || rawSubject.toUpperCase() === 'F/S')
+        ? [rawSubject]
+        : rawSubject.split('/').map(t => t.trim());
+      const teacherTokens = rawTeacher.split(',').map(t => t.trim());
+      
+      subjectTokens.forEach((subjectToken, index) => {
+        if (!mapForUI[subjectToken]) mapForUI[subjectToken] = {};
+        
+        const teacherForSubject = teacherTokens.length > 1 && teacherTokens.length === subjectTokens.length
+          ? teacherTokens[index]
+          : rawTeacher;
+          
+        mapForUI[subjectToken][classId] = teacherForSubject;
+      });
+    });
+    return mapForUI;
+  } catch (e) {
+    console.error("Error parsing initial CSV in context", e);
+    return {};
+  }
+};
 
 const TimetableContext = createContext();
 
@@ -23,7 +59,18 @@ export const TimetableProvider = ({ children }) => {
   const [substitutions, setSubstitutions] = useState({});
   const [absentTeachers, setAbsentTeachers] = useState({});
   const [teacherMapping, setTeacherMapping] = useState(initialTeacherMapping);
-  const [teacherSubjectMap, setTeacherSubjectMap] = useState({});
+  const [teacherSubjectMap, setTeacherSubjectMap] = useState(() => {
+    const item = localStorage.getItem('teacherSubjectMap');
+    if (!item || item === "undefined" || item === "null" || item === "[object Object]") {
+      return parseCSVInitialData();
+    }
+    try {
+      const parsed = JSON.parse(item);
+      return parsed === null ? parseCSVInitialData() : parsed;
+    } catch (e) {
+      return parseCSVInitialData();
+    }
+  });
 
   useEffect(() => {
     // Helper function to safely parse JSON from localStorage
@@ -52,7 +99,6 @@ export const TimetableProvider = ({ children }) => {
     const savedAbsentTeachers = safeJSONParse('absentTeachers', null);
     if (savedAbsentTeachers) setAbsentTeachers(savedAbsentTeachers);
     
-    setTeacherSubjectMap(safeJSONParse('teacherSubjectMap', {}));
     
     const customTeachers = safeJSONParse('addedTeachers', []);
     const deletedTeachersList = safeJSONParse('deletedTeachers', []);
@@ -242,7 +288,9 @@ export const TimetableProvider = ({ children }) => {
   }, [absentTeachers]);
 
   useEffect(() => {
-    localStorage.setItem('teacherSubjectMap', JSON.stringify(teacherSubjectMap));
+    if (teacherSubjectMap && Object.keys(teacherSubjectMap).length > 0) {
+      localStorage.setItem('teacherSubjectMap', JSON.stringify(teacherSubjectMap));
+    }
   }, [teacherSubjectMap]);
 
   // Logic: Check for teacher collision using the engine
@@ -572,6 +620,72 @@ export const TimetableProvider = ({ children }) => {
     });
   };
 
+  const removeLoadMasterEntry = (classId, subject) => {
+    setLoadMaster(prev => prev.filter(item => !(item.class_id === classId && item.subject === subject)));
+  };
+
+  const renameLoadMasterSubject = (classId, oldSubject, newSubject) => {
+    const trimmed = newSubject.trim();
+    if (!trimmed) return;
+    
+    setLoadMaster(prev => prev.map(item => {
+      if (item.class_id === classId && item.subject === oldSubject) {
+        return { ...item, subject: trimmed };
+      }
+      return item;
+    }));
+
+    setTimetables(prev => {
+      const nextTT = { ...prev };
+      if (nextTT[classId]) {
+        nextTT[classId] = nextTT[classId].map(slot => {
+          if (slot.subject === oldSubject) {
+            return { ...slot, subject: trimmed };
+          }
+          return slot;
+        });
+      }
+      return nextTT;
+    });
+  };
+
+  const renameSubjectGlobal = (oldSubject, newSubject) => {
+    const trimmed = newSubject.trim();
+    if (!trimmed) return;
+
+    // 1. Rename in loadMaster
+    setLoadMaster(prev => prev.map(item => {
+      if (item.subject === oldSubject) {
+        return { ...item, subject: trimmed };
+      }
+      return item;
+    }));
+
+    // 2. Rename in timetables
+    setTimetables(prev => {
+      const nextTT = {};
+      Object.keys(prev).forEach(classId => {
+        nextTT[classId] = prev[classId].map(slot => {
+          if (slot.subject === oldSubject) {
+            return { ...slot, subject: trimmed };
+          }
+          return slot;
+        });
+      });
+      return nextTT;
+    });
+
+    // 3. Rename in teacherSubjectMap
+    setTeacherSubjectMap(prev => {
+      const nextMap = { ...prev };
+      if (nextMap[oldSubject]) {
+        nextMap[trimmed] = nextMap[oldSubject];
+        delete nextMap[oldSubject];
+      }
+      return nextMap;
+    });
+  };
+
   const addSubstitution = (dateString, period, classId, subject, absentTeacher, substituteTeacher, isManual = false) => {
     setSubstitutions(prev => {
       const dailySubs = prev[dateString] || [];
@@ -658,6 +772,9 @@ export const TimetableProvider = ({ children }) => {
       deleteMasterClass,
       deleteMasterSection,
       addLoadMasterEntry,
+      removeLoadMasterEntry,
+      renameLoadMasterSubject,
+      renameSubjectGlobal,
       addSubstitution,
       removeSubstitution,
       setDailySubstitutions,

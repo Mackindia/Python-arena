@@ -33,7 +33,9 @@ const parseCSVConfig = () => {
     if (wingDef) {
       const classId = `${cls}${section}`.toUpperCase();
       
-      const subjectTokens = rawSubject.split('/').map(t => t.trim());
+      const subjectTokens = (rawSubject.toUpperCase() === 'A/C' || rawSubject.toUpperCase() === 'F/S')
+        ? [rawSubject]
+        : rawSubject.split('/').map(t => t.trim());
       const teacherTokens = rawTeacher.split(',').map(t => t.trim());
       
       subjectTokens.forEach((subjectToken, index) => {
@@ -58,6 +60,22 @@ const parseCSVConfig = () => {
     const parsed = savedDeletedSubjects ? JSON.parse(savedDeletedSubjects) : [];
     deletedSubjectsList = Array.isArray(parsed) ? parsed : [];
   } catch(e) {}
+
+  const savedAddedSubjects = localStorage.getItem('addedSubjects');
+  let addedSubjectsList = [];
+  try {
+    const parsed = savedAddedSubjects ? JSON.parse(savedAddedSubjects) : [];
+    addedSubjectsList = Array.isArray(parsed) ? parsed : [];
+  } catch(e) {}
+
+  addedSubjectsList.forEach(item => {
+    if (wings[item.wingId]) {
+      wings[item.wingId].subjects.add(item.subject);
+      if (!mapForUI[item.subject]) {
+        mapForUI[item.subject] = {};
+      }
+    }
+  });
 
   const savedDeletedTeachers = localStorage.getItem('deletedTeachers');
   let deletedTeachersList = [];
@@ -103,9 +121,21 @@ const TeacherSubjectMapping = () => {
     swapTeacherGlobal, 
     teachers, 
     addNewTeacher,
-    deleteTeacher
+    deleteTeacher,
+    renameSubjectGlobal
   } = useTimetable();
   const [config, setConfig] = useState(null);
+
+  const allCurrentSubjects = useMemo(() => {
+    if (!config || !config.wings) return [];
+    const subjs = new Set();
+    config.wings.forEach(w => {
+      if (w.subjects) {
+        w.subjects.forEach(s => subjs.add(s));
+      }
+    });
+    return Array.from(subjs).sort();
+  }, [config]);
 
   // Parse CSV and Initialize
   useEffect(() => {
@@ -194,6 +224,22 @@ const TeacherSubjectMapping = () => {
           <button 
             className="btn btn-outline" 
             onClick={() => {
+              if (window.confirm("This will wipe all customizations and perform a HARD RESTORE from the original CSV data. All deleted teachers and subjects will be restored. Are you absolutely sure?")) {
+                localStorage.removeItem('deletedSubjects');
+                localStorage.removeItem('deletedTeachers');
+                localStorage.removeItem('addedSubjects');
+                localStorage.removeItem('teacherSubjectMap');
+                window.location.reload();
+              }
+            }}
+            style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #ef4444', color: '#b91c1c', cursor: 'pointer', fontWeight: 600, background: '#fef2f2' }}
+            title="Restore deleted subjects and teachers from CSV"
+          >
+            Hard Restore Data
+          </button>
+          <button 
+            className="btn btn-outline" 
+            onClick={() => {
               if (window.confirm("This will reset all your current mappings back to the original CSV file. Are you sure?")) {
                 setTeacherSubjectMap(config.initialData);
               }
@@ -246,6 +292,100 @@ const TeacherSubjectMapping = () => {
                 }}
               >
                 Add
+              </button>
+            </div>
+          </div>
+
+          {/* Add Subject Row */}
+          <div style={{ background: '#eff6ff', padding: '1.5rem', borderRadius: '8px', border: '1px solid #bfdbfe' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1e40af', marginBottom: '0.5rem' }}>Add Subject Row</h3>
+            <p style={{ fontSize: '0.875rem', color: '#2563eb', margin: '0 0 1rem 0' }}>Add a brand new subject row to the mapping grid.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <select 
+                id="add-subject-wing"
+                style={{ width: '100%', padding: '0.5rem', border: '1px solid #bfdbfe', borderRadius: '4px', background: '#fff' }}
+              >
+                <option value="">- Select Wing -</option>
+                <option value="primary">Primary Wing (Classes 1 - 5)</option>
+                <option value="middle">Middle Wing (Classes 6 - 8)</option>
+                <option value="secondary">Secondary Wing (Classes 9 - 10)</option>
+                <option value="senior">Senior Secondary Wing (Classes 11 - 12)</option>
+              </select>
+              <input 
+                id="add-subject-name" 
+                type="text" 
+                placeholder="e.g. Science" 
+                style={{ width: '100%', padding: '0.5rem', border: '1px solid #bfdbfe', borderRadius: '4px' }} 
+              />
+              <button 
+                className="btn"
+                style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer' }}
+                onClick={() => {
+                  const wingId = document.getElementById('add-subject-wing').value;
+                  const subjectName = document.getElementById('add-subject-name').value.trim();
+                  if (!wingId || !subjectName) {
+                    alert("Please select a wing and enter a subject name.");
+                    return;
+                  }
+                  
+                  let exists = false;
+                  config.wings.forEach(w => {
+                    if (w.subjects.includes(subjectName)) {
+                      exists = true;
+                    }
+                  });
+                  if (exists) {
+                    alert(`Subject "${subjectName}" already exists in the mapping grid.`);
+                    return;
+                  }
+
+                  // 1. Add to addedSubjects in localStorage
+                  const savedAddedSubjects = localStorage.getItem('addedSubjects');
+                  const addedList = savedAddedSubjects ? JSON.parse(savedAddedSubjects) : [];
+                  addedList.push({ subject: subjectName, wingId });
+                  localStorage.setItem('addedSubjects', JSON.stringify(addedList));
+
+                  // Remove from deleted list if it was deleted previously
+                  const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
+                  if (savedDeletedSubjects) {
+                    try {
+                      let deletedList = JSON.parse(savedDeletedSubjects) || [];
+                      if (deletedList.includes(subjectName)) {
+                        deletedList = deletedList.filter(s => s !== subjectName);
+                        localStorage.setItem('deletedSubjects', JSON.stringify(deletedList));
+                      }
+                    } catch (e) {}
+                  }
+
+                  // 2. Update config wings state
+                  setConfig(prev => {
+                    const newWings = prev.wings.map(w => {
+                      if (w.id === wingId) {
+                        return {
+                          ...w,
+                          subjects: [...new Set([...w.subjects, subjectName])].sort()
+                        };
+                      }
+                      return w;
+                    });
+                    return { ...prev, wings: newWings };
+                  });
+
+                  // 3. Initialize mapping row
+                  setTeacherSubjectMap(prev => {
+                    const nextMap = { ...prev };
+                    if (!nextMap[subjectName]) {
+                      nextMap[subjectName] = {};
+                    }
+                    return nextMap;
+                  });
+
+                  alert(`Successfully added subject "${subjectName}" to the ${wingId} wing.`);
+                  document.getElementById('add-subject-name').value = '';
+                  document.getElementById('add-subject-wing').value = '';
+                }}
+              >
+                Add Subject Row
               </button>
             </div>
           </div>
@@ -315,17 +455,18 @@ const TeacherSubjectMapping = () => {
             <div style={{ background: '#fffbeb', padding: '1.5rem', borderRadius: '8px', border: '1px solid #fde68a', flex: 1 }}>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#b45309', marginBottom: '0.5rem' }}>Delete Subject</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <input 
+                <select 
                   id="delete-subject-name" 
-                  type="text" 
-                  placeholder="- Type Subject Name -" 
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #fcd34d', borderRadius: '4px' }} 
-                />
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #fcd34d', borderRadius: '4px', background: '#fff' }} 
+                >
+                  <option value="">- Select Subject -</option>
+                  {allCurrentSubjects.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
                 <button 
                   className="btn"
                   style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer' }}
                   onClick={() => {
-                    const val = document.getElementById('delete-subject-name').value.trim();
+                    const val = document.getElementById('delete-subject-name').value;
                     if (!val) return;
                     if (window.confirm(`Are you sure you want to completely erase the subject "${val}" from the Mapping Grid?`)) {
                       const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
@@ -362,79 +503,166 @@ const TeacherSubjectMapping = () => {
           </div>
         </div>
 
-        {/* Teacher Swapping / Renaming Engine */}
-        <div style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '8px', border: '1px solid #cbd5e1', flex: '2', minWidth: '500px' }}>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1e293b', marginBottom: '0.5rem' }}>Rename / Swap Teacher</h3>
-          <p style={{ fontSize: '0.875rem', color: '#64748b', margin: '0 0 1rem 0' }}>Rename a teacher's initials, or swap an old teacher with a new one globally across all timetables.</p>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.25rem' }}>Old Initials</label>
-              <input 
-                id="swap-old-teacher" 
-                type="text" 
-                list="teacher-list"
-                placeholder="- Select Old Initial -" 
-                style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} 
-              />
-            </div>
-            <div style={{ paddingBottom: '0.5rem', color: '#64748b', fontWeight: 'bold' }}>→</div>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.25rem' }}>New Initials</label>
-              <input 
-                id="swap-new-teacher" 
-                type="text" 
-                list="teacher-list"
-                placeholder="- Type New Initial -" 
-                style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} 
-              />
-            </div>
-            <button 
-              className="btn"
-              style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', height: '37px' }}
-              onClick={() => {
-                const oldT = document.getElementById('swap-old-teacher').value.trim().toUpperCase();
-                const newT = document.getElementById('swap-new-teacher').value.trim().toUpperCase();
-                if (!oldT || !newT) {
-                  alert("Please enter both the old and new teacher initials.");
-                  return;
-                }
-                if (window.confirm(`Are you sure you want to completely replace/rename ${oldT} to ${newT} everywhere?`)) {
-                  
-                  // Ensure new teacher is saved to the list too
-                  addNewTeacher(newT);
+        {/* Teacher & Subject Swapping / Renaming Engines */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: '2', minWidth: '500px' }}>
+          {/* Rename / Swap Teacher */}
+          <div style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1e293b', marginBottom: '0.5rem' }}>Rename / Swap Teacher</h3>
+            <p style={{ fontSize: '0.875rem', color: '#64748b', margin: '0 0 1rem 0' }}>Rename a teacher's initials, or swap an old teacher with a new one globally across all timetables.</p>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.25rem' }}>Old Initials</label>
+                <input 
+                  id="swap-old-teacher" 
+                  type="text" 
+                  list="teacher-list"
+                  placeholder="- Select Old Initial -" 
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} 
+                />
+              </div>
+              <div style={{ paddingBottom: '0.5rem', color: '#64748b', fontWeight: 'bold' }}>→</div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.25rem' }}>New Initials</label>
+                <input 
+                  id="swap-new-teacher" 
+                  type="text" 
+                  list="teacher-list"
+                  placeholder="- Type New Initial -" 
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} 
+                />
+              </div>
+              <button 
+                className="btn"
+                style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', height: '37px' }}
+                onClick={() => {
+                  const oldT = document.getElementById('swap-old-teacher').value.trim().toUpperCase();
+                  const newT = document.getElementById('swap-new-teacher').value.trim().toUpperCase();
+                  if (!oldT || !newT) {
+                    alert("Please enter both the old and new teacher initials.");
+                    return;
+                  }
+                  if (window.confirm(`Are you sure you want to completely replace/rename ${oldT} to ${newT} everywhere?`)) {
+                    
+                    // Ensure new teacher is saved to the list too
+                    addNewTeacher(newT);
 
-                  // 1. Swap in the Mapping Grid
-                  setTeacherSubjectMap(prev => {
-                    const nextMap = JSON.parse(JSON.stringify(prev));
-                    Object.keys(nextMap).forEach(subj => {
-                      Object.keys(nextMap[subj]).forEach(col => {
-                        const currentVal = nextMap[subj][col] || "";
-                        if (currentVal) {
-                          const tokens = currentVal.split(',').map(t => t.trim());
-                          if (tokens.includes(oldT)) {
-                            const newTokens = tokens.map(t => t === oldT ? newT : t);
-                            nextMap[subj][col] = newTokens.join(', ');
+                    // 1. Swap in the Mapping Grid
+                    setTeacherSubjectMap(prev => {
+                      const nextMap = JSON.parse(JSON.stringify(prev));
+                      Object.keys(nextMap).forEach(subj => {
+                        Object.keys(nextMap[subj]).forEach(col => {
+                          const currentVal = nextMap[subj][col] || "";
+                          if (currentVal) {
+                            const tokens = currentVal.split(',').map(t => t.trim());
+                            if (tokens.includes(oldT)) {
+                              const newTokens = tokens.map(t => t === oldT ? newT : t);
+                              nextMap[subj][col] = newTokens.join(', ');
+                            }
                           }
-                        }
+                        });
                       });
+                      return nextMap;
                     });
-                    return nextMap;
-                  });
 
-                  // 2. Swap directly in the Live Timetable
-                  swapTeacherGlobal(oldT, newT);
+                    // 2. Swap directly in the Live Timetable
+                    swapTeacherGlobal(oldT, newT);
+                    
+                    // 3. Remove the old teacher from the system completely
+                    deleteTeacher(oldT);
+                    
+                    alert(`Successfully renamed Teacher ${oldT} to ${newT} everywhere!`);
+                    document.getElementById('swap-old-teacher').value = '';
+                    document.getElementById('swap-new-teacher').value = '';
+                  }
+                }}
+              >
+                Rename / Swap
+              </button>
+            </div>
+          </div>
+
+          {/* Rename Subject Globally */}
+          <div style={{ background: '#f0fdfa', padding: '1.5rem', borderRadius: '8px', border: '1px solid #99f6e4' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0f766e', marginBottom: '0.5rem' }}>Rename Subject Globally</h3>
+            <p style={{ fontSize: '0.875rem', color: '#0d9488', margin: '0 0 1rem 0' }}>Rename a subject globally across the Mapping Grid, Load Master, and Live Timetable.</p>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#0f766e', marginBottom: '0.25rem' }}>Old Subject Name</label>
+                <input 
+                  id="rename-old-subject" 
+                  type="text" 
+                  placeholder="- e.g. English_Lit -" 
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} 
+                />
+              </div>
+              <div style={{ paddingBottom: '0.5rem', color: '#0d9488', fontWeight: 'bold' }}>→</div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#0f766e', marginBottom: '0.25rem' }}>New Subject Name</label>
+                <input 
+                  id="rename-new-subject" 
+                  type="text" 
+                  placeholder="- Type New Name -" 
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} 
+                />
+              </div>
+              <button 
+                className="btn"
+                style={{ background: '#0d9488', color: 'white', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', height: '37px' }}
+                onClick={() => {
+                  const oldSubj = document.getElementById('rename-old-subject').value.trim();
+                  const newSubj = document.getElementById('rename-new-subject').value.trim();
+                  if (!oldSubj || !newSubj) {
+                    alert("Please enter both the old and new subject names.");
+                    return;
+                  }
                   
-                  // 3. Remove the old teacher from the system completely
-                  deleteTeacher(oldT);
+                  // Find if subject exists in any wing
+                  let subjectExists = false;
+                  config.wings.forEach(w => {
+                    if (w.subjects.includes(oldSubj)) {
+                      subjectExists = true;
+                    }
+                  });
                   
-                  alert(`Successfully renamed Teacher ${oldT} to ${newT} everywhere!`);
-                  document.getElementById('swap-old-teacher').value = '';
-                  document.getElementById('swap-new-teacher').value = '';
-                }
-              }}
-            >
-              Rename / Swap
-            </button>
+                  if (!subjectExists) {
+                    alert(`Subject "${oldSubj}" is not in the Mapping Grid.`);
+                    return;
+                  }
+                  
+                  if (window.confirm(`Are you sure you want to rename "${oldSubj}" to "${newSubj}" globally?`)) {
+                    // 1. Rename in Timetable and Load Master globally
+                    renameSubjectGlobal(oldSubj, newSubj);
+                    
+                    // 2. Rename in config wings to update UI grid display
+                    setConfig(prev => {
+                      const newWings = prev.wings.map(w => ({
+                        ...w,
+                        subjects: w.subjects.map(s => s === oldSubj ? newSubj : s)
+                      }));
+                      return { ...prev, wings: newWings };
+                    });
+
+                    // 3. Update deleted subjects list in localStorage if it was previously there
+                    const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
+                    if (savedDeletedSubjects) {
+                      try {
+                        let deletedList = JSON.parse(savedDeletedSubjects) || [];
+                        if (deletedList.includes(oldSubj)) {
+                          deletedList = deletedList.map(s => s === oldSubj ? newSubj : s);
+                          localStorage.setItem('deletedSubjects', JSON.stringify(deletedList));
+                        }
+                      } catch (e) {}
+                    }
+                    
+                    alert(`Successfully renamed subject "${oldSubj}" to "${newSubj}" globally!`);
+                    document.getElementById('rename-old-subject').value = '';
+                    document.getElementById('rename-new-subject').value = '';
+                  }
+                }}
+              >
+                Rename Subject
+              </button>
+            </div>
           </div>
         </div>
       </div>
