@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { requireAdminApi } from "@/lib/admin-api";
+import { requireAdminApi, requireSuperAdminApi } from "@/lib/admin-api";
 import { deleteCloudinaryAssetByUrl } from "@/lib/cloudinary";
 import Subject from "@/models/lms/Subject";
 import ClassModel from "@/models/lms/Class";
@@ -241,7 +241,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
 export async function DELETE(_request: NextRequest, context: RouteContext) {
   try {
-    const access = await requireAdminApi();
+    const access = await requireSuperAdminApi();
     if (!access.ok) {
       return access.response;
     }

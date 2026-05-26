@@ -118,7 +118,11 @@ const SubstitutionEngineUI = ({
           s => normalizeTeacherId(s.substituteTeacher) === tId && normalizePeriod(s.period) === normalizedPeriod
         );
       })
+      // exempt from substitution duty
+      .filter(t => !['AN', 'P', 'RN'].includes(normalizeTeacherId(t)))
       .map(t => ({ name: t, load: getTeacherDailyLoad(t) }))
+      // strictly enforce max 7 periods per day
+      .filter(t => t.load < 7)
       .sort((a,b) => a.load - b.load);
   };
 
@@ -209,7 +213,7 @@ const SubstitutionEngineUI = ({
                           <option value="">Change</option>
                           {getValidManualTeachers(sub.period).map(t => (
                             <option key={t.name} value={t.name}>
-                              {t.name} {getTeacherFullName(t.name) !== t.name ? `- ${getTeacherFullName(t.name)}` : ''} ({t.load}/7)
+                              {t.name} {getTeacherFullName(t.name) !== t.name ? `- ${getTeacherFullName(t.name)}` : ''} (Load: {t.load}/8)
                             </option>
                           ))}
                         </select>
@@ -257,8 +261,8 @@ const SubstitutionManager = () => {
     return days[d.getDay()];
   }, [selectedDate]);
 
-  const dailySubstitutions = substitutions[selectedDate] || [];
-  const dailyAbsent = absentTeachers[selectedDate] || [];
+  const dailySubstitutions = useMemo(() => substitutions[selectedDate] || [], [substitutions, selectedDate]);
+  const dailyAbsent = useMemo(() => absentTeachers[selectedDate] || [], [absentTeachers, selectedDate]);
 
   const handleToggleAbsent = (teacherName) => {
     if (dailyAbsent.includes(teacherName)) {

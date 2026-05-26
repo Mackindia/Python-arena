@@ -168,7 +168,7 @@ export function useQuiz({ subjectSlug, classSlug, lessonSlug }: UseQuizParams) {
     load();
     return () => { active = false; };
   // Re-fetch if slugs change (not on retry — quiz doesn't change)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [subjectSlug, classSlug, lessonSlug]);
 
   // ── Load attempts ─────────────────────────────────────────────────────
@@ -197,7 +197,7 @@ export function useQuiz({ subjectSlug, classSlug, lessonSlug }: UseQuizParams) {
     loadAttempts();
     return () => { active = false; };
   // Re-fetch after each attempt (retry increments attemptKey)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [subjectSlug, classSlug, lessonSlug, state.attemptKey]);
 
   // ── Actions ───────────────────────────────────────────────────────────

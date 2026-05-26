@@ -8,9 +8,10 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 const Mastersheet = () => {
-  const { timetables, classes, checkTeacherCollision, updateSlot, teachers, loadMaster, teacherSubjectMap } = useTimetable();
+  const { timetables, classes, checkTeacherCollision, updateSlot, teachers, loadMaster, teacherSubjectMap, getAllowedSubjectsForClass } = useTimetable();
   const [selectedDay, setSelectedDay] = useState('Mon');
   const [editMode, setEditMode] = useState(false);
+  const [adminOverride, setAdminOverride] = useState(false);
   const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
 
@@ -24,23 +25,23 @@ const Mastersheet = () => {
     return numA - numB;
   });
 
-  const allSubjects = [...new Set([
-    ...loadMaster.map(l => l.subject),
-    'Library', 'Games', 'Music', 'Dance', 'Art', 'Computer', 'PE', 'CCA', 'VE'
-  ])].sort();
-
   const handleSlotUpdate = (cls, day, period, field, value, currentSubject, currentTeacher) => {
     let subject = currentSubject || '';
     let teacher = currentTeacher || '';
+    let assignedTeachers = null;
+    let clashes = [];
 
     if (field === 'subject') {
       subject = value;
+      teacher = ''; // RULE: Clear previous assignment before recalculation
       // Auto-assign teacher using centralized engine
       if (value && teacherSubjectMap) {
         const assignment = autoAssignTeacher(value, cls, day, period, teacherSubjectMap, timetables);
         
         if (assignment.status !== 'empty') {
           teacher = assignment.teacher;
+          assignedTeachers = assignment.assignedTeachers || [];
+          clashes = assignment.clashes || [];
           
           if (assignment.status === 'success') {
             setNotification({ type: 'success', message: assignment.message });
@@ -70,7 +71,7 @@ const Mastersheet = () => {
       }
     }
 
-    updateSlot(cls, day, period, subject, teacher);
+    updateSlot(cls, day, period, subject, teacher, assignedTeachers, clashes);
     
     // Clear notification after 3s
     setTimeout(() => setNotification(null), 3000);
@@ -102,6 +103,14 @@ const Mastersheet = () => {
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 className="page-title">Mastersheet</h1>
         <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            className="btn btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem', background: '#3b82f6', border: 'none' }}
+            onClick={() => window.print()}
+            title="Download this day's Mastersheet as a Landscape PDF"
+          >
+            🖨️ Print to PDF
+          </button>
           <button 
             className="btn btn-primary" 
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem', background: '#059669', border: 'none' }}
@@ -109,6 +118,69 @@ const Mastersheet = () => {
             title="Sync this timetable to the main LMS Database"
           >
             Deploy to LMS Database
+          </button>
+          <button 
+            className="btn btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem', background: '#8b5cf6', border: 'none' }}
+            onClick={() => {
+              const backup = {
+                timetables: localStorage.getItem('timetables'),
+                teacherSubjectMap: localStorage.getItem('teacherSubjectMap'),
+                addedTeachers: localStorage.getItem('addedTeachers'),
+                deletedTeachers: localStorage.getItem('deletedTeachers'),
+                deletedSubjects: localStorage.getItem('deletedSubjects')
+              };
+              const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(blob);
+              a.download = `Timetable_Data_Backup_${new Date().toISOString().split('T')[0]}.json`;
+              a.click();
+            }}
+            title="Download a hard copy backup of your current timetable data"
+          >
+            💾 Export Backup
+          </button>
+          
+          <label 
+            className="btn btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem', background: '#ef4444', border: 'none', cursor: 'pointer' }}
+            title="Restore your timetable data from a previously downloaded JSON backup file"
+          >
+            ↩️ Restore Backup
+            <input 
+              type="file" 
+              accept=".json"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                  try {
+                    const data = JSON.parse(event.target.result);
+                    if (data.timetables) localStorage.setItem('timetables', data.timetables);
+                    if (data.teacherSubjectMap) localStorage.setItem('teacherSubjectMap', data.teacherSubjectMap);
+                    if (data.addedTeachers) localStorage.setItem('addedTeachers', data.addedTeachers);
+                    if (data.deletedTeachers) localStorage.setItem('deletedTeachers', data.deletedTeachers);
+                    if (data.deletedSubjects) localStorage.setItem('deletedSubjects', data.deletedSubjects);
+                    alert('Backup Restored Successfully! The page will now reload.');
+                    window.location.reload();
+                  } catch (err) {
+                    alert('Error parsing backup file. Make sure it is the correct JSON file.');
+                  }
+                };
+                reader.readAsText(file);
+              }}
+            />
+          </label>
+
+          <button 
+            className={adminOverride ? "btn btn-primary" : "btn"}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem' }}
+            onClick={() => setAdminOverride(!adminOverride)}
+            title="Enable manual teacher selection"
+          >
+            {adminOverride ? 'Disable Override' : 'Admin Override'}
           </button>
           <button 
             className={editMode ? "btn" : "btn btn-primary"}
@@ -127,6 +199,10 @@ const Mastersheet = () => {
           </button>
         </div>
       </div>
+
+      <h1 className="print-only-title" style={{ display: 'none', textAlign: 'center', marginBottom: '20px', fontSize: '24px' }}>
+        Doon Scholars - Master Timetable ({selectedDay})
+      </h1>
 
       {notification && (
         <div style={{
@@ -160,14 +236,12 @@ const Mastersheet = () => {
         </div>
       </div>
 
-      <datalist id="subject-list">
-        {allSubjects.map(sub => <option key={sub} value={sub} />)}
-      </datalist>
+
       <datalist id="teacher-list">
         {teachers.map(t => <option key={t} value={t} />)}
       </datalist>
 
-      <div className="card" style={{ overflowX: 'auto' }}>
+      <div className="card printable-area" style={{ overflowX: 'auto' }}>
         <div className="master-grid" style={{ gridTemplateColumns: `80px repeat(${PERIODS.length}, minmax(${editMode ? '140px' : '1fr'}, 1fr))` }}>
           {/* Header Row */}
           <div className="grid-cell grid-header">Class</div>
@@ -192,29 +266,44 @@ const Mastersheet = () => {
                   >
                     {editMode ? (
                       <div className="edit-slot" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <input 
-                          type="text"
-                          list="subject-list"
+                        <select 
                           value={slot?.subject || ''} 
                           onChange={(e) => handleSlotUpdate(cls, selectedDay, p, 'subject', e.target.value, slot?.subject, slot?.teacher)}
-                          style={{ fontSize: '0.8rem', padding: '2px', width: '100%' }}
-                          placeholder="- Sub -"
-                        />
-                        <input 
-                          type="text"
-                          list="teacher-list"
-                          value={slot?.teacher || ''} 
-                          onChange={(e) => handleSlotUpdate(cls, selectedDay, p, 'teacher', e.target.value, slot?.subject, slot?.teacher)}
-                          style={{ fontSize: '0.8rem', padding: '2px', width: '100%' }}
-                          placeholder="- Tr -"
-                        />
+                          style={{ fontSize: '0.8rem', padding: '2px', width: '100%', background: '#fff', border: '1px solid #ccc', borderRadius: '2px' }}
+                        >
+                          <option value="">- Sub -</option>
+                          {getAllowedSubjectsForClass(cls).map(sub => (
+                            <option key={sub} value={sub}>{sub}</option>
+                          ))}
+                        </select>
+                        {adminOverride && (
+                          <input 
+                            type="text"
+                            list="teacher-list"
+                            value={slot?.teacher || ''} 
+                            onChange={(e) => handleSlotUpdate(cls, selectedDay, p, 'teacher', e.target.value, slot?.subject, slot?.teacher)}
+                            style={{ fontSize: '0.8rem', padding: '2px', width: '100%' }}
+                            placeholder="- Tr Override -"
+                          />
+                        )}
                       </div>
                     ) : (
                       <>
                         {slot?.subject ? (
                           <>
                             <div className="slot-subject">{slot.subject}</div>
-                            <div className="slot-teacher">{slot.teacher}</div>
+                            <div className="slot-teacher">
+                              {slot.assignedTeachers && slot.assignedTeachers.length > 0 
+                                ? slot.assignedTeachers.map((at, idx) => {
+                                    if (typeof at === 'string') return <span key={idx}>{at}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}</span>;
+                                    return (
+                                      <span key={idx} style={{ color: at.clash ? '#ef4444' : 'inherit' }} title={at.clashWith ? `Clash: ${at.clashWith}` : ''}>
+                                        {at.teacher}{at.clash ? ` ⚠ (${at.clashWith})` : ''}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}
+                                      </span>
+                                    );
+                                  })
+                                : (slot.teacher ? slot.teacher : 'No Teacher')}
+                            </div>
                           </>
                         ) : (
                           <div className="slot-teacher" style={{opacity: 0.3}}>-</div>

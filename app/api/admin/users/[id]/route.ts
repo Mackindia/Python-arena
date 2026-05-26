@@ -3,20 +3,25 @@ import { connectDB } from "../../../../../lib/mongodb";
 import User from "../../../../../models/User";
 import { auth } from "@clerk/nextjs/server";
 import { cookies } from "next/headers";
+import { requireSuperAdminApi } from "@/lib/admin-api";
 
 async function isAdmin() {
   await connectDB();
   const { userId } = await auth();
+  
   if (userId) {
     const user = await User.findOne({ clerkId: userId });
-    return user?.role === "admin";
+    // Hardcode abhishekr474@gmail.com as super_admin
+    if (user?.email?.toLowerCase() === "abhishekr474@gmail.com") return true;
+    return user?.role === "admin" || user?.role === "super_admin";
   }
 
   const cookieStore = await cookies();
   const localUserId = cookieStore.get("local_user_id")?.value;
   if (localUserId) {
     const user = await User.findById(localUserId);
-    return user?.role === "admin";
+    if (user?.email?.toLowerCase() === "abhishekr474@gmail.com") return true;
+    return user?.role === "admin" || user?.role === "super_admin";
   }
 
   return false;
@@ -73,8 +78,9 @@ export async function PUT(req: Request, { params }: RouteParams) {
 
 export async function DELETE(req: Request, { params }: RouteParams) {
   try {
-    if (!(await isAdmin())) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const access = await requireSuperAdminApi();
+    if (!access.ok) {
+      return access.response;
     }
 
     const { id } = await params;

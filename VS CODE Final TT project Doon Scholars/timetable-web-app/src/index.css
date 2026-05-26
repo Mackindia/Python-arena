@@ -331,3 +331,65 @@ select:focus, input:focus {
 .data-table tr:last-child td {
   border-bottom: none;
 }
+
+/* Print Styles */
+@media print {
+  body {
+    background-color: white !important;
+  }
+  
+  body * {
+    visibility: hidden;
+  }
+  
+  .printable-area, .printable-area * {
+    visibility: visible;
+  }
+  
+  .printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
+  
+  .no-print, .sidebar, .page-header, .filter-bar {
+    display: none !important;
+  }
+  
+  .print-only-title {
+    display: block !important;
+  }
+  
+  .timetable-wrapper {
+    page-break-after: always;
+    break-after: page;
+    margin-bottom: 2rem;
+  }
+  
+  /* Reset grid borders for better printing */
+  .timetable-grid {
+    min-width: 100% !important;
+    border: 1px solid #000;
+  }
+  
+  .grid-cell {
+    border: 1px solid #ccc;
+    background-color: transparent !important;
+  }
+  
+  .slot-teacher {
+    background-color: transparent !important;
+    color: #333 !important;
+  }
+
+  /* Force Landscape Mode for Timetables */
+  @page {
+    size: landscape;
+    margin: 10mm;
+  }
+}

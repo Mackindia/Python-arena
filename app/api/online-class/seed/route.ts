@@ -19,8 +19,8 @@ export async function GET() {
     
     for (let i = 1; i <= 7; i++) {
       const endMin = startMin + 40; // 40-minute periods
-      let h1 = startHour.toString().padStart(2, "0");
-      let m1 = startMin.toString().padStart(2, "0");
+      const h1 = startHour.toString().padStart(2, "0");
+      const m1 = startMin.toString().padStart(2, "0");
       
       let endHourVal = startHour;
       let endMinVal = endMin;
@@ -29,8 +29,8 @@ export async function GET() {
         endMinVal = endMinVal % 60;
       }
       
-      let h2 = endHourVal.toString().padStart(2, "0");
-      let m2 = endMinVal.toString().padStart(2, "0");
+      const h2 = endHourVal.toString().padStart(2, "0");
+      const m2 = endMinVal.toString().padStart(2, "0");
       
       periods.push({
         period_no: i,

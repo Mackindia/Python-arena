@@ -55,13 +55,54 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Check if username already exists
+    // Check if username already exists in MongoDB
     const existing = await User.findOne({ username });
     if (existing) {
-      return NextResponse.json({ error: "Username already exists" }, { status: 400 });
+      return NextResponse.json({ error: "Username already exists in Database" }, { status: 400 });
     }
 
+    let clerkId = "";
+    
+    // --- CLERK SYNC LOGIC ---
+    // Try to create the user in Clerk so they can log in via the Social Login component immediately
+    try {
+      // Use dynamic import or available clerkClient instance
+      const { clerkClient } = await import("@clerk/nextjs/server");
+      
+      // Depending on the Clerk version, clerkClient might be a function or an object
+      const client = typeof clerkClient === 'function' ? await clerkClient() : clerkClient;
+      
+      const nameParts = fullName ? fullName.split(" ") : ["User"];
+      const firstName = nameParts[0];
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : undefined;
+
+      const newClerkUser = await client.users.createUser({
+        firstName: firstName,
+        lastName: lastName,
+        username: username,
+        emailAddress: [`${username}@doonscholars.com`], // Changed .internal to .com as Clerk often rejects invalid TLDs
+        password: password,
+        publicMetadata: { role: role },
+        skipPasswordChecks: true
+      });
+      
+      clerkId = newClerkUser.id;
+    } catch (clerkError: any) {
+      console.error("Clerk Sync Error:", JSON.stringify(clerkError, null, 2));
+      
+      // Extract the exact field that failed and the detailed message
+      const errDetail = clerkError.errors?.[0];
+      const paramName = errDetail?.meta?.paramName || "Unknown Field";
+      const message = errDetail?.message || clerkError.message || "No specific error message";
+      
+      return NextResponse.json({ 
+        error: `Failed to create user in Clerk Security: [${paramName}] ${message}` 
+      }, { status: 400 });
+    }
+    // --- END CLERK SYNC LOGIC ---
+
     const newUser = await User.create({
+      clerkId: clerkId,
       fullName,
       username,
       password,

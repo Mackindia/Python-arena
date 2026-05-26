@@ -1,10 +1,11 @@
 import { connectDB } from "@/src/lib/mongodb";
 import AINews from "@/src/models/AINews";
+import he from "he";
+import Parser from "rss-parser";
 
 function decodeEntities(str: string): string {
   if (!str) return "";
   try {
-    const he = require("he");
     return he.decode(str);
   } catch (e) {
     return str
@@ -29,7 +30,6 @@ export async function fetchAINews() {
   const now = new Date();
 
   try {
-    const Parser = require("rss-parser");
     const parser = new Parser();
     const feed = await parser.parseURL(feedUrl);
     

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X, ExternalLink } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import MegaDropdown from "@/src/components/dropdown/MegaDropdown";
 import { learnMenu, primaryNavLinks } from "@/src/data/navigation";
@@ -113,13 +113,17 @@ export default function Navbar() {
               <Link href="/dashboard/python" className="rounded-lg bg-blue-100 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-200">
                 Python Editor
               </Link>
-              {dbUser && dbUser.role === "admin" && (
+              {(dbUser?.role === "admin" || dbUser?.role === "super_admin") && (
                 <>
                   <Link href="/admin/users" className="rounded-lg px-3 py-2 text-sm font-medium text-purple-600 transition hover:bg-purple-50 hover:text-purple-700">
                     User Mgmt
                   </Link>
-                  <Link href="/admin/timetable" className="rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 transition hover:bg-indigo-50 hover:text-indigo-700">
-                    Timetable Mgmt
+                  <Link 
+                    href={process.env.NODE_ENV === "development" ? "http://localhost:5173" : "/admin/timetable"}
+                    target={process.env.NODE_ENV === "development" ? "_blank" : undefined}
+                    className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 transition hover:bg-indigo-50 hover:text-indigo-700"
+                  >
+                    Timetable Mgmt {process.env.NODE_ENV === "development" && <ExternalLink className="h-3 w-3" />}
                   </Link>
                 </>
               )}
@@ -250,7 +254,7 @@ export default function Navbar() {
                           <UserButton afterSignOutUrl="/" />
                         )}
                       </div>
-                      {dbUser && dbUser.role === "admin" && (
+                      {(dbUser?.role === "admin" || dbUser?.role === "super_admin") && (
                         <>
                           <Link
                             href="/admin/users"
@@ -260,11 +264,12 @@ export default function Navbar() {
                             User Mgmt
                           </Link>
                           <Link
-                            href="/admin/timetable"
+                            href={process.env.NODE_ENV === "development" ? "http://localhost:5173" : "/admin/timetable"}
+                            target={process.env.NODE_ENV === "development" ? "_blank" : undefined}
                             onClick={handleMobileMenuClose}
-                            className="text-sm font-medium text-indigo-600"
+                            className="flex items-center gap-1.5 text-sm font-medium text-indigo-600"
                           >
-                            Timetable Mgmt
+                            Timetable Mgmt {process.env.NODE_ENV === "development" && <ExternalLink className="h-3 w-3" />}
                           </Link>
                         </>
                       )}

@@ -9,6 +9,8 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [adminChecked, setAdminChecked] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<"all" | "student" | "teacher" | "admin">("all");
   const router = useRouter();
 
   // Modal / Form state
@@ -33,7 +35,7 @@ export default function AdminUsersPage() {
       try {
         const res = await fetch("/api/auth/me");
         const data = await res.json();
-        if (!data.user || data.user.role !== "admin") {
+        if (!data.user || (data.user.role !== "admin" && data.user.role !== "super_admin")) {
           router.push("/online-class");
         } else {
           setAdminChecked(true);
@@ -158,10 +160,31 @@ export default function AdminUsersPage() {
     );
   }
 
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = !searchQuery || (
+      u.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.role?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.class?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.studentClass?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    let matchesRole = true;
+    if (roleFilter === "student") matchesRole = u.role === "student";
+    if (roleFilter === "teacher") matchesRole = u.role === "teacher";
+    if (roleFilter === "admin") matchesRole = u.role === "admin" || u.role === "super_admin";
+
+    return matchesSearch && matchesRole;
+  });
+
+  const totalStudents = users.filter(u => u.role === "student").length;
+  const totalTeachers = users.filter(u => u.role === "teacher").length;
+  const totalAdmins = users.filter(u => u.role === "admin" || u.role === "super_admin").length;
+
   return (
     <div className="min-h-screen bg-slate-950 p-6 text-white md:p-10">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">
               User Management
@@ -170,13 +193,69 @@ export default function AdminUsersPage() {
               Manage student, teacher, and administrator credentials and system access.
             </p>
           </div>
-          <button
-            onClick={handleOpenAdd}
-            className="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <input
+              type="text"
+              placeholder="Search by name, ID, or role..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full sm:w-64 rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition"
+            />
+            <button
+              onClick={handleOpenAdd}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.3)] sm:w-auto"
+            >
+              <Plus className="h-4 w-4" />
+              ADD USER
+            </button>
+          </div>
+        </div>
+
+        <div className="mb-6 grid grid-cols-3 gap-4">
+          <div 
+            onClick={() => setRoleFilter(prev => prev === "student" ? "all" : "student")}
+            className={`cursor-pointer transition-all rounded-2xl p-5 shadow-[0_8px_30px_rgba(6,182,212,0.05)] ${
+              roleFilter === "student"
+                ? "border border-cyan-400 bg-cyan-900/40 ring-1 ring-cyan-400 scale-[1.02]"
+                : "border border-cyan-800/30 bg-[linear-gradient(135deg,rgba(6,182,212,0.1),rgba(15,23,42,0.6))] hover:bg-cyan-900/20"
+            }`}
           >
-            <Plus className="h-4 w-4" />
-            ADD USER
-          </button>
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen className="h-4 w-4 text-cyan-400" />
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-300/80">Total Students</p>
+            </div>
+            <p className="text-3xl font-bold text-white">{totalStudents}</p>
+          </div>
+          
+          <div 
+            onClick={() => setRoleFilter(prev => prev === "teacher" ? "all" : "teacher")}
+            className={`cursor-pointer transition-all rounded-2xl p-5 shadow-[0_8px_30px_rgba(20,184,166,0.05)] ${
+              roleFilter === "teacher"
+                ? "border border-teal-400 bg-teal-900/40 ring-1 ring-teal-400 scale-[1.02]"
+                : "border border-teal-800/30 bg-[linear-gradient(135deg,rgba(20,184,166,0.1),rgba(15,23,42,0.6))] hover:bg-teal-900/20"
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Video className="h-4 w-4 text-teal-400" />
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-teal-300/80">Total Teachers</p>
+            </div>
+            <p className="text-3xl font-bold text-white">{totalTeachers}</p>
+          </div>
+
+          <div 
+            onClick={() => setRoleFilter(prev => prev === "admin" ? "all" : "admin")}
+            className={`cursor-pointer transition-all rounded-2xl p-5 shadow-[0_8px_30px_rgba(99,102,241,0.05)] ${
+              roleFilter === "admin"
+                ? "border border-indigo-400 bg-indigo-900/40 ring-1 ring-indigo-400 scale-[1.02]"
+                : "border border-indigo-800/30 bg-[linear-gradient(135deg,rgba(99,102,241,0.1),rgba(15,23,42,0.6))] hover:bg-indigo-900/20"
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="h-4 w-4 text-indigo-400" />
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-300/80">Total Admins</p>
+            </div>
+            <p className="text-3xl font-bold text-white">{totalAdmins}</p>
+          </div>
         </div>
 
         <GlassCard className="overflow-hidden border border-slate-800 bg-slate-900/40">
@@ -192,14 +271,14 @@ export default function AdminUsersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
-                {users.length === 0 ? (
+                {filteredUsers.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-10 text-center text-slate-500">
-                      No users found. Create one by clicking the "Add User" button.
+                      {searchQuery ? "No users match your search." : "No users found. Create one by clicking the \"Add User\" button."}
                     </td>
                   </tr>
                 ) : (
-                  users.map((u) => (
+                  filteredUsers.map((u) => (
                     <tr key={u._id} className="hover:bg-slate-900/30 transition-colors">
                       <td className="px-6 py-4">
                         <div className="font-semibold text-white">{u.fullName}</div>
@@ -207,13 +286,13 @@ export default function AdminUsersPage() {
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          u.role === "admin" 
+                          u.role === "admin" || u.role === "super_admin"
                             ? "bg-indigo-900/40 text-indigo-300 border border-indigo-800/50" 
                             : u.role === "teacher"
                             ? "bg-teal-900/40 text-teal-300 border border-teal-800/50"
                             : "bg-cyan-900/40 text-cyan-300 border border-cyan-800/50"
                         }`}>
-                          {u.role === "admin" && <Shield className="h-3 w-3" />}
+                          {(u.role === "admin" || u.role === "super_admin") && <Shield className="h-3 w-3" />}
                           {u.role === "teacher" && <Video className="h-3 w-3" />}
                           {u.role === "student" && <BookOpen className="h-3 w-3" />}
                           {u.role}
@@ -228,7 +307,7 @@ export default function AdminUsersPage() {
                             {u.meet_link || "No Meet Link Assigned"}
                           </span>
                         )}
-                        {u.role === "admin" && <span>Full System Access</span>}
+                        {(u.role === "admin" || u.role === "super_admin") && <span>Full System Access</span>}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${

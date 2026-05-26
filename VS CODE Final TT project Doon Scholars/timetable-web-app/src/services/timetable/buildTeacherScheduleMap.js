@@ -7,16 +7,20 @@ export const buildTeacherScheduleMap = (timetables) => {
     schedule.forEach(slot => {
       if (!slot.teacher) return;
 
-      const teacherId = normalizeTeacherId(slot.teacher);
+      const currentTeachers = slot.teacher.split(',').map(t => t.trim().toUpperCase()).filter(Boolean);
+      
+      currentTeachers.forEach(tStr => {
+        const teacherId = normalizeTeacherId(tStr);
 
-      if (!map[teacherId]) map[teacherId] = {};
-      if (!map[teacherId][slot.day]) map[teacherId][slot.day] = {};
+        if (!map[teacherId]) map[teacherId] = {};
+        if (!map[teacherId][slot.day]) map[teacherId][slot.day] = {};
 
-      map[teacherId][slot.day][normalizePeriod(slot.period)] = {
-        classId,
-        subject: slot.subject || "",
-        originalTeacher: slot.teacher
-      };
+        map[teacherId][slot.day][normalizePeriod(slot.period)] = {
+          classId,
+          subject: slot.subject || "",
+          originalTeacher: slot.teacher
+        };
+      });
     });
   });
 

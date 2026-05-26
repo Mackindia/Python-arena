@@ -16,7 +16,12 @@ export const adminSidebarLinks: AdminNavItem[] = [
   { label: "Manage Lessons", href: "/admin/lessons", icon: BookOpen },
   { label: "Manage Subjects", href: "/admin/courses", icon: GraduationCap },
   { label: "Students", href: "/admin/users", icon: Users },
-  { label: "School Timetable System", href: "/admin/timetable", icon: Calendar, external: false },
+  { 
+    label: "School Timetable System", 
+    href: process.env.NODE_ENV === "development" ? "http://localhost:5173" : "/admin/timetable", 
+    icon: Calendar, 
+    external: process.env.NODE_ENV === "development" 
+  },
   { label: "Online Scheduler (7-Period)", href: "/admin/online-scheduler", icon: Calendar },
   { label: "Analytics", href: "/admin/analytics", icon: ChartColumn },
   { label: "Settings", href: "/admin/settings", icon: Settings },

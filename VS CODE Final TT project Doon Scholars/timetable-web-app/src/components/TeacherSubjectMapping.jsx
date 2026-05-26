@@ -27,33 +27,76 @@ const parseCSVConfig = () => {
     const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
     if (!matches || matches.length < 4) return;
     
-    let [subject, cls, section, teacher] = matches.map(m => m.replace(/^"|"$/g, '').trim());
+    let [rawSubject, cls, section, rawTeacher] = matches.map(m => m.replace(/^"|"$/g, '').trim());
     
     const wingDef = WING_DEFS.find(w => w.match(cls));
     if (wingDef) {
       const classId = `${cls}${section}`.toUpperCase();
       
-      wings[wingDef.id].subjects.add(subject);
-      wings[wingDef.id].columns.add(classId);
+      const subjectTokens = rawSubject.split('/').map(t => t.trim());
+      const teacherTokens = rawTeacher.split(',').map(t => t.trim());
       
-      if (!mapForUI[subject]) mapForUI[subject] = {};
-      mapForUI[subject][classId] = teacher;
+      subjectTokens.forEach((subjectToken, index) => {
+        wings[wingDef.id].subjects.add(subjectToken);
+        wings[wingDef.id].columns.add(classId);
+        
+        if (!mapForUI[subjectToken]) mapForUI[subjectToken] = {};
+        
+        // If multiple teachers exist, map 1-to-1. If single teacher, map to all.
+        const teacherForSubject = teacherTokens.length > 1 && teacherTokens.length === subjectTokens.length
+          ? teacherTokens[index]
+          : rawTeacher; // fallback to full string if mismatch
+          
+        mapForUI[subjectToken][classId] = teacherForSubject;
+      });
     }
   });
+
+  const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
+  const deletedSubjectsList = savedDeletedSubjects ? JSON.parse(savedDeletedSubjects) : [];
+
+  const savedDeletedTeachers = localStorage.getItem('deletedTeachers');
+  const deletedTeachersList = savedDeletedTeachers ? JSON.parse(savedDeletedTeachers) : [];
 
   const finalConfig = WING_DEFS.map(w => ({
     title: w.title,
     headerColor: w.headerColor,
     rowColor: w.rowColor,
     columns: Array.from(wings[w.id].columns),
-    subjects: Array.from(wings[w.id].subjects)
-  })).filter(w => w.columns.length > 0);
+    subjects: Array.from(wings[w.id].subjects).filter(s => !deletedSubjectsList.includes(s))
+  })).filter(w => w.columns.length > 0 && w.subjects.length > 0);
+
+  // Remove deleted subjects from initialData
+  Object.keys(mapForUI).forEach(subj => {
+    if (deletedSubjectsList.includes(subj)) {
+      delete mapForUI[subj];
+    } else {
+      // Also remove any permanently deleted teachers from the raw CSV data
+      Object.keys(mapForUI[subj]).forEach(col => {
+        const currentVal = mapForUI[subj][col] || "";
+        if (currentVal) {
+          const tokens = currentVal.split(',').map(t => t.trim());
+          const newTokens = tokens.filter(t => !deletedTeachersList.includes(t));
+          mapForUI[subj][col] = newTokens.join(', ');
+        }
+      });
+    }
+  });
 
   return { wings: finalConfig, initialData: mapForUI };
 };
 
 const TeacherSubjectMapping = () => {
-  const { teacherSubjectMap, setTeacherSubjectMap, timetables, updateTeacherForSubject } = useTimetable();
+  const { 
+    teacherSubjectMap, 
+    setTeacherSubjectMap, 
+    timetables, 
+    updateTeacherForSubject, 
+    swapTeacherGlobal, 
+    teachers, 
+    addNewTeacher,
+    deleteTeacher
+  } = useTimetable();
   const [config, setConfig] = useState(null);
 
   // Parse CSV and Initialize
@@ -105,19 +148,24 @@ const TeacherSubjectMapping = () => {
 
       schedule.forEach(slot => {
         if (!slot.subject) return;
-        let subj = slot.subject.toLowerCase();
-        
-        for (const mSubj of Object.keys(teacherSubjectMap)) {
-          // Splitting by slash handles groups like "Bio/Eco/Phy_Edu" matching "Biology"
-          const mSubjParts = mSubj.toLowerCase().split('/');
-          
-          if (mSubjParts.some(p => subj.includes(p) || p.includes(subj))) {
-            const mappedTeacher = teacherSubjectMap[mSubj][normalizedId];
-            if (mappedTeacher) {
-              updateTeacherForSubject(classId, slot.subject, mappedTeacher);
-              count++;
-            }
+        const subjectTokens = slot.subject.split('/').map(t => t.trim());
+        let assignedTeachers = [];
+
+        subjectTokens.forEach(token => {
+          // Exact lookup only
+          const mappedTeacher = teacherSubjectMap[token]?.[normalizedId];
+          if (mappedTeacher) {
+            assignedTeachers.push(mappedTeacher);
           }
+        });
+
+        // Remove duplicates
+        assignedTeachers = [...new Set(assignedTeachers)];
+
+        // Save into timetable
+        if (assignedTeachers.length > 0) {
+          updateTeacherForSubject(classId, slot.subject, assignedTeachers.join(','));
+          count++;
         }
       });
     });
@@ -128,6 +176,10 @@ const TeacherSubjectMapping = () => {
 
   return (
     <div style={{ paddingBottom: '3rem' }}>
+      <datalist id="teacher-list">
+        {teachers.map(t => <option key={t} value={t} />)}
+      </datalist>
+
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h1 className="page-title">Teacher Subject Mapping</h1>
         <div style={{ display: 'flex', gap: '1rem' }}>
@@ -150,6 +202,232 @@ const TeacherSubjectMapping = () => {
             <Save size={18} />
             Sync to Timetable
           </button>
+        </div>
+      </div>
+
+      {/* Teacher Management Engines */}
+      <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+        
+        {/* Delete Subject and Teacher Initials */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: '1', minWidth: '300px' }}>
+          
+          {/* Add Teacher */}
+          <div style={{ background: '#f0fdf4', padding: '1.5rem', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#166534', marginBottom: '0.5rem' }}>Add New Teacher</h3>
+            <p style={{ fontSize: '0.875rem', color: '#15803d', margin: '0 0 1rem 0' }}>Register a brand new teacher's initials.</p>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <input 
+                id="new-teacher-initial" 
+                type="text" 
+                placeholder="e.g. AB" 
+                style={{ flex: 1, padding: '0.5rem', border: '1px solid #86efac', borderRadius: '4px' }} 
+              />
+              <button 
+                className="btn"
+                style={{ background: '#22c55e', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer' }}
+                onClick={() => {
+                  const val = document.getElementById('new-teacher-initial').value;
+                  if (!val) return;
+                  if (teachers.includes(val.toUpperCase())) {
+                    alert(`${val.toUpperCase()} is already in the system.`);
+                    return;
+                  }
+                  addNewTeacher(val);
+                  alert(`Added ${val.toUpperCase()} to the teacher list!`);
+                  document.getElementById('new-teacher-initial').value = '';
+                }}
+              >
+                Add
+              </button>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            {/* Delete Teacher */}
+            <div style={{ background: '#fef2f2', padding: '1.5rem', borderRadius: '8px', border: '1px solid #fecaca', flex: 1 }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#991b1b', marginBottom: '0.5rem' }}>Delete Teacher</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <input 
+                  id="delete-teacher-initial" 
+                  type="text" 
+                  list="teacher-list"
+                  placeholder="- Select Teacher -" 
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #fca5a5', borderRadius: '4px' }} 
+                />
+                <button 
+                  className="btn"
+                  style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer' }}
+                  onClick={() => {
+                    const val = document.getElementById('delete-teacher-initial').value.trim().toUpperCase();
+                    if (!val) return;
+                    if (!teachers.includes(val)) {
+                      alert(`Teacher ${val} is not currently in the system.`);
+                      return;
+                    }
+
+                    // STRICT VALIDATION: Check if teacher still has assignments
+                    let hasAssignments = false;
+                    
+                    // 1. Check Mapping Grid
+                    Object.values(teacherSubjectMap).forEach(row => {
+                      Object.values(row).forEach(cellVal => {
+                        if (cellVal && cellVal.split(',').map(t => t.trim()).includes(val)) {
+                          hasAssignments = true;
+                        }
+                      });
+                    });
+
+                    // 2. Check Live Timetables
+                    Object.values(timetables).forEach(schedule => {
+                      schedule.forEach(slot => {
+                        if (slot.teacher && slot.teacher.split(',').map(t => t.trim()).includes(val)) {
+                          hasAssignments = true;
+                        }
+                      });
+                    });
+
+                    if (hasAssignments) {
+                      alert(`DENIED: Cannot delete ${val}!\n\nThis teacher still has active classes assigned in the Master Grid or Live Timetables. You MUST first use the 'Rename / Swap Teacher' engine to transfer their classes to a different teacher before they can be deleted.`);
+                      return;
+                    }
+
+                    if (window.confirm(`This will permanently erase ${val} from the system. Are you sure?`)) {
+                      deleteTeacher(val);
+                      alert(`Successfully erased Teacher ${val} from the entire system.`);
+                      document.getElementById('delete-teacher-initial').value = '';
+                    }
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+
+            {/* Delete Subject */}
+            <div style={{ background: '#fffbeb', padding: '1.5rem', borderRadius: '8px', border: '1px solid #fde68a', flex: 1 }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#b45309', marginBottom: '0.5rem' }}>Delete Subject</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <input 
+                  id="delete-subject-name" 
+                  type="text" 
+                  placeholder="- Type Subject Name -" 
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #fcd34d', borderRadius: '4px' }} 
+                />
+                <button 
+                  className="btn"
+                  style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer' }}
+                  onClick={() => {
+                    const val = document.getElementById('delete-subject-name').value.trim();
+                    if (!val) return;
+                    if (window.confirm(`Are you sure you want to completely erase the subject "${val}" from the Mapping Grid?`)) {
+                      const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
+                      const deletedSubjectsList = savedDeletedSubjects ? JSON.parse(savedDeletedSubjects) : [];
+                      
+                      if (!deletedSubjectsList.includes(val)) {
+                        deletedSubjectsList.push(val);
+                        localStorage.setItem('deletedSubjects', JSON.stringify(deletedSubjectsList));
+                      }
+                      
+                      setTeacherSubjectMap(prev => {
+                        const nextMap = { ...prev };
+                        delete nextMap[val];
+                        return nextMap;
+                      });
+
+                      setConfig(prev => {
+                        const newWings = prev.wings.map(w => ({
+                          ...w,
+                          subjects: w.subjects.filter(s => s !== val)
+                        })).filter(w => w.columns.length > 0 && w.subjects.length > 0);
+                        return { ...prev, wings: newWings };
+                      });
+
+                      alert(`Successfully deleted the subject "${val}".`);
+                      document.getElementById('delete-subject-name').value = '';
+                    }
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Teacher Swapping / Renaming Engine */}
+        <div style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '8px', border: '1px solid #cbd5e1', flex: '2', minWidth: '500px' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#1e293b', marginBottom: '0.5rem' }}>Rename / Swap Teacher</h3>
+          <p style={{ fontSize: '0.875rem', color: '#64748b', margin: '0 0 1rem 0' }}>Rename a teacher's initials, or swap an old teacher with a new one globally across all timetables.</p>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.25rem' }}>Old Initials</label>
+              <input 
+                id="swap-old-teacher" 
+                type="text" 
+                list="teacher-list"
+                placeholder="- Select Old Initial -" 
+                style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} 
+              />
+            </div>
+            <div style={{ paddingBottom: '0.5rem', color: '#64748b', fontWeight: 'bold' }}>→</div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.25rem' }}>New Initials</label>
+              <input 
+                id="swap-new-teacher" 
+                type="text" 
+                list="teacher-list"
+                placeholder="- Type New Initial -" 
+                style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} 
+              />
+            </div>
+            <button 
+              className="btn"
+              style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', height: '37px' }}
+              onClick={() => {
+                const oldT = document.getElementById('swap-old-teacher').value.trim().toUpperCase();
+                const newT = document.getElementById('swap-new-teacher').value.trim().toUpperCase();
+                if (!oldT || !newT) {
+                  alert("Please enter both the old and new teacher initials.");
+                  return;
+                }
+                if (window.confirm(`Are you sure you want to completely replace/rename ${oldT} to ${newT} everywhere?`)) {
+                  
+                  // Ensure new teacher is saved to the list too
+                  addNewTeacher(newT);
+
+                  // 1. Swap in the Mapping Grid
+                  setTeacherSubjectMap(prev => {
+                    const nextMap = JSON.parse(JSON.stringify(prev));
+                    Object.keys(nextMap).forEach(subj => {
+                      Object.keys(nextMap[subj]).forEach(col => {
+                        const currentVal = nextMap[subj][col] || "";
+                        if (currentVal) {
+                          const tokens = currentVal.split(',').map(t => t.trim());
+                          if (tokens.includes(oldT)) {
+                            const newTokens = tokens.map(t => t === oldT ? newT : t);
+                            nextMap[subj][col] = newTokens.join(', ');
+                          }
+                        }
+                      });
+                    });
+                    return nextMap;
+                  });
+
+                  // 2. Swap directly in the Live Timetable
+                  swapTeacherGlobal(oldT, newT);
+                  
+                  // 3. Remove the old teacher from the system completely
+                  deleteTeacher(oldT);
+                  
+                  alert(`Successfully renamed Teacher ${oldT} to ${newT} everywhere!`);
+                  document.getElementById('swap-old-teacher').value = '';
+                  document.getElementById('swap-new-teacher').value = '';
+                }
+              }}
+            >
+              Rename / Swap
+            </button>
+          </div>
         </div>
       </div>
 
@@ -185,22 +463,30 @@ const TeacherSubjectMapping = () => {
                           <td key={`${subject}-${col}`} style={{ padding: 0, background: wing.rowColor, borderBottom: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0' }}>
                             <input 
                               type="text"
+                              list="teacher-list"
                               value={val}
                               onChange={(e) => handleCellChange(subject, col, e.target.value.toUpperCase())}
+                              placeholder="-"
+                              title="Click to Edit Teacher"
                               style={{
                                 width: '100%',
                                 height: '100%',
                                 minHeight: '36px',
                                 padding: '4px',
-                                border: 'none',
-                                background: 'transparent',
+                                border: '1px solid transparent',
+                                borderBottom: '1px solid #cbd5e1',
+                                background: '#ffffff',
                                 textAlign: 'center',
                                 outline: 'none',
                                 fontWeight: val ? '600' : 'normal',
-                                color: '#0f172a'
+                                color: '#0f172a',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
                               }}
-                              onFocus={(e) => e.target.style.background = 'rgba(255,255,255,0.6)'}
-                              onBlur={(e) => e.target.style.background = 'transparent'}
+                              onMouseOver={(e) => { e.target.style.border = '1px solid #3b82f6'; e.target.style.background = '#eff6ff'; }}
+                              onMouseOut={(e) => { e.target.style.border = '1px solid transparent'; e.target.style.borderBottom = '1px solid #cbd5e1'; e.target.style.background = '#ffffff'; }}
+                              onFocus={(e) => { e.target.style.border = '2px solid #2563eb'; e.target.style.background = '#ffffff'; }}
+                              onBlur={(e) => { e.target.style.border = '1px solid transparent'; e.target.style.borderBottom = '1px solid #cbd5e1'; e.target.style.background = '#ffffff'; }}
                             />
                           </td>
                         );

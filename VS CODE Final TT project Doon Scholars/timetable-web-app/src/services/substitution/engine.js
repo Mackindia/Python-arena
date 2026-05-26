@@ -114,6 +114,9 @@ export const generateAllSubstitutions = (
             )
           })
 
+          // exempt from substitution duty
+          .filter(t => !['AN', 'P', 'RN'].includes(t.id))
+
           // max 7 periods
           .filter(t => {
 

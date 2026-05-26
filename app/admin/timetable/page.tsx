@@ -40,14 +40,31 @@ export default function AdminTimetablePage() {
           </a>
         </div>
 
-        {/* Embedded Application */}
-        <div className="flex-1 w-full bg-white rounded-xl overflow-hidden border border-white/10 shadow-2xl" style={{ minHeight: 'calc(100vh - 160px)' }}>
-          <iframe 
-            src={timetableUrl}
-            className="w-full h-full border-none" 
-            title="School Timetable System"
-            style={{ width: '100%', height: '100%', minHeight: '800px' }}
-          />
+        {/* Embedded Application or Dev Welcome */}
+        <div className="flex-1 w-full bg-slate-900 rounded-xl overflow-hidden border border-white/10 shadow-2xl flex items-center justify-center" style={{ minHeight: 'calc(100vh - 160px)' }}>
+          {process.env.NODE_ENV === "development" ? (
+            <div className="text-center p-8">
+              <h2 className="text-3xl font-bold text-white mb-4">Welcome to Doon Scholars Timetable Management System</h2>
+              <p className="text-slate-400 mb-8 max-w-lg mx-auto">
+                You are currently in Development Mode. Please use the standalone server window (localhost:5173) that just opened to make your edits.
+              </p>
+              <a
+                href="http://localhost:5173"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500"
+              >
+                Open Development Server <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
+          ) : (
+            <iframe 
+              src={timetableUrl}
+              className="w-full h-full border-none bg-white" 
+              title="School Timetable System"
+              style={{ width: '100%', height: '100%', minHeight: '800px' }}
+            />
+          )}
         </div>
 
       </div>

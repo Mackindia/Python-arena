@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { requireAdminApi } from "@/lib/admin-api";
+import { requireAdminApi, requireSuperAdminApi } from "@/lib/admin-api";
 import Announcement from "@/models/Announcement";
 
 export async function GET() {
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const access = await requireAdminApi();
+    const access = await requireSuperAdminApi();
     if (!access.ok) {
       return access.response;
     }

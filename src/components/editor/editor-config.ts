@@ -157,7 +157,7 @@ export const PaginationPlugin = Extension.create({
 
 function balancePages(view: any) {
   const state = view.state;
-  let tr = state.tr;
+  const tr = state.tr;
   let modified = false;
   const doc = state.doc;
 

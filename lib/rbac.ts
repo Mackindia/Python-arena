@@ -3,13 +3,13 @@ import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
 
-export type AppRole = "admin" | "teacher" | "student";
+export type AppRole = "super_admin" | "admin" | "teacher" | "student";
 
-export const ADMIN_PANEL_ROLES: AppRole[] = ["admin", "teacher"];
+export const ADMIN_PANEL_ROLES: AppRole[] = ["super_admin", "admin", "teacher"];
 
 function normalizeRole(value: unknown): AppRole {
-  if (value === "admin" || value === "teacher") {
-    return value;
+  if (value === "super_admin" || value === "admin" || value === "teacher") {
+    return value as AppRole;
   }
   return "student";
 }
@@ -39,8 +39,23 @@ export async function getRequestUserContext() {
   const metadataRole = normalizeRole(clerkUser?.publicMetadata?.role);
   const dbRole = normalizeRole(dbUser?.role);
 
-  const role = dbUser ? dbRole : metadataRole;
-  const email = clerkUser?.primaryEmailAddress?.emailAddress ?? dbUser?.email ?? "";
+  let role = dbUser ? dbRole : metadataRole;
+  
+  // Extract email properly depending on Clerk API version
+  let email = "";
+  if (clerkUser) {
+    const primaryId = clerkUser.primaryEmailAddressId;
+    const primaryEmailObj = clerkUser.emailAddresses?.find(e => e.id === primaryId);
+    email = primaryEmailObj?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress || "";
+  }
+  if (!email && dbUser) {
+    email = dbUser.email || "";
+  }
+
+  // Assign super_admin explicitly to the owner
+  if (email.toLowerCase() === "abhishekr474@gmail.com") {
+    role = "super_admin";
+  }
 
   return {
     userId,
@@ -63,3 +78,4 @@ export async function requireRolePage(allowedRoles: AppRole[]) {
 
   return ctx;
 }
+

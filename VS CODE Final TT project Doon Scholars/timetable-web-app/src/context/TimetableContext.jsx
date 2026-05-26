@@ -68,7 +68,16 @@ export const TimetableProvider = ({ children }) => {
       setTeacherSubjectMap({});
     }
     
-    setTeachers(initialTeachers);
+    const savedAddedTeachers = localStorage.getItem('addedTeachers');
+    const customTeachers = savedAddedTeachers ? JSON.parse(savedAddedTeachers) : [];
+
+    const savedDeletedTeachers = localStorage.getItem('deletedTeachers');
+    const deletedTeachersList = savedDeletedTeachers ? JSON.parse(savedDeletedTeachers) : [];
+
+    const validInitial = initialTeachers.filter(t => !deletedTeachersList.includes(t));
+    const validCustom = customTeachers.filter(t => !deletedTeachersList.includes(t));
+
+    setTeachers([...new Set([...validInitial, ...validCustom])].sort());
     
     const savedMasterClasses = localStorage.getItem('masterClasses');
     if (savedMasterClasses) {
@@ -104,13 +113,23 @@ export const TimetableProvider = ({ children }) => {
       localStorage.setItem('timetables', JSON.stringify(timetables));
       
       // Dynamically update teachers list based on assigned timetables
-      const dynamicTeachers = new Set([...initialTeachers]);
+      const savedAddedTeachers = localStorage.getItem('addedTeachers');
+      const customTeachers = savedAddedTeachers ? JSON.parse(savedAddedTeachers) : [];
+
+      const savedDeletedTeachers = localStorage.getItem('deletedTeachers');
+      const deletedTeachers = savedDeletedTeachers ? JSON.parse(savedDeletedTeachers) : [];
+      
+      const validInitial = initialTeachers.filter(t => !deletedTeachers.includes(t));
+      const validCustom = customTeachers.filter(t => !deletedTeachers.includes(t));
+
+      const dynamicTeachers = new Set([...validInitial, ...validCustom]);
+      
       Object.values(timetables).forEach(schedule => {
         schedule.forEach(slot => {
           if (slot.teacher) {
             slot.teacher.split(',').forEach(t => {
               const cleanT = t.trim();
-              if (cleanT && cleanT.toLowerCase() !== 'nan' && cleanT !== '0') {
+              if (cleanT && cleanT.toLowerCase() !== 'nan' && cleanT !== '0' && !deletedTeachers.includes(cleanT)) {
                 dynamicTeachers.add(cleanT);
               }
             });
@@ -120,6 +139,98 @@ export const TimetableProvider = ({ children }) => {
       setTeachers(Array.from(dynamicTeachers).sort());
     }
   }, [timetables]);
+
+  const addNewTeacher = (initials) => {
+    const formatted = initials.trim().toUpperCase();
+    if (!formatted) return;
+
+    const savedAddedTeachers = localStorage.getItem('addedTeachers');
+    const customTeachers = savedAddedTeachers ? JSON.parse(savedAddedTeachers) : [];
+    
+    // Make sure it's removed from deletedTeachers if they re-add it!
+    const savedDeletedTeachers = localStorage.getItem('deletedTeachers');
+    let deletedTeachers = savedDeletedTeachers ? JSON.parse(savedDeletedTeachers) : [];
+    if (deletedTeachers.includes(formatted)) {
+      deletedTeachers = deletedTeachers.filter(t => t !== formatted);
+      localStorage.setItem('deletedTeachers', JSON.stringify(deletedTeachers));
+    }
+
+    if (!customTeachers.includes(formatted)) {
+      customTeachers.push(formatted);
+      localStorage.setItem('addedTeachers', JSON.stringify(customTeachers));
+      setTeachers(prev => {
+        const next = new Set([...prev, formatted]);
+        return Array.from(next).sort();
+      });
+    }
+  };
+
+  const deleteTeacher = (initials) => {
+    const formatted = initials.trim().toUpperCase();
+    if (!formatted) return;
+
+    // 1. Remove from addedTeachers
+    const savedAddedTeachers = localStorage.getItem('addedTeachers');
+    let customTeachers = savedAddedTeachers ? JSON.parse(savedAddedTeachers) : [];
+    customTeachers = customTeachers.filter(t => t !== formatted);
+    localStorage.setItem('addedTeachers', JSON.stringify(customTeachers));
+    
+    // 1.5 Add to deletedTeachers to ensure it overrides initialTeachers
+    const savedDeletedTeachers = localStorage.getItem('deletedTeachers');
+    const deletedTeachersList = savedDeletedTeachers ? JSON.parse(savedDeletedTeachers) : [];
+    if (!deletedTeachersList.includes(formatted)) {
+      deletedTeachersList.push(formatted);
+      localStorage.setItem('deletedTeachers', JSON.stringify(deletedTeachersList));
+    }
+
+    // 2. Remove from active state
+    setTeachers(prev => prev.filter(t => t !== formatted));
+
+    // 3. Remove from teacherSubjectMap
+    setTeacherSubjectMap(prev => {
+      const nextMap = JSON.parse(JSON.stringify(prev));
+      Object.keys(nextMap).forEach(subj => {
+        Object.keys(nextMap[subj]).forEach(col => {
+          const currentVal = nextMap[subj][col] || "";
+          if (currentVal) {
+            const tokens = currentVal.split(',').map(t => t.trim());
+            const newTokens = tokens.filter(t => t !== formatted);
+            nextMap[subj][col] = newTokens.join(', ');
+          }
+        });
+      });
+      return nextMap;
+    });
+
+    // 4. Remove from timetables
+    setTimetables(prev => {
+      const nextTT = { ...prev };
+      Object.keys(nextTT).forEach(classId => {
+        const classSchedule = [...nextTT[classId]];
+        let updated = false;
+        
+        const updatedSchedule = classSchedule.map(slot => {
+          if (!slot.teacher) return slot;
+          const currentTeachers = slot.teacher.split(',').map(t => t.trim());
+          if (currentTeachers.includes(formatted)) {
+            const newTeacherList = currentTeachers.filter(t => t !== formatted);
+            updated = true;
+            return { 
+              ...slot, 
+              teacher: newTeacherList.join(', '), 
+              assignedTeachers: newTeacherList 
+            };
+          }
+          return slot;
+        });
+        
+        if (updated) {
+          nextTT[classId] = updatedSchedule;
+        }
+      });
+      return nextTT;
+    });
+  };
 
   useEffect(() => {
     if (loadMaster.length > 0) {
@@ -164,13 +275,41 @@ export const TimetableProvider = ({ children }) => {
     return false;
   };
 
+  const getAllowedSubjectsForClass = (classId) => {
+    const normalizedClassId = classId.replace(/\s+/g, '').toUpperCase();
+    const subjects = new Set();
+    
+    // 1. From loadMaster
+    loadMaster.forEach(l => {
+      if (l.class_id.toUpperCase() === normalizedClassId) {
+        subjects.add(l.subject);
+      }
+    });
+    
+    // 2. From teacherSubjectMap
+    if (teacherSubjectMap) {
+      Object.keys(teacherSubjectMap).forEach(subj => {
+        if (teacherSubjectMap[subj][normalizedClassId]) {
+          subjects.add(subj);
+        }
+      });
+    }
+    
+    return Array.from(subjects).sort();
+  };
+
   // Update a specific slot in a class timetable
-  const updateSlot = (classId, day, period, subject, teacher) => {
+  const updateSlot = (classId, day, period, subject, teacher, assignedTeachers = null, clashes = []) => {
     setTimetables(prev => {
       const classSchedule = [...(prev[classId] || [])];
       
       // Find if slot exists
       const slotIndex = classSchedule.findIndex(s => s.day === day && s.period === period);
+      
+      let finalAssigned = assignedTeachers;
+      if (finalAssigned === null) {
+        finalAssigned = teacher ? teacher.split(',').map(t => t.trim()).filter(Boolean) : [];
+      }
       
       if (!subject && !teacher) {
         // Remove the slot if both are empty
@@ -180,10 +319,10 @@ export const TimetableProvider = ({ children }) => {
       } else {
         if (slotIndex >= 0) {
           // Update existing
-          classSchedule[slotIndex] = { ...classSchedule[slotIndex], subject, teacher };
+          classSchedule[slotIndex] = { ...classSchedule[slotIndex], subject, teacher, assignedTeachers: finalAssigned, clashes };
         } else {
           // Add new
-          classSchedule.push({ day, period, subject, teacher });
+          classSchedule.push({ day, period, subject, teacher, assignedTeachers: finalAssigned, clashes });
         }
       }
       
@@ -198,12 +337,48 @@ export const TimetableProvider = ({ children }) => {
       
       const updatedSchedule = classSchedule.map(slot => {
         if (slot.subject === subject) {
-          return { ...slot, teacher: newTeacher };
+          const assignedTeachers = newTeacher ? newTeacher.split(',').map(t => t.trim()).filter(Boolean) : [];
+          return { ...slot, teacher: newTeacher, assignedTeachers };
         }
         return slot;
       });
       
       return { ...prev, [classId]: updatedSchedule };
+    });
+  };
+
+  // Global swap: Replaces oldTeacher with newTeacher everywhere in the timetables
+  const swapTeacherGlobal = (oldTeacher, newTeacher) => {
+    setTimetables(prev => {
+      const nextTT = { ...prev };
+      let swappedCount = 0;
+      
+      Object.keys(nextTT).forEach(classId => {
+        const classSchedule = [...nextTT[classId]];
+        let updated = false;
+        
+        const updatedSchedule = classSchedule.map(slot => {
+          if (!slot.teacher) return slot;
+          const currentTeachers = slot.teacher.split(',').map(t => t.trim());
+          if (currentTeachers.includes(oldTeacher)) {
+            const newTeacherList = currentTeachers.map(t => t === oldTeacher ? newTeacher : t);
+            updated = true;
+            swappedCount++;
+            return { 
+              ...slot, 
+              teacher: newTeacherList.join(', '), 
+              assignedTeachers: newTeacherList 
+            };
+          }
+          return slot;
+        });
+        
+        if (updated) {
+          nextTT[classId] = updatedSchedule;
+        }
+      });
+      
+      return nextTT;
     });
   };
 
@@ -425,12 +600,12 @@ export const TimetableProvider = ({ children }) => {
     });
   };
 
-  const setDailySubstitutions = (dateString, subsArray) => {
+  const setDailySubstitutions = React.useCallback((dateString, subsArray) => {
     setSubstitutions(prev => ({
       ...prev,
       [dateString]: subsArray
     }));
-  };
+  }, []);
 
   const removeSubstitution = (dateString, period, classId) => {
     setSubstitutions(prev => {
@@ -489,9 +664,11 @@ export const TimetableProvider = ({ children }) => {
       absentTeachers,
       updateSlot,
       updateTeacherForSubject,
+      swapTeacherGlobal,
       autoFillSnapshotTeachers,
       updateTotalLoad,
       checkTeacherCollision,
+      getAllowedSubjectsForClass,
       getTeacherSlotUsage,
       addMasterClass,
       addMasterSection,
@@ -502,7 +679,9 @@ export const TimetableProvider = ({ children }) => {
       removeSubstitution,
       setDailySubstitutions,
       markTeacherAbsent,
-      unmarkTeacherAbsent
+      unmarkTeacherAbsent,
+      addNewTeacher,
+      deleteTeacher
     }}>
       {children}
     </TimetableContext.Provider>

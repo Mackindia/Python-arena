@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/mongodb";
 import Timetable from "../../../../../models/Timetable";
+import { requireSuperAdminApi } from "@/lib/admin-api";
 
 export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const access = await requireSuperAdminApi();
+    if (!access.ok) {
+      return access.response;
+    }
+
     await connectDB();
     const { id } = await params;
 

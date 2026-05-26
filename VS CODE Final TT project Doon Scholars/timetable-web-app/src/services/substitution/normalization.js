@@ -10,7 +10,6 @@ export const normalizeTeacherId = (
     .trim()
     .toUpperCase()
     .replace(/\(.*?\)/g, "")
-    .split(",")[0]
     .trim()
 }
 

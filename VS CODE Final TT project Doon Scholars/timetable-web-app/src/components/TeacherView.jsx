@@ -54,12 +54,82 @@ const TeacherView = () => {
     });
   });
 
+  // Calculate schedules for ALL teachers for the bulk print feature
+  const allSchedules = React.useMemo(() => {
+    const map = {};
+    teachers.forEach(t => {
+      const sch = {};
+      DAYS.forEach(day => {
+        sch[day] = {};
+        PERIODS.forEach(p => {
+          sch[day][p] = null;
+        });
+      });
+      const engineSchedule = generateTeacherTimetable(timetables, t);
+      engineSchedule.forEach(slot => {
+        const p = parseInt(slot.period);
+        if (sch[slot.day][p]) {
+          sch[slot.day][p].classId += `, ${slot.classId}`;
+          sch[slot.day][p].subject += `, ${slot.subject}`;
+        } else {
+          sch[slot.day][p] = {
+            classId: slot.classId,
+            subject: slot.subject
+          };
+        }
+      });
+      map[t] = sch;
+    });
+    return map;
+  }, [teachers, timetables]);
+
+  const [printMode, setPrintMode] = useState('single');
+
+  const handlePrintAll = () => {
+    setPrintMode('all');
+    setTimeout(() => {
+      window.print();
+      setPrintMode('single');
+    }, 100);
+  };
+
+  const handlePrintSingle = () => {
+    setPrintMode('single');
+    setTimeout(() => {
+      window.print();
+    }, 100);
+  };
+
   return (
     <div>
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 className="page-title">Teacher View</h1>
         
         <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-secondary)', padding: '0.25rem', borderRadius: '8px' }}>
+          {viewMode === 'schedule' && (
+            <button
+              style={{ 
+                display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', 
+                background: '#059669', color: 'white',
+                border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 500
+              }}
+              onClick={handlePrintAll}
+              title="Download every teacher's schedule as a bulk PDF packet"
+            >
+              📑 Print All Teachers
+            </button>
+          )}
+          <button
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', 
+              background: '#3b82f6', color: 'white',
+              border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 500
+            }}
+            onClick={handlePrintSingle}
+            title="Download this view as a Landscape PDF"
+          >
+            🖨️ Print Current
+          </button>
           <button 
             style={{ 
               display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', 
@@ -84,6 +154,10 @@ const TeacherView = () => {
           </button>
         </div>
       </div>
+
+      <h1 className={printMode === 'single' ? "print-only-title" : "no-print"} style={{ display: 'none', textAlign: 'center', marginBottom: '20px', fontSize: '24px' }}>
+        Doon Scholars - {viewMode === 'schedule' ? `Teacher Schedule (${selectedTeacher})` : 'Teacher Weekly Load Matrix'}
+      </h1>
 
       {viewMode === 'schedule' && (
         <>
@@ -112,7 +186,7 @@ const TeacherView = () => {
           </div>
 
           {selectedTeacher ? (
-            <div className="card">
+            <div className={`card ${printMode === 'single' ? 'printable-area' : 'no-print'}`}>
               <div className="timetable-grid">
                 <div className="grid-cell grid-header">Day</div>
                 {PERIODS.map(p => (
@@ -150,9 +224,9 @@ const TeacherView = () => {
       )}
 
       {viewMode === 'matrix' && (
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className={`card ${printMode === 'single' ? 'printable-area' : 'no-print'}`} style={{ padding: 0, overflow: 'hidden' }}>
           <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Teacher Weekly Load Overview</h3>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Teacher Weekly Load Overview (Total: {teachers.length} Teachers)</h3>
           </div>
           <div style={{ overflowX: 'auto', maxHeight: '70vh' }}>
             <table className="data-table" style={{ whiteSpace: 'nowrap' }}>
@@ -210,6 +284,44 @@ const TeacherView = () => {
           </div>
         </div>
       )}
+
+      {/* MULTI-TEACHER PRINT CONTAINER */}
+      <div className={printMode === 'all' ? 'printable-area' : 'no-print'} style={{ display: printMode === 'all' ? 'block' : 'none' }}>
+        {teachers.map((t, idx) => (
+          <div key={t} className="timetable-wrapper" style={{ pageBreakAfter: idx < teachers.length - 1 ? 'always' : 'auto' }}>
+            <h1 style={{ textAlign: 'center', marginBottom: '20px', fontSize: '24px' }}>
+              Doon Scholars - Teacher Schedule ({t})
+            </h1>
+            <div className="timetable-grid" style={{ minWidth: '100%', border: '1px solid #000' }}>
+              <div className="grid-cell grid-header">Day</div>
+              {PERIODS.map(p => (
+                <div key={`p${p}`} className="grid-cell grid-header">Period {p}</div>
+              ))}
+
+              {DAYS.map(day => (
+                <React.Fragment key={day}>
+                  <div className="grid-cell day-header">{day}</div>
+                  {PERIODS.map(p => {
+                    const slot = allSchedules[t][day][p];
+                    return (
+                      <div key={`${day}-p${p}`} className="grid-cell" style={slot ? { backgroundColor: 'rgba(79, 70, 229, 0.05)' } : {}}>
+                        {slot ? (
+                          <>
+                            <div className="slot-subject">{slot.classId.toUpperCase()}</div>
+                            <div className="slot-teacher">{slot.subject}</div>
+                          </>
+                        ) : (
+                          <div className="slot-teacher" style={{opacity: 0.3}}>- Free -</div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

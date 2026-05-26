@@ -1,17 +1,13 @@
 import { NextResponse } from "next/server";
-import { requireAdminApi } from "@/lib/admin-api";
+import { requireSuperAdminApi } from "@/lib/admin-api";
 import { connectDB } from "@/lib/mongodb";
 import PrivateNote from "@/src/models/PrivateNote";
 
 export async function GET() {
-  const access = await requireAdminApi();
+  const access = await requireSuperAdminApi();
 
   if (!access.ok) {
     return access.response;
-  }
-
-  if (access.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
@@ -32,14 +28,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const access = await requireAdminApi();
+  const access = await requireSuperAdminApi();
 
   if (!access.ok) {
     return access.response;
-  }
-
-  if (access.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
@@ -72,4 +64,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-}
+}
