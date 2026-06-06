@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { Suspense, useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Editor from "@monaco-editor/react";
 import { useUser } from "@clerk/nextjs";
@@ -13,7 +13,7 @@ interface PythonProgram {
   pythonCode: string;
 }
 
-export default function PythonEditorPage() {
+function PythonEditorPageContent() {
   const searchParams = useSearchParams();
   const adminProgramId = searchParams.get("adminProgramId");
 
@@ -369,5 +369,19 @@ export default function PythonEditorPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PythonEditorPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-[calc(100vh-64px)] items-center justify-center bg-slate-950 text-white">
+          Loading python editor...
+        </div>
+      }
+    >
+      <PythonEditorPageContent />
+    </Suspense>
   );
 }
