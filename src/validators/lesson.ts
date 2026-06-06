@@ -28,7 +28,9 @@ export const LessonCreateSchema = z.object({
   /** Subject slug or ObjectId */
   subject: z.string().min(1, "Subject is required"),
   /** Class slug or ObjectId */
-  class: z.string().min(1, "Class is required"),
+  class: z.string().min(1, "Class is required").optional(),
+  /** Multiple Class slugs or ObjectIds */
+  classes: z.array(z.string()).optional(),
   description: z.string().min(1, "Description is required").max(2000),
   pdfUrl: HttpUrl.optional().or(z.literal("")),
   thumbnailUrl: HttpUrl.optional().or(z.literal("")),
@@ -39,6 +41,14 @@ export const LessonCreateSchema = z.object({
   /** Injected server-side from Clerk/MongoDB — not accepted from client */
   createdBy: MongoObjectId,
 }).superRefine((data, ctx) => {
+  if (!data.class && (!data.classes || data.classes.length === 0)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["class"],
+      message: "At least one class is required",
+    });
+  }
+
   const hasContent = Boolean(data.content?.trim());
   const hasPdf = Boolean(data.pdfUrl && data.pdfUrl.trim());
   const hasThumb = Boolean(data.thumbnailUrl && data.thumbnailUrl.trim());

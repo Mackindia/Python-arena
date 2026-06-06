@@ -8,13 +8,16 @@ import { Save, Calendar, Clock, RefreshCw } from "lucide-react";
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const CLASSES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
 const SECTIONS = ["A", "B", "C", "D", "E"];
-const PERIODS = [1, 2, 3, 4, 5, 6, 7]; // Strict 7 period online format
+const PERIODS = [1, 2, 3, 4, 5, 6];
 
 export default function OnlineSchedulerPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [adminChecked, setAdminChecked] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [remapping, setRemapping] = useState(false);
+  const [importingTeachers, setImportingTeachers] = useState(false);
+  const [importReport, setImportReport] = useState<any | null>(null);
 
   // Bell Timings State
   const [showBellModal, setShowBellModal] = useState(false);
@@ -28,9 +31,35 @@ export default function OnlineSchedulerPage() {
 
   // Data
   const [teachers, setTeachers] = useState<any[]>([]);
-  // We'll store periods in an array of objects: { period_no: 1, subject: "", teacher_id: "", teacher_name: "" }
+  // Two assignment slots per period (slot-2 optional for combination subjects)
   const [schedule, setSchedule] = useState<any[]>(
-    PERIODS.map(p => ({ period_no: p, subject: "", teacher_id: "", teacher_name: "" }))
+    PERIODS.map(p => ({
+      period_no: p,
+      subject: "",
+      teacher_id: "",
+      teacher_name: "",
+      subject2: "",
+      teacher_id2: "",
+      teacher_name2: "",
+      subject3: "",
+      teacher_id3: "",
+      teacher_name3: "",
+    }))
+  );
+
+  const teacherValueSet = new Set(
+    teachers.map((t: any) => String(t.teacher_id || t.clerkId || t._id || "").trim()).filter(Boolean)
+  );
+  const csvTeacherInitials = Array.from(
+    new Set(
+      schedule
+        .flatMap((slot: any) => [
+          String(slot.teacher_id || "").trim(),
+          String(slot.teacher_id2 || "").trim(),
+          String(slot.teacher_id3 || "").trim(),
+        ])
+        .filter((id: string) => Boolean(id) && id !== "UNASSIGNED" && !teacherValueSet.has(id))
+    )
   );
 
   // Settings State
@@ -46,7 +75,7 @@ export default function OnlineSchedulerPage() {
       try {
         const res = await fetch("/api/auth/me");
         const data = await res.json();
-        if (!data.user || data.user.role !== "admin") {
+        if (!data.user || !["admin", "super_admin"].includes(data.user.role)) {
           router.push("/online-class");
           return;
         }
@@ -87,10 +116,20 @@ export default function OnlineSchedulerPage() {
       const res = await fetch("/api/admin/periods");
       const data = await res.json();
       if (data.periods && data.periods.length > 0) {
-        setBellTimings(data.periods);
+        const filtered = data.periods
+          .filter((p: any) => PERIODS.includes(Number(p.period_no)))
+          .sort((a: any, b: any) => Number(a.period_no) - Number(b.period_no));
+        setBellTimings(filtered);
       } else {
-        // Fallback default
-        const defaultBells = PERIODS.map(p => ({ period_no: p, start_time: "08:00", end_time: "08:40" }));
+        // Fallback default (aligned with Online class TT 2026.csv)
+        const defaultBells = [
+          { period_no: 1, start_time: "08:15", end_time: "09:00" },
+          { period_no: 2, start_time: "09:15", end_time: "10:00" },
+          { period_no: 3, start_time: "10:15", end_time: "11:00" },
+          { period_no: 4, start_time: "11:15", end_time: "12:00" },
+          { period_no: 5, start_time: "12:15", end_time: "13:00" },
+          { period_no: 6, start_time: "13:15", end_time: "14:00" },
+        ];
         setBellTimings(defaultBells);
       }
     } catch (err) {
@@ -117,20 +156,56 @@ export default function OnlineSchedulerPage() {
       const res = await fetch(`/api/admin/online-scheduler?class=${selectedClass}&section=${selectedSection}&day=${selectedDay}`);
       const data = await res.json();
       
-      // Reset to empty 7 periods
-      const newSchedule = PERIODS.map(p => ({ period_no: p, subject: "", teacher_id: "", teacher_name: "" }));
+      // Reset to empty configured periods
+      const newSchedule: any[] = PERIODS.map(p => ({
+        period_no: p,
+        subject: "",
+        teacher_id: "",
+        teacher_name: "",
+        subject2: "",
+        teacher_id2: "",
+        teacher_name2: "",
+        subject3: "",
+        teacher_id3: "",
+        teacher_name3: "",
+      }));
       
-      // Overlay fetched data
+      // Overlay fetched data; preserve parallel subjects in same period.
       if (data.timetable && data.timetable.length > 0) {
+        const grouped = new Map<number, any[]>();
         data.timetable.forEach((slot: any) => {
-          if (slot.period_no >= 1 && slot.period_no <= 7) {
-            newSchedule[slot.period_no - 1] = {
-              period_no: slot.period_no,
+          const slotPeriod = Number(slot.period_no);
+          if (!PERIODS.includes(slotPeriod)) return;
+          const existing = grouped.get(slotPeriod) || [];
+          existing.push(slot);
+          grouped.set(slotPeriod, existing);
+        });
+
+        PERIODS.forEach((period, idx) => {
+          const slots = grouped.get(period) || [];
+          if (slots.length === 0) return;
+
+          const first = slots[0];
+          const second = slots[1];
+          const third = slots[2];
+          newSchedule[idx] = {
+            period_no: period,
+            subject: first?.subject || "",
+            teacher_id: first?.teacher_id || "",
+            teacher_name: first?.teacher_name || "",
+            subject2: second?.subject || "",
+            teacher_id2: second?.teacher_id || "",
+            teacher_name2: second?.teacher_name || "",
+            subject3: third?.subject || "",
+            teacher_id3: third?.teacher_id || "",
+            teacher_name3: third?.teacher_name || "",
+            sessions: slots.map((slot: any) => ({
               subject: slot.subject || "",
               teacher_id: slot.teacher_id || "",
-              teacher_name: slot.teacher_name || ""
-            };
-          }
+              teacher_name: slot.teacher_name || "",
+              group: slot.group || "MAIN",
+            })),
+          } as any;
         });
       }
       setSchedule(newSchedule);
@@ -143,14 +218,22 @@ export default function OnlineSchedulerPage() {
     const newSchedule = [...schedule];
     newSchedule[periodIndex][field] = value;
 
+    if (field === "subject" || field === "subject2" || field === "subject3") {
+      delete newSchedule[periodIndex].sessions;
+    }
+
     // If teacher_id changed, update teacher_name automatically
-    if (field === "teacher_id") {
+    if (field === "teacher_id" || field === "teacher_id2" || field === "teacher_id3") {
       if (value === "") {
-        newSchedule[periodIndex].teacher_name = "";
+        if (field === "teacher_id") newSchedule[periodIndex].teacher_name = "";
+        if (field === "teacher_id2") newSchedule[periodIndex].teacher_name2 = "";
+        if (field === "teacher_id3") newSchedule[periodIndex].teacher_name3 = "";
       } else {
         const t = teachers.find(t => t.teacher_id === value || t.clerkId === value || t._id === value);
         if (t) {
-          newSchedule[periodIndex].teacher_name = t.fullName;
+          if (field === "teacher_id") newSchedule[periodIndex].teacher_name = t.fullName;
+          if (field === "teacher_id2") newSchedule[periodIndex].teacher_name2 = t.fullName;
+          if (field === "teacher_id3") newSchedule[periodIndex].teacher_name3 = t.fullName;
         }
       }
     }
@@ -165,7 +248,41 @@ export default function OnlineSchedulerPage() {
         class: selectedClass,
         section: selectedSection,
         day: selectedDay,
-        periods: schedule
+        periods: schedule.map((p: any) => {
+          const sessions: any[] = [];
+
+          if (String(p.subject || "").trim() && String(p.teacher_id || "").trim()) {
+            sessions.push({
+              subject: String(p.subject).trim(),
+              teacher_id: String(p.teacher_id).trim(),
+              teacher_name: String(p.teacher_name || p.teacher_id || "").trim(),
+              group: "MAIN",
+            });
+          }
+
+          if (String(p.subject2 || "").trim() && String(p.teacher_id2 || "").trim()) {
+            sessions.push({
+              subject: String(p.subject2).trim(),
+              teacher_id: String(p.teacher_id2).trim(),
+              teacher_name: String(p.teacher_name2 || p.teacher_id2 || "").trim(),
+              group: "MAIN",
+            });
+          }
+
+          if (String(p.subject3 || "").trim() && String(p.teacher_id3 || "").trim()) {
+            sessions.push({
+              subject: String(p.subject3).trim(),
+              teacher_id: String(p.teacher_id3).trim(),
+              teacher_name: String(p.teacher_name3 || p.teacher_id3 || "").trim(),
+              group: "MAIN",
+            });
+          }
+
+          return {
+            period_no: p.period_no,
+            sessions,
+          };
+        })
       };
 
       const res = await fetch("/api/admin/online-scheduler", {
@@ -237,6 +354,57 @@ export default function OnlineSchedulerPage() {
     }
   };
 
+  const handleRemapTeachers = async () => {
+    setRemapping(true);
+    try {
+      const res = await fetch("/api/admin/online-scheduler/remap-teachers", {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(`Teacher mapping updated: ${data.updatedRows} row(s) across ${data.teacherCount} teacher ID(s).`);
+        await fetchSchedule();
+      } else {
+        alert("Error remapping teachers: " + data.error);
+      }
+    } catch (err) {
+      alert("Failed to remap teachers.");
+    } finally {
+      setRemapping(false);
+    }
+  };
+
+  const handleImportTeachersCsv = async () => {
+    setImportingTeachers(true);
+    setImportReport(null);
+    try {
+      const res = await fetch("/api/admin/users/import-teachers-csv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName: "teachers id and passwords.csv" }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setImportReport({ error: data.error || "Unknown error" });
+        alert("Import failed: " + (data.error || "Unknown error"));
+        return;
+      }
+
+      setImportReport(data);
+
+      alert(
+        `Import complete. Created: ${data.createdCount}, Skipped: ${data.skippedCount}, Failed: ${data.failedCount}`
+      );
+
+      await Promise.all([fetchTeachers(), fetchSchedule()]);
+    } catch (err) {
+      setImportReport({ error: "Failed to import teachers CSV." });
+      alert("Failed to import teachers CSV.");
+    } finally {
+      setImportingTeachers(false);
+    }
+  };
+
   if (!adminChecked || loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
@@ -254,7 +422,7 @@ export default function OnlineSchedulerPage() {
               Online Class Scheduler
             </h1>
             <p className="mt-2 text-sm text-slate-400">
-              Build and assign the 7-period online class schedule mapping directly to registered teachers.
+              Build and assign the online class schedule mapping directly to registered teachers.
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -280,43 +448,131 @@ export default function OnlineSchedulerPage() {
               {saving ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
               {saving ? "SAVING..." : "SAVE SCHEDULE"}
             </button>
+            <button
+              onClick={handleRemapTeachers}
+              disabled={remapping}
+              className="flex items-center gap-2 rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-3 text-sm font-bold text-amber-200 transition hover:bg-amber-500/20 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-5 w-5 ${remapping ? "animate-spin" : ""}`} />
+              {remapping ? "RE-MAPPING..." : "RE-MAP TEACHERS"}
+            </button>
+            <button
+              onClick={handleImportTeachersCsv}
+              disabled={importingTeachers}
+              className="flex items-center gap-2 rounded-xl border border-cyan-500/50 bg-cyan-500/10 px-4 py-3 text-sm font-bold text-cyan-200 transition hover:bg-cyan-500/20 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-5 w-5 ${importingTeachers ? "animate-spin" : ""}`} />
+              {importingTeachers ? "IMPORTING..." : "IMPORT TEACHERS CSV"}
+            </button>
           </div>
         </div>
 
-        <GlassCard className="mb-6 p-6 border border-slate-800 bg-slate-900/40">
+        {importReport ? (
+          <div className="mb-6 rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm font-semibold text-cyan-100">Teacher CSV Import Report</p>
+              {importReport.error ? (
+                <span className="text-xs font-semibold text-red-300">{importReport.error}</span>
+              ) : (
+                <span className="text-xs font-semibold text-cyan-200">
+                  Created: {importReport.createdCount} | Skipped: {importReport.skippedCount} | Failed: {importReport.failedCount}
+                </span>
+              )}
+            </div>
+
+            {!importReport.error ? (
+              <div className="mt-4 grid gap-4 lg:grid-cols-3">
+                <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-200">Created</p>
+                  <div className="mt-2 max-h-40 overflow-auto text-xs text-emerald-100">
+                    {(importReport.created || []).length === 0 ? (
+                      <p className="text-emerald-200/80">No new users created.</p>
+                    ) : (
+                      (importReport.created || []).slice(0, 20).map((row: any) => (
+                        <p key={`created-${row.row}`}>
+                          Row {row.row}: {row.username} ({row.teacher_id})
+                        </p>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-amber-400/20 bg-amber-500/10 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Skipped</p>
+                  <div className="mt-2 max-h-40 overflow-auto text-xs text-amber-100">
+                    {(importReport.skipped || []).length === 0 ? (
+                      <p className="text-amber-200/80">No skipped rows.</p>
+                    ) : (
+                      (importReport.skipped || []).slice(0, 20).map((row: any) => (
+                        <p key={`skipped-${row.row}`}>
+                          Row {row.row}: {row.username || "-"} ({row.reason})
+                        </p>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-red-400/20 bg-red-500/10 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-red-200">Failed</p>
+                  <div className="mt-2 max-h-40 overflow-auto text-xs text-red-100">
+                    {(importReport.failed || []).length === 0 ? (
+                      <p className="text-red-200/80">No failed rows.</p>
+                    ) : (
+                      (importReport.failed || []).slice(0, 20).map((row: any) => (
+                        <p key={`failed-${row.row}`}>
+                          Row {row.row}: {row.username || "-"} ({row.reason})
+                        </p>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        <GlassCard className="mb-6 border border-cyan-300/30 bg-[#0b1322]/90 p-6">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <span className="rounded-md border border-emerald-300/50 bg-emerald-950/75 px-2 py-0.5 text-xs font-bold text-emerald-100">
+              Class {selectedClass}{selectedSection}
+            </span>
+            <span className="rounded-md border border-violet-300/50 bg-violet-950/70 px-2 py-0.5 text-xs font-bold text-violet-100">
+              {selectedDay}
+            </span>
+          </div>
           <div className="flex flex-wrap gap-6">
             <div className="flex-1 min-w-[200px]">
-              <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-400">
+              <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-cyan-100">
                 <Calendar className="h-4 w-4" /> Class
               </label>
               <select
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm font-medium text-white focus:border-cyan-500 focus:outline-none"
+                className="w-full rounded-xl border border-cyan-300/60 bg-[#0f1a2e] px-4 py-3 text-sm font-semibold text-white focus:border-cyan-200 focus:outline-none"
               >
                 {CLASSES.map(c => <option key={c} value={c}>Class {c}</option>)}
               </select>
             </div>
             <div className="flex-1 min-w-[150px]">
-              <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-400">
+              <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-cyan-100">
                 Section
               </label>
               <select
                 value={selectedSection}
                 onChange={(e) => setSelectedSection(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm font-medium text-white focus:border-cyan-500 focus:outline-none"
+                className="w-full rounded-xl border border-cyan-300/60 bg-[#0f1a2e] px-4 py-3 text-sm font-semibold text-white focus:border-cyan-200 focus:outline-none"
               >
                 {SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
               </select>
             </div>
             <div className="flex-1 min-w-[200px]">
-              <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-400">
+              <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-cyan-100">
                 Day
               </label>
               <select
                 value={selectedDay}
                 onChange={(e) => setSelectedDay(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm font-medium text-white focus:border-cyan-500 focus:outline-none"
+                className="w-full rounded-xl border border-cyan-300/60 bg-[#0f1a2e] px-4 py-3 text-sm font-semibold text-white focus:border-cyan-200 focus:outline-none"
               >
                 {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
               </select>
@@ -335,34 +591,103 @@ export default function OnlineSchedulerPage() {
                   Period {slot.period_no}
                 </div>
               </div>
-              
-              <div className="flex w-full flex-1 flex-col sm:flex-row gap-4">
-                <div className="flex-1">
+
+              <div className="flex w-full flex-1 flex-col gap-3">
+                <div className="grid gap-3 sm:grid-cols-2">
                   <input
                     type="text"
-                    placeholder="Subject (e.g. Mathematics)"
+                    placeholder="Subject 1 (e.g. Business Studies)"
                     value={slot.subject}
                     onChange={(e) => handleSlotChange(index, "subject", e.target.value)}
                     className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:border-cyan-500 focus:outline-none"
                   />
-                </div>
-                <div className="flex-1">
                   <select
                     value={slot.teacher_id}
                     onChange={(e) => handleSlotChange(index, "teacher_id", e.target.value)}
                     className={`w-full rounded-lg border border-slate-700 px-4 py-2.5 text-sm focus:border-cyan-500 focus:outline-none ${slot.teacher_id ? 'bg-indigo-950 text-indigo-100' : 'bg-slate-950 text-slate-400'}`}
                   >
-                    <option value="">-- Unassigned Teacher --</option>
-                    {teachers.map(t => {
+                    <option value="">-- Unassigned Teacher 1 --</option>
+                    {csvTeacherInitials.map((initial) => (
+                      <option key={`csv-1-${initial}`} value={initial}>
+                        {initial} (from CSV, not mapped)
+                      </option>
+                    ))}
+                    {teachers.map((t) => {
                       const idToUse = t.teacher_id || t.clerkId || t._id.toString();
                       return (
-                        <option key={t._id} value={idToUse}>
-                          {t.fullName} {t.teacher_id ? `(${t.teacher_id})` : ''}
+                        <option key={`t1-${t._id}`} value={idToUse}>
+                          {t.fullName} {t.teacher_id ? `(${t.teacher_id})` : ""}
                         </option>
                       );
                     })}
                   </select>
                 </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <input
+                    type="text"
+                    placeholder="Subject 2 (optional, e.g. Political Science)"
+                    value={slot.subject2 || ""}
+                    onChange={(e) => handleSlotChange(index, "subject2", e.target.value)}
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:border-cyan-500 focus:outline-none"
+                  />
+                  <select
+                    value={slot.teacher_id2 || ""}
+                    onChange={(e) => handleSlotChange(index, "teacher_id2", e.target.value)}
+                    className={`w-full rounded-lg border border-slate-700 px-4 py-2.5 text-sm focus:border-cyan-500 focus:outline-none ${slot.teacher_id2 ? 'bg-indigo-950 text-indigo-100' : 'bg-slate-950 text-slate-400'}`}
+                  >
+                    <option value="">-- Unassigned Teacher 2 --</option>
+                    {csvTeacherInitials.map((initial) => (
+                      <option key={`csv-2-${initial}`} value={initial}>
+                        {initial} (from CSV, not mapped)
+                      </option>
+                    ))}
+                    {teachers.map((t) => {
+                      const idToUse = t.teacher_id || t.clerkId || t._id.toString();
+                      return (
+                        <option key={`t2-${t._id}`} value={idToUse}>
+                          {t.fullName} {t.teacher_id ? `(${t.teacher_id})` : ""}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <input
+                    type="text"
+                    placeholder="Subject 3 (optional, e.g. Economics)"
+                    value={slot.subject3 || ""}
+                    onChange={(e) => handleSlotChange(index, "subject3", e.target.value)}
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:border-cyan-500 focus:outline-none"
+                  />
+                  <select
+                    value={slot.teacher_id3 || ""}
+                    onChange={(e) => handleSlotChange(index, "teacher_id3", e.target.value)}
+                    className={`w-full rounded-lg border border-slate-700 px-4 py-2.5 text-sm focus:border-cyan-500 focus:outline-none ${slot.teacher_id3 ? 'bg-indigo-950 text-indigo-100' : 'bg-slate-950 text-slate-400'}`}
+                  >
+                    <option value="">-- Unassigned Teacher 3 --</option>
+                    {csvTeacherInitials.map((initial) => (
+                      <option key={`csv-3-${initial}`} value={initial}>
+                        {initial} (from CSV, not mapped)
+                      </option>
+                    ))}
+                    {teachers.map((t) => {
+                      const idToUse = t.teacher_id || t.clerkId || t._id.toString();
+                      return (
+                        <option key={`t3-${t._id}`} value={idToUse}>
+                          {t.fullName} {t.teacher_id ? `(${t.teacher_id})` : ""}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                {Array.isArray(slot.sessions) && slot.sessions.length > 3 ? (
+                  <p className="text-xs text-amber-200">
+                    This period has {slot.sessions.length} combinations in source data. Editor currently supports 3 slots; extra combinations remain until you edit/save this period.
+                  </p>
+                ) : null}
               </div>
             </GlassCard>
           ))}
@@ -417,7 +742,7 @@ export default function OnlineSchedulerPage() {
             <h2 className="mb-2 text-xl font-bold text-white flex items-center gap-2">
               <Clock className="h-5 w-5 text-cyan-400" /> Configure Bell Schedule
             </h2>
-            <p className="mb-6 text-sm text-slate-400">Set the exact Start and End time for each of the 7 periods. Add your 10-minute gaps or breaks by adjusting the times.</p>
+            <p className="mb-6 text-sm text-slate-400">Set the exact Start and End time for each period. Add your 10-minute gaps or breaks by adjusting the times.</p>
             
             <div className="space-y-3 mb-6 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
               {bellTimings.map((bell, index) => (

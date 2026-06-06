@@ -11,6 +11,7 @@ export type LearnCategory = {
 
 export const primaryNavLinks: NavLink[] = [
   { label: "Home", href: "/" },
+  { label: "Educational AI", href: "/educational-ai" },
   { label: "Articles", href: "/articles" },
   { label: "Videos", href: "/videos" },
   { label: "Practice", href: "/practice" },

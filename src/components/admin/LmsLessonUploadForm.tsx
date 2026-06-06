@@ -38,11 +38,17 @@ export default function LmsLessonUploadForm({
   const [pdf, setPdf] = useState<UploadState>({ file: null, dragActive: false });
   const [thumbnail, setThumbnail] = useState<ThumbnailState>({ file: null, dragActive: false });
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    title: string;
+    description: string;
+    subject: string;
+    classes: string[];
+    published: boolean;
+  }>({
     title: "",
     description: "",
     subject: "",
-    class: "",
+    classes: [],
     published: false,
   });
 
@@ -100,6 +106,8 @@ export default function LmsLessonUploadForm({
       setThumbnail((prev) => ({ ...prev, dragActive: false }));
     }
   }
+
+  // ─── Drop/Change Handlers ─────────────────────────────────────────────────
 
   function handleThumbnailDrop(e: React.DragEvent) {
     e.preventDefault();
@@ -168,8 +176,8 @@ export default function LmsLessonUploadForm({
       setError("Subject is required");
       return;
     }
-    if (!form.class) {
-      setError("Class is required");
+    if (!form.classes || form.classes.length === 0) {
+      setError("At least one class must be selected");
       return;
     }
     if (!pdf.file) {
@@ -201,7 +209,7 @@ export default function LmsLessonUploadForm({
           title: form.title.trim(),
           description: form.description.trim(),
           subject: form.subject,
-          class: form.class,
+          classes: form.classes,
           pdfUrl,
           thumbnail: thumbnailUrl,
           thumbnailUrl,
@@ -219,7 +227,8 @@ export default function LmsLessonUploadForm({
 
       // Capture subject/class at submission time — avoids stale closure in setTimeout.
       const submittedSubject = subjects.find((s) => s._id === form.subject);
-      const submittedClass = classes.find((c) => c._id === form.class);
+      const firstClassId = form.classes[0];
+      const submittedClass = classes.find((c) => c._id === firstClassId);
 
       // Redirect to published lesson page
       setTimeout(() => {
@@ -280,14 +289,14 @@ export default function LmsLessonUploadForm({
         </div>
       </div>
 
-      {/* Subject & Class */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Subject & Target Classes */}
+      <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-slate-200 mb-2">Subject</label>
           <select
             value={form.subject}
             onChange={(e) => {
-              setForm((prev) => ({ ...prev, subject: e.target.value, class: "" }));
+              setForm((prev) => ({ ...prev, subject: e.target.value, classes: [] }));
             }}
             className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500"
             disabled={uploading}
@@ -301,22 +310,50 @@ export default function LmsLessonUploadForm({
           </select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-200 mb-2">Class</label>
-          <select
-            value={form.class}
-            onChange={(e) => setForm((prev) => ({ ...prev, class: e.target.value }))}
-            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500"
-            disabled={uploading || !form.subject}
-          >
-            <option value="">Select class...</option>
-            {filteredClasses.map((c) => (
-              <option key={c._id} value={c._id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        {form.subject && (
+          <div>
+            <label className="block text-sm font-medium text-slate-200 mb-2">Target Classes</label>
+            {filteredClasses.length > 0 ? (
+              <div className="flex flex-wrap gap-2.5">
+                {filteredClasses.map((c) => {
+                  const isSelected = form.classes.includes(c._id);
+                  return (
+                    <button
+                      key={c._id}
+                      type="button"
+                      onClick={() => {
+                        setForm((prev) => {
+                          const isSel = prev.classes.includes(c._id);
+                          const nextClasses = isSel
+                            ? prev.classes.filter((id) => id !== c._id)
+                            : [...prev.classes, c._id];
+                          return { ...prev, classes: nextClasses };
+                        });
+                      }}
+                      className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition ${
+                        isSelected
+                          ? "border-cyan-400 bg-cyan-500/10 text-cyan-200 shadow-[0_4px_20px_rgba(34,211,238,0.15)]"
+                          : "border-slate-700 bg-slate-900 text-slate-400 hover:border-slate-600 hover:text-white"
+                      }`}
+                      disabled={uploading}
+                    >
+                      <span className={`inline-flex h-4 w-4 items-center justify-center rounded border transition-all ${
+                        isSelected ? "border-cyan-400 bg-cyan-500 text-slate-950" : "border-slate-600 bg-transparent"
+                      }`}>
+                        {isSelected ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        ) : null}
+                      </span>
+                      {c.name}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">No classes found for this subject.</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* PDF Upload */}

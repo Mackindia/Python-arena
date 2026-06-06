@@ -28,9 +28,9 @@ const MetadataSchema = z.object({
   subject: z.enum(["ai", "python", "computer-science"], {
     errorMap: () => ({ message: "Select a subject." }),
   }),
-  classSlug: z.enum(["class-6", "class-7", "class-8", "class-9", "class-10", "class-11", "class-12"], {
-    errorMap: () => ({ message: "Select a class." }),
-  }),
+  classes: z.array(
+    z.enum(["class-6", "class-7", "class-8", "class-9", "class-10", "class-11", "class-12"])
+  ).min(1, "Select at least one class."),
   description: z.string().trim().min(20, "Description must be at least 20 characters."),
 });
 
@@ -44,13 +44,13 @@ const ImageSchema = z
   .refine((file) => file.type.startsWith("image/"), "Only image files are allowed.")
   .refine((file) => file.size <= 10 * 1024 * 1024, "Thumbnail size must be 10MB or smaller.");
 
-type UploadErrors = Partial<Record<"title" | "subject" | "classSlug" | "description" | "lessonPdf" | "thumbnail", string>>;
+type UploadErrors = Partial<Record<"title" | "subject" | "classes" | "description" | "lessonPdf" | "thumbnail", string>>;
 
 export default function AdminLessonUploadForm() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState<(typeof SUBJECT_OPTIONS)[number]["value"] | "">("");
-  const [classSlug, setClassSlug] = useState<(typeof CLASS_OPTIONS)[number]["value"] | "">("");
+  const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [lessonPdf, setLessonPdf] = useState<File | null>(null);
   const [thumbnail, setThumbnail] = useState<File | null>(null);
@@ -65,13 +65,13 @@ export default function AdminLessonUploadForm() {
 
   function validateForm() {
     const nextErrors: UploadErrors = {};
-    const metadata = MetadataSchema.safeParse({ title, subject, classSlug, description });
+    const metadata = MetadataSchema.safeParse({ title, subject, classes: selectedClasses, description });
 
     if (!metadata.success) {
       const fieldErrors = metadata.error.flatten().fieldErrors;
       if (fieldErrors.title?.[0]) nextErrors.title = fieldErrors.title[0];
       if (fieldErrors.subject?.[0]) nextErrors.subject = fieldErrors.subject[0];
-      if (fieldErrors.classSlug?.[0]) nextErrors.classSlug = fieldErrors.classSlug[0];
+      if (fieldErrors.classes?.[0]) nextErrors.classes = fieldErrors.classes[0];
       if (fieldErrors.description?.[0]) nextErrors.description = fieldErrors.description[0];
     }
 
@@ -124,7 +124,7 @@ export default function AdminLessonUploadForm() {
         body: JSON.stringify({
           title: title.trim(),
           subject,
-          class: classSlug,
+          classes: selectedClasses,
           description: description.trim(),
           pdfUrl: pdfUpload.url,
           thumbnailUrl: thumbnailUpload.url,
@@ -154,8 +154,9 @@ export default function AdminLessonUploadForm() {
         throw new Error("Lesson created but the slug was missing from the response.");
       }
 
-      setSuccessMessage("Lesson published successfully. Redirecting to the lesson page...");
-      router.push(`/lms/${subject}/${classSlug}/${lessonSlug}`);
+      setSuccessMessage("Lessons published successfully. Redirecting to the first lesson page...");
+      const firstClassSlug = selectedClasses[0];
+      router.push(`/lms/${subject}/${firstClassSlug}/${lessonSlug}`);
       router.refresh();
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Failed to publish lesson.");
@@ -179,7 +180,7 @@ export default function AdminLessonUploadForm() {
           <div className="grid gap-3 sm:grid-cols-3 lg:w-[28rem] lg:grid-cols-1 xl:w-[32rem] xl:grid-cols-3">
             {[
               { label: "Cloudinary", value: "2 assets", icon: Cloud },
-              { label: "MongoDB", value: "1 lesson", icon: BookOpen },
+              { label: "MongoDB", value: "Multi-Publish", icon: BookOpen },
               { label: "Slugging", value: "Automatic", icon: Sparkles },
             ].map((item) => {
               const Icon = item.icon;
@@ -214,13 +215,13 @@ export default function AdminLessonUploadForm() {
                 {errors.title ? <span className="mt-2 block text-xs text-rose-300">{errors.title}</span> : null}
               </label>
 
-              <label className="block">
+              <label className="block md:col-span-2">
                 <span className="mb-2 block text-sm font-medium text-slate-200">Subject</span>
                 <select
                   value={subject}
                   onChange={(event) => {
                     setSubject(event.target.value as (typeof SUBJECT_OPTIONS)[number]["value"]);
-                    setClassSlug("");
+                    setSelectedClasses([]);
                   }}
                   className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-300/70"
                 >
@@ -234,22 +235,42 @@ export default function AdminLessonUploadForm() {
                 {errors.subject ? <span className="mt-2 block text-xs text-rose-300">{errors.subject}</span> : null}
               </label>
 
-              <label className="block">
-                <span className="mb-2 block text-sm font-medium text-slate-200">Class</span>
-                <select
-                  value={classSlug}
-                  onChange={(event) => setClassSlug(event.target.value as (typeof CLASS_OPTIONS)[number]["value"])}
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-300/70"
-                >
-                  <option value="" className="bg-slate-900">Select class</option>
-                  {CLASS_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value} className="bg-slate-900">
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                {errors.classSlug ? <span className="mt-2 block text-xs text-rose-300">{errors.classSlug}</span> : null}
-              </label>
+              <div className="block md:col-span-2">
+                <span className="mb-2 block text-sm font-medium text-slate-200">Target Classes</span>
+                <div className="flex flex-wrap gap-2.5">
+                  {CLASS_OPTIONS.map((option) => {
+                    const isSelected = selectedClasses.includes(option.value);
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          if (isSelected) {
+                            setSelectedClasses(selectedClasses.filter((c) => c !== option.value));
+                          } else {
+                            setSelectedClasses([...selectedClasses, option.value]);
+                          }
+                        }}
+                        className={`inline-flex items-center gap-2 rounded-2xl border px-4 py-2.5 text-xs font-semibold uppercase tracking-wider transition ${
+                          isSelected
+                            ? "border-cyan-400/40 bg-cyan-400/15 text-white shadow-[0_4px_20px_rgba(34,211,238,0.15)]"
+                            : "border-white/10 bg-black/25 text-slate-400 hover:border-white/20 hover:text-white"
+                        }`}
+                      >
+                        <span className={`inline-flex h-4 w-4 items-center justify-center rounded border transition-all ${
+                          isSelected ? "border-cyan-300 bg-cyan-400 text-slate-950" : "border-slate-500 bg-transparent"
+                        }`}>
+                          {isSelected ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                          ) : null}
+                        </span>
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {errors.classes ? <span className="mt-2 block text-xs text-rose-300">{errors.classes}</span> : null}
+              </div>
 
               <label className="block md:col-span-2">
                 <span className="mb-2 block text-sm font-medium text-slate-200">Lesson description</span>
@@ -344,9 +365,19 @@ export default function AdminLessonUploadForm() {
             </div>
             <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3 text-xs text-slate-300">
               <p>Route preview</p>
-              <p className="mt-1 break-all text-cyan-100">
-                {subject && classSlug ? `/lms/${subject}/${classSlug}/lesson-slug` : "/lms/subject/class/lesson-slug"}
-              </p>
+              {subject && selectedClasses.length > 0 ? (
+                <div className="mt-1 space-y-0.5">
+                  {selectedClasses.map((cls) => (
+                    <p key={cls} className="break-all text-cyan-100">
+                      /lms/{subject}/{cls}/[lesson-slug]
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-1 break-all text-cyan-100">
+                  /lms/subject/class/lesson-slug
+                </p>
+              )}
             </div>
           </div>
         </div>

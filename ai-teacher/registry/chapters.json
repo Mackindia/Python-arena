@@ -1,0 +1,20 @@
+[
+  {
+    "book_id": "class6_ai",
+    "chapter_number": 1,
+    "chapter_name": "Computational",
+    "subject": "Artificial Intelligence",
+    "class_level": "6",
+    "start_page": 1,
+    "end_page": 84
+  },
+  {
+    "book_id": "class6_ai_run_232021",
+    "chapter_number": 1,
+    "chapter_name": "Computational",
+    "subject": "Artificial Intelligence",
+    "class_level": "6",
+    "start_page": 1,
+    "end_page": 84
+  }
+]

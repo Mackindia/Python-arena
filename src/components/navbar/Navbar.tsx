@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Menu, X, ExternalLink } from "lucide-react";
+import { ChevronDown, Menu, X, ExternalLink, LayoutGrid, Box, ShieldAlert } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import MegaDropdown from "@/src/components/dropdown/MegaDropdown";
 import { learnMenu, primaryNavLinks } from "@/src/data/navigation";
@@ -36,18 +36,30 @@ export default function Navbar() {
 
   const isSignedIn = isClerkSignedIn || !!dbUser;
   const isLoaded = isClerkLoaded && isDbLoaded;
+  
   const [isLearnOpen, setIsLearnOpen] = useState(false);
+  const [isAppsOpen, setIsAppsOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobileLearnOpen, setIsMobileLearnOpen] = useState(false);
+  const [isMobileAppsOpen, setIsMobileAppsOpen] = useState(false);
+  const [isMobileAdminOpen, setIsMobileAdminOpen] = useState(false);
+  
   const learnRef = useRef<HTMLDivElement | null>(null);
+  const appsRef = useRef<HTMLDivElement | null>(null);
+  const adminRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function onClickOutside(event: MouseEvent) {
-      if (!learnRef.current) {
-        return;
-      }
-      if (!learnRef.current.contains(event.target as Node)) {
+      if (learnRef.current && !learnRef.current.contains(event.target as Node)) {
         setIsLearnOpen(false);
+      }
+      if (appsRef.current && !appsRef.current.contains(event.target as Node)) {
+        setIsAppsOpen(false);
+      }
+      if (adminRef.current && !adminRef.current.contains(event.target as Node)) {
+        setIsAdminOpen(false);
       }
     }
 
@@ -58,6 +70,17 @@ export default function Navbar() {
   const handleMobileMenuClose = () => {
     setIsMobileOpen(false);
     setIsMobileLearnOpen(false);
+    setIsMobileAppsOpen(false);
+    setIsMobileAdminOpen(false);
+  };
+
+  const isAdmin = user?.publicMetadata?.role === "admin" || dbUser?.role === "admin" || dbUser?.role === "super_admin";
+
+  const resolvePrimaryHref = (href: string) => {
+    if (href === "/online-class" && isAdmin) {
+      return "/admin/online-scheduler";
+    }
+    return href;
   };
 
   return (
@@ -72,7 +95,7 @@ export default function Navbar() {
             {primaryNavLinks.map((link) => (
               <Link
                 key={link.href}
-                href={link.href}
+                href={resolvePrimaryHref(link.href)}
                 className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
               >
                 {link.label}
@@ -99,52 +122,108 @@ export default function Navbar() {
           <div className="hidden items-center gap-2 lg:flex">
             {isLoaded && isSignedIn ? (
               <>
-              <Link href="/dashboard" className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
-                Dashboard
-              </Link>
-              {user?.publicMetadata?.role === "admin" && (
-                <Link href="/admin/resets" className="rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 hover:text-red-700">
-                  Resets
+                <Link href="/dashboard" className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
+                  Dashboard
                 </Link>
-              )}
-              <Link href="/dashboard/code" className="rounded-lg bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-200">
-                Web Editor
-              </Link>
-              <Link href="/dashboard/python" className="rounded-lg bg-blue-100 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-200">
-                Python Editor
-              </Link>
-              {(dbUser?.role === "admin" || dbUser?.role === "super_admin") && (
-                <>
-                  <Link href="/admin/users" className="rounded-lg px-3 py-2 text-sm font-medium text-purple-600 transition hover:bg-purple-50 hover:text-purple-700">
-                    User Mgmt
-                  </Link>
-                  <Link 
-                    href={process.env.NODE_ENV === "development" ? "http://localhost:5173" : "/admin/timetable"}
-                    target={process.env.NODE_ENV === "development" ? "_blank" : undefined}
-                    className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 transition hover:bg-indigo-50 hover:text-indigo-700"
-                  >
-                    Timetable Mgmt {process.env.NODE_ENV === "development" && <ExternalLink className="h-3 w-3" />}
-                  </Link>
-                </>
-              )}
-              {dbUser && !dbUser.isClerk ? (
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-slate-700">
-                    Hi, {dbUser.fullName}
-                  </span>
+                
+                {/* Apps Dropdown */}
+                <div className="relative" ref={appsRef}>
                   <button
-                    onClick={async () => {
-                      await fetch("/api/auth/logout", { method: "POST" });
-                      window.location.href = "/";
-                    }}
-                    className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+                    type="button"
+                    onClick={() => setIsAppsOpen((prev) => !prev)}
+                    className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                   >
-                    Sign Out
+                    <Box className="h-4 w-4" />
+                    Apps
+                    <ChevronDown className={`h-4 w-4 transition duration-200 ${isAppsOpen ? "rotate-180" : ""}`} />
                   </button>
+
+                  <AnimatePresence>
+                    {isAppsOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
+                      >
+                        <div className="mb-1 px-2 py-1.5 text-xs font-bold uppercase tracking-wide text-slate-500">Learning</div>
+                        <Link href="/dashboard/code" onClick={() => setIsAppsOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">Web Editor</Link>
+                        <Link href="/dashboard/python" onClick={() => setIsAppsOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50">Python Editor</Link>
+                        <Link href="/educational-ai" onClick={() => setIsAppsOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-cyan-700 hover:bg-cyan-50">Educational AI</Link>
+                        
+                        <div className="my-1 border-t border-slate-100"></div>
+                        <div className="mb-1 px-2 py-1.5 text-xs font-bold uppercase tracking-wide text-slate-500">School</div>
+                        <Link href="/admin/timetable" onClick={() => setIsAppsOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Timetable</Link>
+                        <Link href="/substitutions" onClick={() => setIsAppsOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Substitutions</Link>
+                        <Link href="/teacher" onClick={() => setIsAppsOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Teacher Tools</Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              ) : (
-                <UserButton afterSignOutUrl="/" />
-              )}
+
+                {/* Admin Dropdown */}
+                {isAdmin && (
+                  <div className="relative" ref={adminRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsAdminOpen((prev) => !prev)}
+                      className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-purple-600 transition hover:bg-purple-50 hover:text-purple-700"
+                    >
+                      <ShieldAlert className="h-4 w-4" />
+                      Admin
+                      <ChevronDown className={`h-4 w-4 transition duration-200 ${isAdminOpen ? "rotate-180" : ""}`} />
+                    </button>
+
+                    <AnimatePresence>
+                      {isAdminOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 8 }}
+                          transition={{ duration: 0.15, ease: "easeOut" }}
+                          className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
+                        >
+                          <Link href="/admin/users" onClick={() => setIsAdminOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">User Management</Link>
+                          <Link 
+                            href={process.env.NODE_ENV === "development" ? "http://localhost:5173" : "/admin/timetable"}
+                            target={process.env.NODE_ENV === "development" ? "_blank" : undefined}
+                            onClick={() => setIsAdminOpen(false)}
+                            className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50"
+                          >
+                            Timetable Engine {process.env.NODE_ENV === "development" && <ExternalLink className="h-3 w-3" />}
+                          </Link>
+                          {user?.publicMetadata?.role === "admin" && (
+                            <Link href="/admin/resets" onClick={() => setIsAdminOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50">Resets</Link>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+                
+                <Link href="/settings" className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
+                  Settings
+                </Link>
+
+                {dbUser && !dbUser.isClerk ? (
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-slate-700">
+                      Hi, {dbUser.fullName}
+                    </span>
+                    <button
+                      onClick={async () => {
+                        await fetch("/api/auth/logout", { method: "POST" });
+                        window.location.href = "/";
+                      }}
+                      className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <UserButton afterSignOutUrl="/" />
+                )}
               </>
             ) : (
               <>
@@ -181,7 +260,7 @@ export default function Navbar() {
                 {primaryNavLinks.map((link) => (
                   <Link
                     key={link.href}
-                    href={link.href}
+                    href={resolvePrimaryHref(link.href)}
                     onClick={handleMobileMenuClose}
                     className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                   >
@@ -193,14 +272,13 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={() => setIsMobileLearnOpen((prev) => !prev)}
-                    aria-expanded={isMobileLearnOpen}
                     className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
                   >
                     Learn
                     <ChevronDown className={`h-4 w-4 transition duration-200 ${isMobileLearnOpen ? "rotate-180" : ""}`} />
                   </button>
                   <AnimatePresence>
-                    {isMobileLearnOpen ? (
+                    {isMobileLearnOpen && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
@@ -225,19 +303,15 @@ export default function Navbar() {
                           </div>
                         ))}
                       </motion.div>
-                    ) : null}
+                    )}
                   </AnimatePresence>
                 </div>
 
                 <div className="border-t border-slate-200 pt-3">
                   {isLoaded && isSignedIn ? (
-                    <div className="flex flex-col gap-2 rounded-lg px-3 py-2">
-                      <div className="flex items-center justify-between">
-                        <Link
-                          href="/dashboard"
-                          onClick={handleMobileMenuClose}
-                          className="text-sm font-medium text-slate-700"
-                        >
+                    <div className="flex flex-col gap-1 px-2">
+                      <div className="flex items-center justify-between px-1 mb-2">
+                        <Link href="/dashboard" onClick={handleMobileMenuClose} className="text-sm font-bold text-slate-800">
                           Dashboard
                         </Link>
                         {dbUser && !dbUser.isClerk ? (
@@ -254,38 +328,73 @@ export default function Navbar() {
                           <UserButton afterSignOutUrl="/" />
                         )}
                       </div>
-                      {(dbUser?.role === "admin" || dbUser?.role === "super_admin") && (
+
+                      {/* Mobile Apps Section */}
+                      <button
+                        type="button"
+                        onClick={() => setIsMobileAppsOpen((prev) => !prev)}
+                        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                      >
+                        <div className="flex items-center gap-2"><Box className="h-4 w-4" /> Apps</div>
+                        <ChevronDown className={`h-4 w-4 transition duration-200 ${isMobileAppsOpen ? "rotate-180" : ""}`} />
+                      </button>
+                      <AnimatePresence>
+                        {isMobileAppsOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="space-y-1 overflow-hidden rounded-lg bg-slate-50 px-2 py-2"
+                          >
+                            <Link href="/dashboard/code" onClick={handleMobileMenuClose} className="block rounded-lg px-3 py-2 text-sm text-emerald-700">Web Editor</Link>
+                            <Link href="/dashboard/python" onClick={handleMobileMenuClose} className="block rounded-lg px-3 py-2 text-sm text-blue-700">Python Editor</Link>
+                            <Link href="/educational-ai" onClick={handleMobileMenuClose} className="block rounded-lg px-3 py-2 text-sm text-cyan-700">Educational AI</Link>
+                            <Link href="/admin/timetable" onClick={handleMobileMenuClose} className="block rounded-lg px-3 py-2 text-sm text-slate-700">Timetable</Link>
+                            <Link href="/substitutions" onClick={handleMobileMenuClose} className="block rounded-lg px-3 py-2 text-sm text-slate-700">Substitutions</Link>
+                            <Link href="/teacher" onClick={handleMobileMenuClose} className="block rounded-lg px-3 py-2 text-sm text-slate-700">Teacher Tools</Link>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Mobile Admin Section */}
+                      {isAdmin && (
                         <>
-                          <Link
-                            href="/admin/users"
-                            onClick={handleMobileMenuClose}
-                            className="text-sm font-medium text-purple-600"
+                          <button
+                            type="button"
+                            onClick={() => setIsMobileAdminOpen((prev) => !prev)}
+                            className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium text-purple-700 transition hover:bg-purple-50"
                           >
-                            User Mgmt
-                          </Link>
-                          <Link
-                            href={process.env.NODE_ENV === "development" ? "http://localhost:5173" : "/admin/timetable"}
-                            target={process.env.NODE_ENV === "development" ? "_blank" : undefined}
-                            onClick={handleMobileMenuClose}
-                            className="flex items-center gap-1.5 text-sm font-medium text-indigo-600"
-                          >
-                            Timetable Mgmt {process.env.NODE_ENV === "development" && <ExternalLink className="h-3 w-3" />}
-                          </Link>
+                            <div className="flex items-center gap-2"><ShieldAlert className="h-4 w-4" /> Admin</div>
+                            <ChevronDown className={`h-4 w-4 transition duration-200 ${isMobileAdminOpen ? "rotate-180" : ""}`} />
+                          </button>
+                          <AnimatePresence>
+                            {isMobileAdminOpen && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="space-y-1 overflow-hidden rounded-lg bg-purple-50/50 px-2 py-2"
+                              >
+                                <Link href="/admin/users" onClick={handleMobileMenuClose} className="block rounded-lg px-3 py-2 text-sm text-slate-700">User Mgmt</Link>
+                                <Link 
+                                  href={process.env.NODE_ENV === "development" ? "http://localhost:5173" : "/admin/timetable"}
+                                  target={process.env.NODE_ENV === "development" ? "_blank" : undefined}
+                                  onClick={handleMobileMenuClose}
+                                  className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-indigo-700"
+                                >
+                                  Timetable Engine {process.env.NODE_ENV === "development" && <ExternalLink className="h-3 w-3" />}
+                                </Link>
+                                {user?.publicMetadata?.role === "admin" && (
+                                  <Link href="/admin/resets" onClick={handleMobileMenuClose} className="block rounded-lg px-3 py-2 text-sm text-red-600">Resets</Link>
+                                )}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </>
                       )}
-                      <Link
-                        href="/dashboard/code"
-                        onClick={handleMobileMenuClose}
-                        className="text-sm font-medium text-slate-700"
-                      >
-                        Web Editor
-                      </Link>
-                      <Link
-                        href="/dashboard/python"
-                        onClick={handleMobileMenuClose}
-                        className="text-sm font-medium text-slate-700"
-                      >
-                        Python Editor
+
+                      <Link href="/settings" onClick={handleMobileMenuClose} className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
+                        Settings
                       </Link>
                     </div>
                   ) : (

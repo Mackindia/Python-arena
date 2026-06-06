@@ -177,6 +177,21 @@ export default async function DashboardPage() {
           </article>
         </section>
 
+        <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Teacher Tools</h2>
+            <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Quick Access</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <Link href="/dashboard" className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-400/40 hover:text-cyan-100">Dashboard</Link>
+            <Link href="/admin/timetable" className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-400/40 hover:text-cyan-100">Timetable</Link>
+            <Link href="/substitutions" className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-400/40 hover:text-cyan-100">Substitutions</Link>
+            <Link href="/teacher" className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-400/40 hover:text-cyan-100">Teacher Tools</Link>
+            <Link href="/educational-ai" className="rounded-xl border border-cyan-400/40 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/20">Educational AI</Link>
+            <Link href="/settings" className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-400/40 hover:text-cyan-100">Settings</Link>
+          </div>
+        </section>
+
         <section className="grid gap-4 lg:grid-cols-2">
           <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
             <h2 className="text-lg font-semibold">Enrolled Courses</h2>

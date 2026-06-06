@@ -1,0 +1,22 @@
+[
+  {
+    "book_id": "class6_ai",
+    "book_name": "Class 6 AI",
+    "class_level": "6",
+    "source_file": "class_6_Computational_thinking_AI.pdf",
+    "source_hash": "954a20f628c3818b4fb71b35aea1524b35a656abfdc89db6658a4703bda3ba55",
+    "chunk_count": 176,
+    "created_at": "2026-06-01T17:38:05.648834+00:00",
+    "updated_at": "2026-06-01T17:38:05.648834+00:00"
+  },
+  {
+    "book_id": "class6_ai_run_232021",
+    "book_name": "Class 6 AI",
+    "class_level": "6",
+    "source_file": "class_6_Computational_thinking_AI.pdf",
+    "source_hash": "954a20f628c3818b4fb71b35aea1524b35a656abfdc89db6658a4703bda3ba55",
+    "chunk_count": 176,
+    "created_at": "2026-06-01T17:50:42.496221+00:00",
+    "updated_at": "2026-06-01T17:50:42.496221+00:00"
+  }
+]

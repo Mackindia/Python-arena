@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import Editor from "@monaco-editor/react";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
@@ -13,6 +14,9 @@ interface PythonProgram {
 }
 
 export default function PythonEditorPage() {
+  const searchParams = useSearchParams();
+  const adminProgramId = searchParams.get("adminProgramId");
+
   const { isLoaded, isSignedIn } = useUser();
   const [programs, setPrograms] = useState<PythonProgram[]>([]);
   const [activeProgram, setActiveProgram] = useState<PythonProgram | null>(null);
@@ -52,9 +56,27 @@ export default function PythonEditorPage() {
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
-      fetchPrograms();
+      if (adminProgramId) {
+        fetchAdminProgram(adminProgramId);
+      } else {
+        fetchPrograms();
+      }
     }
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, adminProgramId]);
+
+  const fetchAdminProgram = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/programs/${id}?type=python`);
+      const data = await res.json();
+      if (res.ok && data.program) {
+        loadProgram(data.program);
+      } else {
+        toast.error("Failed to load user program");
+      }
+    } catch (error) {
+      toast.error("Failed to fetch admin program");
+    }
+  };
 
   // Initialize Web Worker
   useEffect(() => {
@@ -117,15 +139,22 @@ export default function PythonEditorPage() {
   // Internal save logic to be used by explicit save and auto-save
   const saveProgramData = async (currentTitle: string, currentCode: string, showToast = false) => {
     setSaveStatus("saving");
-    const payload = {
+    const payload: any = {
       id: activeProgram?._id,
       title: currentTitle,
       pythonCode: currentCode,
     };
 
+    if (adminProgramId) {
+      payload.type = "python";
+    }
+
     try {
-      const res = await fetch("/api/python-programs", {
-        method: activeProgram ? "PUT" : "POST",
+      const endpoint = adminProgramId ? "/api/admin/programs" : "/api/python-programs";
+      const method = adminProgramId ? "PUT" : (activeProgram ? "PUT" : "POST");
+
+      const res = await fetch(endpoint, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -137,10 +166,10 @@ export default function PythonEditorPage() {
         // Update active program if it's a new one
         if (!activeProgram) {
             setActiveProgram(data.program);
-            fetchPrograms();
+            if (!adminProgramId) fetchPrograms();
         } else {
             // Update programs list silently
-            setPrograms(prev => prev.map(p => p._id === data.program._id ? data.program : p));
+            if (!adminProgramId) setPrograms(prev => prev.map(p => p._id === data.program._id ? data.program : p));
         }
       } else {
         if (showToast) toast.error("Failed to save.");
@@ -215,17 +244,21 @@ export default function PythonEditorPage() {
       {/* Sidebar */}
       <div className="w-64 border-r border-slate-800 bg-slate-900 p-4 overflow-y-auto">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">Python Projects</h2>
-          <button 
-            onClick={handleNew}
-            className="rounded bg-cyan-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-cyan-500"
-          >
-            + New
-          </button>
+          <h2 className="text-lg font-bold text-white">{adminProgramId ? "Admin Mode" : "Python Projects"}</h2>
+          {!adminProgramId && (
+            <button 
+              onClick={handleNew}
+              className="rounded bg-cyan-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-cyan-500"
+            >
+              + New
+            </button>
+          )}
         </div>
         
         <div className="space-y-2">
-          {programs.length === 0 ? (
+          {adminProgramId ? (
+            <p className="text-sm text-amber-400">Viewing a student's program.</p>
+          ) : programs.length === 0 ? (
             <p className="text-sm text-slate-500">No projects yet.</p>
           ) : (
             programs.map(prog => (

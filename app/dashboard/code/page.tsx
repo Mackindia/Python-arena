@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Editor from "@monaco-editor/react";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
@@ -16,6 +17,9 @@ interface Program {
 }
 
 export default function CodeEditorPage() {
+  const searchParams = useSearchParams();
+  const adminProgramId = searchParams.get("adminProgramId");
+
   const { isLoaded, isSignedIn } = useUser();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [activeProgram, setActiveProgram] = useState<Program | null>(null);
@@ -53,9 +57,27 @@ export default function CodeEditorPage() {
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
-      fetchPrograms();
+      if (adminProgramId) {
+        fetchAdminProgram(adminProgramId);
+      } else {
+        fetchPrograms();
+      }
     }
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, adminProgramId]);
+
+  const fetchAdminProgram = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/programs/${id}?type=web`);
+      const data = await res.json();
+      if (res.ok && data.program) {
+        loadProgram(data.program);
+      } else {
+        toast.error("Failed to load user program");
+      }
+    } catch (error) {
+      toast.error("Failed to fetch admin program");
+    }
+  };
 
   const fetchPrograms = async () => {
     try {
@@ -87,7 +109,7 @@ export default function CodeEditorPage() {
 
   const handleSave = async () => {
     setIsLoading(true);
-    const payload = {
+    const payload: any = {
       id: activeProgram?._id,
       title,
       htmlCode,
@@ -95,9 +117,16 @@ export default function CodeEditorPage() {
       jsCode,
     };
 
+    if (adminProgramId) {
+      payload.type = "web";
+    }
+
     try {
-      const res = await fetch("/api/programs", {
-        method: activeProgram ? "PUT" : "POST",
+      const endpoint = adminProgramId ? "/api/admin/programs" : "/api/programs";
+      const method = adminProgramId ? "PUT" : (activeProgram ? "PUT" : "POST");
+
+      const res = await fetch(endpoint, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -105,8 +134,8 @@ export default function CodeEditorPage() {
       
       if (res.ok) {
         toast.success("Saved successfully!");
-        fetchPrograms();
-        setActiveProgram(data.program);
+        if (!adminProgramId) fetchPrograms();
+        setActiveProgram(data.program || activeProgram);
       } else {
         toast.error("Failed to save.");
       }
@@ -137,17 +166,21 @@ export default function CodeEditorPage() {
       {/* Sidebar */}
       <div className="w-64 border-r border-slate-800 bg-slate-900 p-4 overflow-y-auto">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">My Projects</h2>
-          <button 
-            onClick={handleNew}
-            className="rounded bg-cyan-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-cyan-500"
-          >
-            + New
-          </button>
+          <h2 className="text-lg font-bold text-white">{adminProgramId ? "Admin Mode" : "My Projects"}</h2>
+          {!adminProgramId && (
+            <button 
+              onClick={handleNew}
+              className="rounded bg-cyan-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-cyan-500"
+            >
+              + New
+            </button>
+          )}
         </div>
         
         <div className="space-y-2">
-          {programs.length === 0 ? (
+          {adminProgramId ? (
+            <p className="text-sm text-amber-400">Viewing a student's program.</p>
+          ) : programs.length === 0 ? (
             <p className="text-sm text-slate-500">No projects yet.</p>
           ) : (
             programs.map(prog => (

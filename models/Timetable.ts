@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const TimetableSchema = new mongoose.Schema({
   class: { type: String, required: true },
   section: { type: String, required: true },
-  group: { type: String, default: "MAIN", enum: ["MAIN", "AI", "FP", "FL"] },
+  group: { type: String, default: "MAIN" },
   day: { type: String, required: true }, // e.g., "Monday", "Tuesday"
   period_no: { type: Number, required: true },
   subject: { type: String, required: true },

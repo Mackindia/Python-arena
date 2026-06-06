@@ -5,6 +5,15 @@ import { auth } from "@clerk/nextjs/server";
 import { cookies } from "next/headers";
 import { requireSuperAdminApi } from "@/lib/admin-api";
 
+function normalizeTeacherId(raw: unknown): string {
+  if (typeof raw !== "string") return "";
+  return raw.trim().toUpperCase();
+}
+
+function isValidTeacherId(value: string): boolean {
+  return /^[A-Z0-9]{2,6}$/.test(value);
+}
+
 async function isAdmin() {
   await connectDB();
   const { userId } = await auth();
@@ -48,11 +57,35 @@ export async function PUT(req: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const nextRole = role || user.role;
+    const normalizedTeacherId = nextRole === "teacher" ? normalizeTeacherId(body.teacher_id) : "";
+
     // Check username uniqueness if modified
     if (username && username !== user.username) {
       const existing = await User.findOne({ username });
       if (existing) {
         return NextResponse.json({ error: "Username already exists" }, { status: 400 });
+      }
+    }
+
+    if (nextRole === "teacher") {
+      if (!normalizedTeacherId) {
+        return NextResponse.json({ error: "Teacher ID is required for teacher role" }, { status: 400 });
+      }
+
+      if (!isValidTeacherId(normalizedTeacherId)) {
+        return NextResponse.json(
+          { error: "Teacher ID must be 2-6 chars: A-Z or 0-9 only" },
+          { status: 400 }
+        );
+      }
+
+      const existingTeacherId = await User.findOne({
+        teacher_id: normalizedTeacherId,
+        _id: { $ne: id },
+      });
+      if (existingTeacherId) {
+        return NextResponse.json({ error: "Teacher ID already exists" }, { status: 400 });
       }
     }
 
@@ -65,7 +98,7 @@ export async function PUT(req: Request, { params }: RouteParams) {
     user.section = section;
     user.group = group || "MAIN";
     user.meet_link = meet_link;
-    user.teacher_id = body.teacher_id; // Add teacher_id update
+    user.teacher_id = normalizedTeacherId;
     if (is_active !== undefined) user.is_active = is_active;
 
     await user.save();

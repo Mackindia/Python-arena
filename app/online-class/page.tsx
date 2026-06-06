@@ -15,6 +15,66 @@ import AdminDashboard from "./AdminDashboard";
 
 import Settings from "../../models/Settings";
 
+const ONLINE_PERIODS = [1, 2, 3, 4, 5, 6];
+const DEFAULT_ONLINE_PERIODS = [
+  { period_no: 1, start_time: "08:15", end_time: "09:00" },
+  { period_no: 2, start_time: "09:15", end_time: "10:00" },
+  { period_no: 3, start_time: "10:15", end_time: "11:00" },
+  { period_no: 4, start_time: "11:15", end_time: "12:00" },
+  { period_no: 5, start_time: "12:15", end_time: "13:00" },
+  { period_no: 6, start_time: "13:15", end_time: "14:00" },
+];
+
+function matchesCanonical(periods: any[]) {
+  if (!Array.isArray(periods) || periods.length < DEFAULT_ONLINE_PERIODS.length) return false;
+
+  for (const expected of DEFAULT_ONLINE_PERIODS) {
+    const found = periods.find((p: any) => Number(p.period_no) === expected.period_no);
+    if (!found) return false;
+    if (String(found.start_time || "") !== expected.start_time) return false;
+    if (String(found.end_time || "") !== expected.end_time) return false;
+  }
+
+  return true;
+}
+
+function parseTimeToMinutes(raw: string): number | null {
+  if (!raw) return null;
+  const value = raw.trim().toLowerCase();
+  const m = value.match(/^(\d{1,2}):(\d{2})(?:\s*(am|pm))?$/i);
+  if (!m) return null;
+
+  let hours = Number(m[1]);
+  const mins = Number(m[2]);
+  const meridiem = m[3];
+
+  if (Number.isNaN(hours) || Number.isNaN(mins)) return null;
+
+  if (meridiem) {
+    if (meridiem === "pm" && hours < 12) hours += 12;
+    if (meridiem === "am" && hours === 12) hours = 0;
+  }
+
+  return hours * 60 + mins;
+}
+
+function getActivePeriodNo(periods: any[]): number | null {
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  for (const period of periods) {
+    const start = parseTimeToMinutes(period.start_time);
+    const end = parseTimeToMinutes(period.end_time);
+    if (start === null || end === null) continue;
+
+    if (nowMinutes >= start && nowMinutes <= end) {
+      return Number(period.period_no);
+    }
+  }
+
+  return null;
+}
+
 export default async function OnlineClassPage() {
   await connectDB();
 
@@ -55,8 +115,12 @@ export default async function OnlineClassPage() {
   }
 
   // Fetch periods
-  const periodsDoc = await Period.find({}).sort({ period_no: 1 }).lean();
-  const periods = JSON.parse(JSON.stringify(periodsDoc));
+  const periodsDoc = await Period.find({ period_no: { $in: ONLINE_PERIODS } }).sort({ period_no: 1 }).lean();
+  const normalizedPeriods = periodsDoc.length > 0 && matchesCanonical(periodsDoc)
+    ? periodsDoc
+    : DEFAULT_ONLINE_PERIODS;
+  const periods = JSON.parse(JSON.stringify(normalizedPeriods));
+  const activePeriodNo = getActivePeriodNo(periods);
 
   // =========================
   // ADMIN
@@ -80,10 +144,9 @@ export default async function OnlineClassPage() {
 
     if (isWindowActive) {
       timetableDoc = await Timetable.find({
-        day: todayName,
         teacher_id: teacherId,
       })
-        .sort({ period_no: 1 })
+        .sort({ day: 1, period_no: 1, class: 1, section: 1, subject: 1 })
         .lean();
 
       activeSessionsDoc = await ActiveSession.find({
@@ -107,6 +170,7 @@ export default async function OnlineClassPage() {
         activeSessions={activeSessions}
         periods={periods}
         teacher={teacher}
+        todayName={todayName}
       />
     );
   }
@@ -122,14 +186,6 @@ export default async function OnlineClassPage() {
   const classRegex = new RegExp(`^${normalizedClass}$`, "i");
   const sectionRegex = new RegExp(`^${rawSection}$`, "i");
   
-  let studentGroups = ["MAIN"];
-  if (Array.isArray(user.group)) {
-    studentGroups = ["MAIN", ...user.group];
-  } else if (typeof user.group === "string" && user.group.trim() !== "") {
-    // If the admin typed "Commerce, Painting", split it into an array
-    studentGroups = ["MAIN", ...user.group.split(",").map((g: string) => g.trim())];
-  }
-
   let timetableDoc: any[] = [];
   let activeSessionsDoc: any[] = [];
 
@@ -137,16 +193,14 @@ export default async function OnlineClassPage() {
     timetableDoc = await Timetable.find({
       class: classRegex,
       section: sectionRegex,
-      group: { $in: studentGroups },
       day: todayName,
     })
-      .sort({ period_no: 1 })
+      .sort({ period_no: 1, subject: 1 })
       .lean();
 
     activeSessionsDoc = await ActiveSession.find({
       class: classRegex,
       section: sectionRegex,
-      group: { $in: studentGroups },
       is_active: true,
     }).lean();
   }

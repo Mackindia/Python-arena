@@ -126,6 +126,111 @@ const TeacherSubjectMapping = () => {
   } = useTimetable();
   const [config, setConfig] = useState(null);
 
+  // ===== Quick Reassign Tool =====
+  const [reassignMode, setReassignMode] = useState('teacher'); // 'teacher' | 'class'
+
+  // --- Mode: Find & Replace Teacher ---
+  const [findTeacher, setFindTeacher] = useState('');
+  const [replaceTeacher, setReplaceTeacher] = useState('');
+  const [checkedSlots, setCheckedSlots] = useState({});
+
+  const foundSlots = useMemo(() => {
+    if (!findTeacher || !teacherSubjectMap) return [];
+    const slots = [];
+    Object.entries(teacherSubjectMap).forEach(([subj, classMap]) => {
+      Object.entries(classMap).forEach(([cls, teacherStr]) => {
+        if (teacherStr) {
+          const tokens = teacherStr.split(',').map(t => t.trim());
+          if (tokens.includes(findTeacher)) {
+            slots.push({ cls, subj, currentTeacher: teacherStr });
+          }
+        }
+      });
+    });
+    return slots.sort((a, b) => {
+      const numA = parseInt(a.cls); const numB = parseInt(b.cls);
+      if (numA !== numB) return numA - numB;
+      return a.cls.localeCompare(b.cls) || a.subj.localeCompare(b.subj);
+    });
+  }, [findTeacher, teacherSubjectMap]);
+
+  const foundByClass = useMemo(() => {
+    const g = {};
+    foundSlots.forEach(s => { if (!g[s.cls]) g[s.cls] = []; g[s.cls].push(s); });
+    return g;
+  }, [foundSlots]);
+
+  useEffect(() => {
+    const c = {};
+    foundSlots.forEach(s => { c[`${s.cls}|${s.subj}`] = true; });
+    setCheckedSlots(c);
+  }, [foundSlots]);
+
+  // --- Mode: Assign by Class ---
+  const [quickClassIds, setQuickClassIds] = useState([]);
+  const [quickSelections, setQuickSelections] = useState({});
+  const [quickNewTeacher, setQuickNewTeacher] = useState('');
+
+  const allClasses = useMemo(() => {
+    if (!config || !config.wings) return [];
+    return config.wings.flatMap(w => w.columns).sort((a, b) => {
+      const numA = parseInt(a); const numB = parseInt(b);
+      if (numA === numB) return a.localeCompare(b);
+      return numA - numB;
+    });
+  }, [config]);
+
+  const classSubjectsMap = useMemo(() => {
+    if (quickClassIds.length === 0) return {};
+    const map = {};
+    quickClassIds.forEach(clsId => {
+      const targetScheduleKey = Object.keys(timetables).find(k => k.replace(/\s+/g, '').toUpperCase() === clsId);
+      const schedule = targetScheduleKey ? timetables[targetScheduleKey] : null;
+      const subjs = new Set();
+      if (schedule) {
+        schedule.forEach(slot => {
+          if (slot.subject) {
+            const subjectTokens = (slot.subject.toUpperCase() === 'A/C' || slot.subject.toUpperCase() === 'F/S')
+              ? [slot.subject] : slot.subject.split('/').map(t => t.trim());
+            subjectTokens.forEach(t => { if (t) subjs.add(t); });
+          }
+        });
+      } else {
+        const wing = config.wings.find(w => w.columns.includes(clsId));
+        if (wing) wing.subjects.forEach(s => subjs.add(s));
+      }
+      map[clsId] = Array.from(subjs).sort();
+    });
+    return map;
+  }, [quickClassIds, config, timetables]);
+
+  useEffect(() => {
+    setQuickSelections(prev => {
+      const next = { ...prev }; let changed = false;
+      Object.keys(next).forEach(cls => {
+        if (!quickClassIds.includes(cls)) { delete next[cls]; changed = true; }
+        else if (classSubjectsMap[cls]) {
+          const v = next[cls].filter(s => classSubjectsMap[cls].includes(s));
+          if (v.length !== next[cls].length) { next[cls] = v; changed = true; }
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [quickClassIds, classSubjectsMap]);
+
+  const toggleSelection = (setter, item) => {
+    setter(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
+  };
+
+  const toggleSubjectSelection = (clsId, subj) => {
+    setQuickSelections(prev => {
+      const classSelections = prev[clsId] || [];
+      const newSelections = classSelections.includes(subj)
+        ? classSelections.filter(s => s !== subj) : [...classSelections, subj];
+      return { ...prev, [clsId]: newSelections };
+    });
+  };
+
   const allCurrentSubjects = useMemo(() => {
     if (!config || !config.wings) return [];
     const subjs = new Set();
@@ -665,6 +770,208 @@ const TeacherSubjectMapping = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ===== Quick Teacher Reassign Tool ===== */}
+      <div style={{ background: '#f5f3ff', padding: '1.5rem', borderRadius: '8px', border: '1px solid #ddd6fe', marginBottom: '2rem', width: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#5b21b6', margin: 0 }}>Quick Teacher Reassign</h3>
+          <button onClick={() => { setFindTeacher(''); setReplaceTeacher(''); setCheckedSlots({}); setQuickClassIds([]); setQuickSelections({}); setQuickNewTeacher(''); }}
+            style={{ background: '#e0e7ff', color: '#4f46e5', border: 'none', padding: '0.35rem 0.75rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>
+            Clear All
+          </button>
+        </div>
+
+        {/* Mode Tabs */}
+        <div style={{ display: 'flex', gap: '0', marginBottom: '1.5rem', borderBottom: '2px solid #ddd6fe' }}>
+          {[{ id: 'teacher', label: 'Find & Replace Teacher' }, { id: 'class', label: 'Assign by Class' }].map(tab => (
+            <button key={tab.id} onClick={() => setReassignMode(tab.id)}
+              style={{ padding: '0.5rem 1.25rem', border: 'none', borderBottom: reassignMode === tab.id ? '3px solid #7c3aed' : '3px solid transparent', background: 'transparent', color: reassignMode === tab.id ? '#5b21b6' : '#94a3b8', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s', marginBottom: '-2px' }}>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ========== MODE: Find & Replace Teacher ========== */}
+        {reassignMode === 'teacher' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <p style={{ fontSize: '0.85rem', color: '#7c3aed', margin: 0 }}>Type a teacher's initials to see everywhere they're assigned. Check the slots you want to change, then type the replacement.</p>
+
+            {/* Step 1: Find Teacher */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#5b21b6', marginBottom: '0.5rem' }}>1. Teacher to Replace</label>
+              <input type="text" list="teacher-list" value={findTeacher}
+                onChange={(e) => setFindTeacher(e.target.value.toUpperCase().trim())}
+                placeholder="Type initials (e.g. AK)" 
+                style={{ width: '200px', padding: '0.5rem', border: '1px solid #c4b5fd', borderRadius: '4px', outline: 'none', fontWeight: 600 }} />
+            </div>
+
+            {/* Step 2: Found Assignments */}
+            {findTeacher && foundSlots.length > 0 && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#5b21b6' }}>2. Found {foundSlots.length} assignment(s) — uncheck slots you want to keep</label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button onClick={() => { const c = {}; foundSlots.forEach(s => { c[`${s.cls}|${s.subj}`] = true; }); setCheckedSlots(c); }}
+                      style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', border: '1px solid #c4b5fd', borderRadius: '3px', background: '#fff', color: '#5b21b6', cursor: 'pointer', fontWeight: 600 }}>
+                      Check All
+                    </button>
+                    <button onClick={() => setCheckedSlots({})}
+                      style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', border: '1px solid #c4b5fd', borderRadius: '3px', background: '#fff', color: '#5b21b6', cursor: 'pointer', fontWeight: 600 }}>
+                      Uncheck All
+                    </button>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '280px', overflowY: 'auto', padding: '1rem', border: '1px solid #c4b5fd', borderRadius: '6px', background: '#fff' }}>
+                  {Object.entries(foundByClass).map(([cls, slots]) => (
+                    <div key={cls} style={{ borderBottom: '1px dashed #e2e8f0', paddingBottom: '0.5rem' }}>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569', marginBottom: '0.4rem' }}>Class {cls}:</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        {slots.map(slot => {
+                          const key = `${slot.cls}|${slot.subj}`;
+                          const isChecked = !!checkedSlots[key];
+                          return (
+                            <label key={key}
+                              style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.3rem 0.6rem', borderRadius: '6px', cursor: 'pointer', border: isChecked ? '2px solid #7c3aed' : '1px solid #e2e8f0', background: isChecked ? '#ede9fe' : '#f8fafc', transition: 'all 0.15s', minWidth: '100px' }}>
+                              <input type="checkbox" checked={isChecked} onChange={(e) => setCheckedSlots(prev => ({ ...prev, [key]: e.target.checked }))} style={{ accentColor: '#7c3aed' }} />
+                              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1e293b' }}>{slot.subj}</span>
+                                <span style={{ fontSize: '0.6rem', color: '#64748b' }}>{slot.currentTeacher}</span>
+                              </div>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {findTeacher && foundSlots.length === 0 && (
+              <div style={{ padding: '1rem', background: '#fef2f2', borderRadius: '6px', border: '1px solid #fecaca', color: '#991b1b', fontSize: '0.85rem' }}>
+                No assignments found for teacher <strong>{findTeacher}</strong>. Check spelling or try a different initial.
+              </div>
+            )}
+
+            {/* Step 3: Replace With */}
+            {Object.values(checkedSlots).some(v => v) && (
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
+                <div style={{ flex: 1, maxWidth: '200px' }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#5b21b6', marginBottom: '0.5rem' }}>3. Replace with</label>
+                  <input type="text" list="teacher-list" value={replaceTeacher}
+                    onChange={(e) => setReplaceTeacher(e.target.value.toUpperCase())}
+                    placeholder="New initials (e.g. BK)" 
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #c4b5fd', borderRadius: '4px', outline: 'none', fontWeight: 600 }} />
+                </div>
+                <button className="btn" disabled={!replaceTeacher.trim()}
+                  style={{ background: replaceTeacher.trim() ? '#7c3aed' : '#c4b5fd', color: 'white', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '4px', fontWeight: 600, cursor: replaceTeacher.trim() ? 'pointer' : 'not-allowed', height: '37px' }}
+                  onClick={() => {
+                    const newT = replaceTeacher.trim().toUpperCase();
+                    if (!newT) return;
+                    if (!teachers.includes(newT)) {
+                      if (!window.confirm(`Teacher ${newT} is not in the system. Add them and proceed?`)) return;
+                      addNewTeacher(newT);
+                    }
+                    const slotsToChange = foundSlots.filter(s => checkedSlots[`${s.cls}|${s.subj}`]);
+                    setTeacherSubjectMap(prev => {
+                      const next = { ...prev };
+                      slotsToChange.forEach(slot => {
+                        const current = next[slot.subj]?.[slot.cls] || '';
+                        const tokens = current.split(',').map(t => t.trim());
+                        const replaced = tokens.map(t => t === findTeacher ? newT : t);
+                        const deduped = [...new Set(replaced)];
+                        if (!next[slot.subj]) next[slot.subj] = {};
+                        next[slot.subj][slot.cls] = deduped.join(', ');
+                      });
+                      return next;
+                    });
+                    alert(`Replaced ${findTeacher} → ${newT} in ${slotsToChange.length} slot(s)!\nRemember to click "Sync to Timetable" to push changes.`);
+                    setFindTeacher(''); setReplaceTeacher(''); setCheckedSlots({});
+                  }}>
+                  Apply Replacement
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ========== MODE: Assign by Class ========== */}
+        {reassignMode === 'class' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <p style={{ fontSize: '0.85rem', color: '#7c3aed', margin: 0 }}>Select classes, pick subjects, and assign a teacher directly.</p>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#5b21b6', marginBottom: '0.5rem' }}>1. Select Class(es)</label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', maxHeight: '120px', overflowY: 'auto', padding: '0.5rem', border: '1px solid #c4b5fd', borderRadius: '6px', background: '#fff' }}>
+                {allClasses.map(cls => (
+                  <button key={cls} onClick={() => toggleSelection(setQuickClassIds, cls)}
+                    style={{ padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', border: quickClassIds.includes(cls) ? 'none' : '1px solid #ddd6fe', background: quickClassIds.includes(cls) ? '#7c3aed' : '#fff', color: quickClassIds.includes(cls) ? '#fff' : '#6d28d9', transition: 'all 0.2s' }}>
+                    {cls}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {quickClassIds.length > 0 && (
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#5b21b6', marginBottom: '0.5rem' }}>2. Select Subject(s) per Class</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '300px', overflowY: 'auto', padding: '1rem', border: '1px solid #c4b5fd', borderRadius: '6px', background: '#fff' }}>
+                  {quickClassIds.map(cls => (
+                    <div key={cls} style={{ borderBottom: '1px dashed #e2e8f0', paddingBottom: '0.75rem' }}>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#475569', marginBottom: '0.5rem' }}>Class {cls} Subjects:</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        {(classSubjectsMap[cls] || []).map(subj => {
+                          const isSelected = (quickSelections[cls] || []).includes(subj);
+                          const currentTeacher = teacherSubjectMap[subj]?.[cls] || "—";
+                          return (
+                            <button key={subj} onClick={() => toggleSubjectSelection(cls, subj)}
+                              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0.35rem 0.6rem', borderRadius: '6px', cursor: 'pointer', border: isSelected ? 'none' : '1px solid #ddd6fe', background: isSelected ? '#8b5cf6' : '#fff', color: isSelected ? '#fff' : '#5b21b6', transition: 'all 0.2s', minWidth: '80px' }}>
+                              <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>{subj}</span>
+                              <span style={{ fontSize: '0.65rem', fontWeight: 600, opacity: 0.6 }}>({currentTeacher})</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {Object.values(quickSelections).some(arr => arr.length > 0) && (
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
+                <div style={{ flex: 1, maxWidth: '300px' }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#5b21b6', marginBottom: '0.5rem' }}>3. Assign Teacher (use commas for multiple)</label>
+                  <input type="text" list="teacher-list" value={quickNewTeacher} onChange={(e) => setQuickNewTeacher(e.target.value.toUpperCase())}
+                    placeholder="e.g. AK or AK, BK, CK" style={{ width: '100%', padding: '0.5rem', border: '1px solid #c4b5fd', borderRadius: '4px', outline: 'none' }} />
+                </div>
+                <button className="btn" disabled={!quickNewTeacher}
+                  style={{ background: quickNewTeacher ? '#7c3aed' : '#c4b5fd', color: 'white', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '4px', fontWeight: 600, cursor: quickNewTeacher ? 'pointer' : 'not-allowed', height: '37px' }}
+                  onClick={() => {
+                    const newT = quickNewTeacher.trim().toUpperCase();
+                    if (!newT) return;
+                    const teacherTokens = newT.split(',').map(t => t.trim()).filter(Boolean);
+                    const missing = teacherTokens.filter(t => !teachers.includes(t));
+                    if (missing.length > 0) {
+                      if (!window.confirm(`Teacher(s) ${missing.join(', ')} not in system. Add them?`)) return;
+                      missing.forEach(t => addNewTeacher(t));
+                    }
+                    const formatted = teacherTokens.join(', ');
+                    setTeacherSubjectMap(prev => {
+                      const nextMap = { ...prev };
+                      Object.entries(quickSelections).forEach(([cls, subjects]) => {
+                        subjects.forEach(subj => { if (!nextMap[subj]) nextMap[subj] = {}; nextMap[subj][cls] = formatted; });
+                      });
+                      return nextMap;
+                    });
+                    const total = Object.values(quickSelections).reduce((a, c) => a + c.length, 0);
+                    alert(`Assigned "${formatted}" to ${total} slot(s)! Click "Sync to Timetable" to push changes.`);
+                    setQuickClassIds([]); setQuickSelections({}); setQuickNewTeacher('');
+                  }}>
+                  Apply Assignment
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

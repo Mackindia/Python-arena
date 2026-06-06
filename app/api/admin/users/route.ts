@@ -1,8 +1,18 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../lib/mongodb";
 import User from "../../../../models/User";
+import Timetable from "../../../../models/Timetable";
 import { auth } from "@clerk/nextjs/server";
 import { cookies } from "next/headers";
+
+function normalizeTeacherId(raw: unknown): string {
+  if (typeof raw !== "string") return "";
+  return raw.trim().toUpperCase();
+}
+
+function isValidTeacherId(value: string): boolean {
+  return /^[A-Z0-9]{2,6}$/.test(value);
+}
 
 // Helper to verify if request is from an admin
 async function isAdmin() {
@@ -12,7 +22,7 @@ async function isAdmin() {
   const { userId } = await auth();
   if (userId) {
     const user = await User.findOne({ clerkId: userId });
-    return user?.role === "admin";
+    return user?.role === "admin" || user?.role === "super_admin";
   }
 
   // Check local session cookie
@@ -20,7 +30,7 @@ async function isAdmin() {
   const localUserId = cookieStore.get("local_user_id")?.value;
   if (localUserId) {
     const user = await User.findById(localUserId);
-    return user?.role === "admin";
+    return user?.role === "admin" || user?.role === "super_admin";
   }
 
   return false;
@@ -50,9 +60,28 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const { fullName, username, password, role, class: cls, section, group, meet_link, is_active } = body;
+    const normalizedTeacherId = role === "teacher" ? normalizeTeacherId(body.teacher_id) : "";
 
     if (!fullName || !username || !password || !role) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    if (role === "teacher") {
+      if (!normalizedTeacherId) {
+        return NextResponse.json({ error: "Teacher ID is required for teacher role" }, { status: 400 });
+      }
+
+      if (!isValidTeacherId(normalizedTeacherId)) {
+        return NextResponse.json(
+          { error: "Teacher ID must be 2-6 chars: A-Z or 0-9 only" },
+          { status: 400 }
+        );
+      }
+
+      const existingTeacherId = await User.findOne({ teacher_id: normalizedTeacherId });
+      if (existingTeacherId) {
+        return NextResponse.json({ error: "Teacher ID already exists" }, { status: 400 });
+      }
     }
 
     // Check if username already exists in MongoDB
@@ -112,9 +141,17 @@ export async function POST(req: Request) {
       section,
       group: group || "MAIN",
       meet_link,
-      teacher_id: body.teacher_id, // Links to timetable shortcode
+      teacher_id: normalizedTeacherId, // Links to timetable shortcode
       is_active: is_active !== undefined ? is_active : true,
     });
+
+    // Auto-map timetable rows created from CSV initials once a teacher account is created.
+    if (role === "teacher" && normalizedTeacherId) {
+      await Timetable.updateMany(
+        { teacher_id: new RegExp(`^${normalizedTeacherId}$`, "i") },
+        { $set: { teacher_name: fullName } }
+      );
+    }
 
     return NextResponse.json({ success: true, user: newUser });
   } catch (error: any) {

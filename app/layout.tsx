@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import ClerkUserSync from "@/src/components/auth/ClerkUserSync";
+import HashEducationalAIRedirect from "@/src/components/educational-ai/HashEducationalAIRedirect";
 import Navbar from "@/src/components/navbar/Navbar";
 import NoticeBoard from "@/src/components/dashboard/NoticeBoard";
 import Footer from "@/src/components/footer/Footer";
@@ -58,20 +59,21 @@ export default function RootLayout({
   }
 
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
-        suppressHydrationWarning
-      >
-        <body className="min-h-full flex flex-col" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <ClerkProvider>
           <ClerkUserSync />
+          <HashEducationalAIRedirect />
           <Navbar />
           <NoticeBoard />
           <main className="flex-1">{children}</main>
           <Footer />
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }
