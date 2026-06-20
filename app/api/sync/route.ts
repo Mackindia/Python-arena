@@ -32,12 +32,12 @@ export async function GET(req: Request) {
       version: syncStore.version,
       updatedAt: syncStore.updatedAt,
       updatedBy: syncStore.updatedBy,
-      timetables: syncStore.timetables || {},
-      teacherSubjectMap: syncStore.teacherSubjectMap || {},
-      loadMaster: syncStore.loadMaster || [],
-      masterClasses: syncStore.masterClasses || [],
-      substitutions: syncStore.substitutions || {},
-      absentTeachers: syncStore.absentTeachers || {},
+      timetables: syncStore.timetables,
+      teacherSubjectMap: syncStore.teacherSubjectMap,
+      loadMaster: syncStore.loadMaster,
+      masterClasses: syncStore.masterClasses,
+      substitutions: syncStore.substitutions,
+      absentTeachers: syncStore.absentTeachers,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
