@@ -128,7 +128,12 @@ const Mastersheet = () => {
                 teacherSubjectMap: localStorage.getItem('teacherSubjectMap'),
                 addedTeachers: localStorage.getItem('addedTeachers'),
                 deletedTeachers: localStorage.getItem('deletedTeachers'),
-                deletedSubjects: localStorage.getItem('deletedSubjects')
+                deletedSubjects: localStorage.getItem('deletedSubjects'),
+                loadMaster: localStorage.getItem('loadMaster'),
+                masterClasses: localStorage.getItem('masterClasses'),
+                teacherSlotUsage: localStorage.getItem('teacherSlotUsage'),
+                substitutions: localStorage.getItem('substitutions'),
+                absentTeachers: localStorage.getItem('absentTeachers')
               };
               const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
               const a = document.createElement('a');
@@ -140,15 +145,15 @@ const Mastersheet = () => {
           >
             💾 Export Backup
           </button>
-          
-          <label 
-            className="btn btn-primary" 
+
+          <label
+            className="btn btn-primary"
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem', background: '#ef4444', border: 'none', cursor: 'pointer' }}
             title="Restore your timetable data from a previously downloaded JSON backup file"
           >
             ↩️ Restore Backup
-            <input 
-              type="file" 
+            <input
+              type="file"
               accept=".json"
               style={{ display: 'none' }}
               onChange={(e) => {
@@ -158,7 +163,7 @@ const Mastersheet = () => {
                 reader.onload = (event) => {
                   try {
                     const data = JSON.parse(event.target.result);
-                    
+
                     const safeSet = (key, value) => {
                       if (!value) return;
                       const stringVal = typeof value === 'string' ? value : JSON.stringify(value);
@@ -170,6 +175,11 @@ const Mastersheet = () => {
                     safeSet('addedTeachers', data.addedTeachers);
                     safeSet('deletedTeachers', data.deletedTeachers);
                     safeSet('deletedSubjects', data.deletedSubjects);
+                    safeSet('loadMaster', data.loadMaster);
+                    safeSet('masterClasses', data.masterClasses);
+                    safeSet('teacherSlotUsage', data.teacherSlotUsage);
+                    safeSet('substitutions', data.substitutions);
+                    safeSet('absentTeachers', data.absentTeachers);
                     
                     alert('Backup Restored Successfully! The page will now reload.');
                     window.location.reload();

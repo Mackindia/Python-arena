@@ -7,7 +7,8 @@
       "mcp__jetro__jet_exec",
       "mcp__jetro__jet_render",
       "PowerShell(npm run *)",
-      "PowerShell(railway *)"
+      "PowerShell(railway *)",
+      "PowerShell(git push *)"
     ]
   },
   "enableAllProjectMcpServers": true,
