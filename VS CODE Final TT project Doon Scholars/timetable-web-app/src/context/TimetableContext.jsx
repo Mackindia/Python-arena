@@ -76,7 +76,8 @@ export const TimetableProvider = ({ children }) => {
   // Sync service state
   const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'synced' | 'receiving'
   const syncReady = useRef(false);   // only push after initial hydration
-  const syncPushTimer = useRef(null);
+  const syncPushTimers = useRef({});
+  const isRemoteUpdate = useRef(false);
 
   useEffect(() => {
     // Helper function to safely parse JSON from localStorage
@@ -145,6 +146,7 @@ export const TimetableProvider = ({ children }) => {
 
   // ── Sync Service: receive remote changes ──────────────────────────────────
   const onRemoteChange = useCallback((payload) => {
+    isRemoteUpdate.current = true;
     setSyncStatus('receiving');
 
     if (payload.timetables && typeof payload.timetables === 'object') {
@@ -182,7 +184,10 @@ export const TimetableProvider = ({ children }) => {
       localStorage.setItem('absentTeachers', JSON.stringify(payload.absentTeachers));
     }
 
-    setTimeout(() => setSyncStatus('synced'), 400);
+    setTimeout(() => {
+      isRemoteUpdate.current = false;
+      setSyncStatus('synced');
+    }, 600);
     setTimeout(() => setSyncStatus('idle'), 2500);
   }, []);
 
@@ -191,12 +196,14 @@ export const TimetableProvider = ({ children }) => {
     return () => syncService.destroy();
   }, [onRemoteChange]);
 
-  // ── Sync Service: push local changes (debounced 800ms) ───────────────────
-  const debouncedPush = useCallback((payload) => {
+  // ── Sync Service: push local changes (debounced 800ms per field) ──────────
+  const debouncedPushField = useCallback((fieldName, fieldData) => {
     if (!syncReady.current) return;
-    clearTimeout(syncPushTimer.current);
-    syncPushTimer.current = setTimeout(() => {
-      syncService.push(payload);
+    if (isRemoteUpdate.current) return;
+
+    clearTimeout(syncPushTimers.current[fieldName]);
+    syncPushTimers.current[fieldName] = setTimeout(() => {
+      syncService.push({ [fieldName]: fieldData });
       setSyncStatus('synced');
       setTimeout(() => setSyncStatus('idle'), 2000);
     }, 800);
@@ -204,28 +211,39 @@ export const TimetableProvider = ({ children }) => {
 
   useEffect(() => {
     if (!syncReady.current || Object.keys(timetables).length === 0) return;
-    debouncedPush({ timetables });
-  }, [timetables, debouncedPush]);
+    if (isRemoteUpdate.current) return;
+    debouncedPushField('timetables', timetables);
+  }, [timetables, debouncedPushField]);
 
   useEffect(() => {
     if (!syncReady.current || !teacherSubjectMap || Object.keys(teacherSubjectMap).length === 0) return;
-    debouncedPush({ teacherSubjectMap });
-  }, [teacherSubjectMap, debouncedPush]);
+    if (isRemoteUpdate.current) return;
+    debouncedPushField('teacherSubjectMap', teacherSubjectMap);
+  }, [teacherSubjectMap, debouncedPushField]);
 
   useEffect(() => {
     if (!syncReady.current || loadMaster.length === 0) return;
-    debouncedPush({ loadMaster });
-  }, [loadMaster, debouncedPush]);
+    if (isRemoteUpdate.current) return;
+    debouncedPushField('loadMaster', loadMaster);
+  }, [loadMaster, debouncedPushField]);
 
   useEffect(() => {
     if (!syncReady.current || masterClasses.length === 0) return;
-    debouncedPush({ masterClasses });
-  }, [masterClasses, debouncedPush]);
+    if (isRemoteUpdate.current) return;
+    debouncedPushField('masterClasses', masterClasses);
+  }, [masterClasses, debouncedPushField]);
 
   useEffect(() => {
     if (!syncReady.current) return;
-    debouncedPush({ substitutions, absentTeachers });
-  }, [substitutions, absentTeachers, debouncedPush]);
+    if (isRemoteUpdate.current) return;
+
+    clearTimeout(syncPushTimers.current['subs_absent']);
+    syncPushTimers.current['subs_absent'] = setTimeout(() => {
+      syncService.push({ substitutions, absentTeachers });
+      setSyncStatus('synced');
+      setTimeout(() => setSyncStatus('idle'), 2000);
+    }, 800);
+  }, [substitutions, absentTeachers]);
 
   // Save to local storage whenever state changes
   useEffect(() => {
