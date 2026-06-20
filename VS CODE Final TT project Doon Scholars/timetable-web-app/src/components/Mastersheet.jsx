@@ -8,7 +8,7 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 const Mastersheet = () => {
-  const { timetables, classes, checkTeacherCollision, updateSlot, teachers, loadMaster, teacherSubjectMap, getAllowedSubjectsForClass } = useTimetable();
+  const { timetables, classes, checkTeacherCollision, updateSlot, teachers, loadMaster, teacherSubjectMap, getAllowedSubjectsForClass, importBackup } = useTimetable();
   const [selectedDay, setSelectedDay] = useState('Mon');
   const [editMode, setEditMode] = useState(false);
   const [adminOverride, setAdminOverride] = useState(false);
@@ -160,29 +160,10 @@ const Mastersheet = () => {
                 const file = e.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
-                reader.onload = (event) => {
+                reader.onload = async (event) => {
                   try {
                     const data = JSON.parse(event.target.result);
-
-                    const safeSet = (key, value) => {
-                      if (!value) return;
-                      const stringVal = typeof value === 'string' ? value : JSON.stringify(value);
-                      localStorage.setItem(key, stringVal);
-                    };
-
-                    safeSet('timetables', data.timetables);
-                    safeSet('teacherSubjectMap', data.teacherSubjectMap);
-                    safeSet('addedTeachers', data.addedTeachers);
-                    safeSet('deletedTeachers', data.deletedTeachers);
-                    safeSet('deletedSubjects', data.deletedSubjects);
-                    safeSet('loadMaster', data.loadMaster);
-                    safeSet('masterClasses', data.masterClasses);
-                    safeSet('teacherSlotUsage', data.teacherSlotUsage);
-                    safeSet('substitutions', data.substitutions);
-                    safeSet('absentTeachers', data.absentTeachers);
-                    
-                    alert('Backup Restored Successfully! The page will now reload.');
-                    window.location.reload();
+                    await importBackup(data);
                   } catch (err) {
                     alert('Error parsing backup file. Make sure it is the correct JSON file.');
                   }

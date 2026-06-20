@@ -874,6 +874,74 @@ export const TimetableProvider = ({ children }) => {
     return generateTeacherUsageGrid(timetables, teachers);
   };
 
+  const importBackup = useCallback(async (backupData) => {
+    try {
+      const parseVal = (val) => {
+        if (!val) return null;
+        if (typeof val === 'string') {
+          try {
+            return JSON.parse(val);
+          } catch (e) {
+            return val;
+          }
+        }
+        return val;
+      };
+
+      const payload = {};
+      const syncKeys = ['timetables', 'teacherSubjectMap', 'loadMaster', 'masterClasses', 'substitutions', 'absentTeachers'];
+      syncKeys.forEach(key => {
+        if (backupData[key] !== undefined) {
+          payload[key] = parseVal(backupData[key]);
+        }
+      });
+
+      const response = await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: syncService._clientId,
+          payload
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update sync server with backup data');
+      }
+
+      const resJson = await response.json();
+      if (resJson.success) {
+        syncService._knownVersion = resJson.version;
+
+        const safeSet = (key, value) => {
+          if (!value) return;
+          const stringVal = typeof value === 'string' ? value : JSON.stringify(value);
+          localStorage.setItem(key, stringVal);
+        };
+
+        Object.keys(backupData).forEach(key => {
+          safeSet(key, backupData[key]);
+        });
+
+        if (payload.timetables) setTimetables(payload.timetables);
+        if (payload.teacherSubjectMap) setTeacherSubjectMap(payload.teacherSubjectMap);
+        if (payload.loadMaster) setLoadMaster(payload.loadMaster);
+        if (payload.masterClasses) setMasterClasses(payload.masterClasses);
+        if (payload.substitutions) setSubstitutions(payload.substitutions);
+        if (payload.absentTeachers) setAbsentTeachers(payload.absentTeachers);
+
+        alert('Backup Restored and Synced to Server Successfully! The page will now reload.');
+        window.location.reload();
+        return true;
+      } else {
+        throw new Error(resJson.error || 'Unknown server error');
+      }
+    } catch (err) {
+      alert('Error restoring backup: ' + err.message);
+      return false;
+    }
+  }, []);
+
   return (
     <TimetableContext.Provider value={{
       timetables,
@@ -910,6 +978,7 @@ export const TimetableProvider = ({ children }) => {
       unmarkTeacherAbsent,
       addNewTeacher,
       deleteTeacher,
+      importBackup,
       syncStatus
     }}>
       {children}
