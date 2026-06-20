@@ -10,7 +10,7 @@ const WING_DEFS = [
   { id: 'senior', title: 'Senior Secondary Wing (Classes 11 - 12)', headerColor: '#fb923c', rowColor: '#ffedd5', match: (cls) => ['11','12'].includes(cls) }
 ];
 
-const parseCSVConfig = () => {
+const parseCSVConfig = (loadMaster = []) => {
   const rows = rawCsvData.split('\n').filter(r => r.trim());
   const dataRows = rows.slice(1);
   
@@ -77,6 +77,28 @@ const parseCSVConfig = () => {
     }
   });
 
+  // Process live loadMaster entries to ensure dynamically added subjects/classes are mapped
+  if (Array.isArray(loadMaster)) {
+    loadMaster.forEach(item => {
+      const cls = item.class_val;
+      const subject = item.subject;
+      const classId = item.class_id.toUpperCase();
+      
+      const wingDef = WING_DEFS.find(w => w.match(cls));
+      if (wingDef) {
+        wings[wingDef.id].subjects.add(subject);
+        wings[wingDef.id].columns.add(classId);
+        
+        if (!mapForUI[subject]) {
+          mapForUI[subject] = {};
+        }
+        if (mapForUI[subject][classId] === undefined) {
+          mapForUI[subject][classId] = "";
+        }
+      }
+    });
+  }
+
   const savedDeletedTeachers = localStorage.getItem('deletedTeachers');
   let deletedTeachersList = [];
   try {
@@ -88,8 +110,18 @@ const parseCSVConfig = () => {
     title: w.title,
     headerColor: w.headerColor,
     rowColor: w.rowColor,
-    columns: Array.from(wings[w.id].columns),
-    subjects: Array.from(wings[w.id].subjects).filter(s => !deletedSubjectsList.includes(s))
+    columns: Array.from(wings[w.id].columns).sort((a, b) => {
+      const matchA = a.match(/^(\d+)(.*)$/);
+      const matchB = b.match(/^(\d+)(.*)$/);
+      if (matchA && matchB) {
+        const numA = parseInt(matchA[1], 10);
+        const numB = parseInt(matchB[1], 10);
+        if (numA !== numB) return numA - numB;
+        return matchA[2].localeCompare(matchB[2]);
+      }
+      return a.localeCompare(b);
+    }),
+    subjects: Array.from(wings[w.id].subjects).filter(s => !deletedSubjectsList.includes(s)).sort((a, b) => a.localeCompare(b))
   })).filter(w => w.columns.length > 0 && w.subjects.length > 0);
 
   // Remove deleted subjects from initialData
@@ -122,7 +154,8 @@ const TeacherSubjectMapping = () => {
     teachers, 
     addNewTeacher,
     deleteTeacher,
-    renameSubjectGlobal
+    renameSubjectGlobal,
+    loadMaster
   } = useTimetable();
   const [config, setConfig] = useState(null);
 
@@ -244,7 +277,7 @@ const TeacherSubjectMapping = () => {
 
   // Parse CSV and Initialize
   useEffect(() => {
-    const parsed = parseCSVConfig();
+    const parsed = parseCSVConfig(loadMaster);
     setConfig(parsed);
     
     // Always merge in the CSV teacher initials if they are missing from the current state!
@@ -259,7 +292,7 @@ const TeacherSubjectMapping = () => {
           hasChanges = true;
         } else {
           Object.keys(parsed.initialData[subj]).forEach(col => {
-            if (!nextMap[subj][col]) {
+            if (nextMap[subj][col] === undefined) {
               nextMap[subj][col] = parsed.initialData[subj][col];
               hasChanges = true;
             }
@@ -269,7 +302,7 @@ const TeacherSubjectMapping = () => {
       
       return hasChanges ? nextMap : prev;
     });
-  }, []); // Run ONLY once on mount
+  }, [loadMaster]); // Re-run when loadMaster changes
 
   const handleCellChange = (subject, col, value) => {
     setTeacherSubjectMap(prev => ({

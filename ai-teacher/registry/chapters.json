@@ -16,5 +16,14 @@
     "class_level": "6",
     "start_page": 1,
     "end_page": 84
+  },
+  {
+    "book_id": "ai-3-to-8-curriculum-3-to-8",
+    "chapter_number": 1,
+    "chapter_name": "Computational Thinking",
+    "subject": "AI",
+    "class_level": "3 to 8",
+    "start_page": 1,
+    "end_page": 32
   }
 ]

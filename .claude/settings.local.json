@@ -1,6 +1,17 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(dir *)",
+      "Bash(Select-Object FullName)",
+      "Bash(npm install *)",
+      "mcp__jetro__jet_exec",
+      "mcp__jetro__jet_render",
+      "PowerShell(npm run *)",
+      "PowerShell(railway *)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "jetro"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

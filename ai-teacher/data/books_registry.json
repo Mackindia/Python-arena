@@ -18,5 +18,15 @@
     "chunk_count": 176,
     "created_at": "2026-06-01T17:50:42.496221+00:00",
     "updated_at": "2026-06-01T17:50:42.496221+00:00"
+  },
+  {
+    "book_id": "ai-3-to-8-curriculum-3-to-8",
+    "book_name": "Curriculum 3 to 8",
+    "class_level": "3 to 8",
+    "source_file": "CURRICULUM_3_TO_8_AI.pdf",
+    "source_hash": "78bed53986faafb0d0b6cd171e8d84d2fda1d00b42cb7bd332aca4762c5839e0",
+    "chunk_count": 76,
+    "created_at": "2026-06-09T08:42:20.520782+00:00",
+    "updated_at": "2026-06-09T08:42:20.520782+00:00"
   }
 ]

@@ -38,5 +38,25 @@
     "indexed_at": "2026-06-01T17:50:42.496221+00:00",
     "source_file": "class_6_Computational_thinking_AI.pdf",
     "chunk_count": 176
+  },
+  {
+    "book_id": "ai-3-to-8-curriculum-3-to-8",
+    "book_name": "Curriculum 3 to 8",
+    "class_level": "3 to 8",
+    "subject": "AI",
+    "chapters": [
+      {
+        "book_id": "ai-3-to-8-curriculum-3-to-8",
+        "chapter_number": 1,
+        "chapter_name": "Computational Thinking",
+        "subject": "AI",
+        "class_level": "3 to 8",
+        "start_page": 1,
+        "end_page": 32
+      }
+    ],
+    "indexed_at": "",
+    "source_file": "CURRICULUM_3_TO_8_AI.pdf",
+    "chunk_count": 0
   }
 ]

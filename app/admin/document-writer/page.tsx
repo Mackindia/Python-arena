@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
+import EnginePageLayout from "@/src/components/admin/EnginePageLayout";
 import {
   FileText, Upload, BookOpen, ClipboardList, GraduationCap,
   Plus, Trash2, Loader2, ChevronDown, FilePlus, Eye, ExternalLink
@@ -246,21 +247,35 @@ export default function DocumentWriterPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-cyan-200/90">Document Writer</p>
-          <h1 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">Create & Edit School Documents</h1>
-          <p className="mt-2 text-sm text-slate-400">Select a format, edit like Google Docs. Each teacher gets their own copy.</p>
-        </div>
-        {isAdmin && (
-          <button onClick={() => setShowUpload(!showUpload)}
-            className="inline-flex items-center gap-2 rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-5 py-3 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-400/20">
-            <Upload className="h-4 w-4" /> Upload Format
-          </button>
-        )}
-      </div>
+    <EnginePageLayout
+      title="Document Writer"
+      category="AI Generators"
+      description="Create and edit structured school documents, holiday homework, and curriculum plans with dynamic templates."
+      quickActions={[
+        {
+          label: "New Syllabus",
+          onClick: () => { setSelectedType("syllabus"); setSelectedTemplate(""); },
+          icon: BookOpen
+        },
+        {
+          label: "New Holiday Homework",
+          onClick: () => { setSelectedType("holiday-homework"); setSelectedTemplate(""); },
+          icon: ClipboardList
+        },
+        ...(isAdmin ? [{
+          label: "Upload Format Template",
+          onClick: () => setShowUpload(prev => !prev),
+          icon: Upload
+        }] : [])
+      ]}
+      recentActivity={documents.slice(0, 4).map((doc) => ({
+        label: doc.title || "Untitled",
+        meta: doc.subject ? `${doc.subject} • ${doc.className}` : doc.type,
+        timestamp: new Date(doc.updatedAt).toLocaleDateString(),
+        onClick: () => openDocument(doc)
+      }))}
+    >
+      <div className="space-y-6">
 
       {/* Upload Template Panel (Admin) */}
       {showUpload && isAdmin && (
@@ -476,6 +491,7 @@ export default function DocumentWriterPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </EnginePageLayout>
   );
 }

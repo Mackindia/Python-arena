@@ -1,8 +1,10 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Calendar, Users, BookOpen, LayoutGrid, Settings, Layers, UserMinus, FileSpreadsheet } from 'lucide-react';
+import { Calendar, Users, BookOpen, LayoutGrid, Settings, Layers, UserMinus, FileSpreadsheet, Wifi, WifiOff } from 'lucide-react';
+import { useTimetable } from '../context/TimetableContext';
 
 const Navigation = () => {
+  const { syncStatus } = useTimetable();
 
   const handleExport = () => {
     const data = JSON.stringify(localStorage);
@@ -35,6 +37,13 @@ const Navigation = () => {
     };
     input.click();
   };
+
+  const syncColors = {
+    idle:       { dot: '#64748b', label: 'Live Sync Active',      icon: <Wifi size={14} /> },
+    synced:     { dot: '#22c55e', label: 'Changes Pushed ✓',      icon: <Wifi size={14} /> },
+    receiving:  { dot: '#3b82f6', label: 'Receiving Updates…',    icon: <Wifi size={14} /> },
+  };
+  const sc = syncColors[syncStatus] || syncColors.idle;
 
   return (
     <div className="sidebar flex flex-col justify-between h-full">
@@ -83,6 +92,39 @@ const Navigation = () => {
       </div>
 
       <div className="sidebar-nav mt-auto border-t border-slate-700 pt-4">
+
+        {/* Live Sync Status Indicator */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '8px 12px',
+          marginBottom: '8px',
+          borderRadius: '8px',
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          color: sc.dot,
+          fontSize: '0.75rem',
+          fontWeight: 600,
+          transition: 'all 0.4s ease',
+        }}>
+          <span style={{
+            width: 8, height: 8,
+            borderRadius: '50%',
+            background: sc.dot,
+            boxShadow: syncStatus !== 'idle' ? `0 0 6px 2px ${sc.dot}` : 'none',
+            animation: syncStatus === 'receiving' ? 'syncPulse 0.8s ease-in-out infinite alternate' : 'none',
+            flexShrink: 0,
+          }} />
+          <span style={{ color: '#94a3b8', fontWeight: 500 }}>{sc.label}</span>
+          <style>{`
+            @keyframes syncPulse {
+              from { opacity: 0.4; transform: scale(0.9); }
+              to   { opacity: 1;   transform: scale(1.2); }
+            }
+          `}</style>
+        </div>
+
         <button onClick={handleExport} className="nav-item w-full text-left bg-transparent border-none cursor-pointer text-slate-300 hover:text-white transition">
           <Settings size={20} className="text-cyan-400" />
           <span>Export Data</span>
@@ -97,3 +139,4 @@ const Navigation = () => {
 };
 
 export default Navigation;
+

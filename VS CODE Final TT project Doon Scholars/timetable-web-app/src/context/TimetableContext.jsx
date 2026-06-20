@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef, useCallback } from 'react';
 
 // Data imports (Using the extracted JSON data as initial state)
 import initialLoadMaster from '../data/load_master.json';
@@ -9,6 +9,7 @@ import initialTeacherMapping from '../data/teacher_mapping.json';
 import { checkTeacherCollision as engineCheckTeacherCollision } from '../services/collisionEngine';
 import { generateTeacherUsageGrid } from '../services/derivedViewEngine';
 import { rawCsvData } from '../data/csvData';
+import { syncService } from '../services/syncService';
 
 const parseCSVInitialData = () => {
   try {
@@ -72,6 +73,11 @@ export const TimetableProvider = ({ children }) => {
     }
   });
 
+  // Sync service state
+  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'synced' | 'receiving'
+  const syncReady = useRef(false);   // only push after initial hydration
+  const syncPushTimer = useRef(null);
+
   useEffect(() => {
     // Helper function to safely parse JSON from localStorage
     const safeJSONParse = (key, fallback) => {
@@ -134,7 +140,92 @@ export const TimetableProvider = ({ children }) => {
       setMasterClasses(initialMaster);
       setClasses(Object.keys(currentTT));
     }
+    syncReady.current = true;
   }, []);
+
+  // ── Sync Service: receive remote changes ──────────────────────────────────
+  const onRemoteChange = useCallback((payload) => {
+    setSyncStatus('receiving');
+
+    if (payload.timetables && typeof payload.timetables === 'object') {
+      setTimetables(payload.timetables);
+      localStorage.setItem('timetables', JSON.stringify(payload.timetables));
+    }
+    if (payload.teacherSubjectMap && typeof payload.teacherSubjectMap === 'object') {
+      setTeacherSubjectMap(payload.teacherSubjectMap);
+      localStorage.setItem('teacherSubjectMap', JSON.stringify(payload.teacherSubjectMap));
+    }
+    if (Array.isArray(payload.loadMaster)) {
+      setLoadMaster(payload.loadMaster);
+      localStorage.setItem('loadMaster', JSON.stringify(payload.loadMaster));
+    }
+    if (Array.isArray(payload.masterClasses)) {
+      setMasterClasses(payload.masterClasses);
+      localStorage.setItem('masterClasses', JSON.stringify(payload.masterClasses));
+      // Derive classes from updated masterClasses
+      const classIds = [];
+      payload.masterClasses.forEach(mc => {
+        if (mc.sections && mc.sections.length > 0) {
+          mc.sections.forEach(sec => classIds.push(`${mc.className}${sec.toLowerCase()}`));
+        } else {
+          classIds.push(mc.className);
+        }
+      });
+      setClasses(classIds);
+    }
+    if (payload.substitutions && typeof payload.substitutions === 'object') {
+      setSubstitutions(payload.substitutions);
+      localStorage.setItem('substitutions', JSON.stringify(payload.substitutions));
+    }
+    if (payload.absentTeachers && typeof payload.absentTeachers === 'object') {
+      setAbsentTeachers(payload.absentTeachers);
+      localStorage.setItem('absentTeachers', JSON.stringify(payload.absentTeachers));
+    }
+
+    setTimeout(() => setSyncStatus('synced'), 400);
+    setTimeout(() => setSyncStatus('idle'), 2500);
+  }, []);
+
+  useEffect(() => {
+    syncService.init(onRemoteChange);
+    return () => syncService.destroy();
+  }, [onRemoteChange]);
+
+  // ── Sync Service: push local changes (debounced 800ms) ───────────────────
+  const debouncedPush = useCallback((payload) => {
+    if (!syncReady.current) return;
+    clearTimeout(syncPushTimer.current);
+    syncPushTimer.current = setTimeout(() => {
+      syncService.push(payload);
+      setSyncStatus('synced');
+      setTimeout(() => setSyncStatus('idle'), 2000);
+    }, 800);
+  }, []);
+
+  useEffect(() => {
+    if (!syncReady.current || Object.keys(timetables).length === 0) return;
+    debouncedPush({ timetables });
+  }, [timetables, debouncedPush]);
+
+  useEffect(() => {
+    if (!syncReady.current || !teacherSubjectMap || Object.keys(teacherSubjectMap).length === 0) return;
+    debouncedPush({ teacherSubjectMap });
+  }, [teacherSubjectMap, debouncedPush]);
+
+  useEffect(() => {
+    if (!syncReady.current || loadMaster.length === 0) return;
+    debouncedPush({ loadMaster });
+  }, [loadMaster, debouncedPush]);
+
+  useEffect(() => {
+    if (!syncReady.current || masterClasses.length === 0) return;
+    debouncedPush({ masterClasses });
+  }, [masterClasses, debouncedPush]);
+
+  useEffect(() => {
+    if (!syncReady.current) return;
+    debouncedPush({ substitutions, absentTeachers });
+  }, [substitutions, absentTeachers, debouncedPush]);
 
   // Save to local storage whenever state changes
   useEffect(() => {
@@ -618,10 +709,31 @@ export const TimetableProvider = ({ children }) => {
         total_load: parseInt(load) || 0
       }];
     });
+
+    setTeacherSubjectMap(prev => {
+      const nextMap = { ...prev };
+      if (!nextMap[subject]) {
+        nextMap[subject] = {};
+      }
+      if (nextMap[subject][classId] === undefined) {
+        nextMap[subject][classId] = "";
+      }
+      return nextMap;
+    });
   };
 
   const removeLoadMasterEntry = (classId, subject) => {
     setLoadMaster(prev => prev.filter(item => !(item.class_id === classId && item.subject === subject)));
+    setTeacherSubjectMap(prev => {
+      const nextMap = { ...prev };
+      if (nextMap[subject]) {
+        delete nextMap[subject][classId];
+        if (Object.keys(nextMap[subject]).length === 0) {
+          delete nextMap[subject];
+        }
+      }
+      return nextMap;
+    });
   };
 
   const renameLoadMasterSubject = (classId, oldSubject, newSubject) => {
@@ -646,6 +758,22 @@ export const TimetableProvider = ({ children }) => {
         });
       }
       return nextTT;
+    });
+
+    setTeacherSubjectMap(prev => {
+      const nextMap = { ...prev };
+      if (nextMap[oldSubject]) {
+        const classMapping = nextMap[oldSubject][classId];
+        if (classMapping !== undefined) {
+          if (!nextMap[trimmed]) nextMap[trimmed] = {};
+          nextMap[trimmed][classId] = classMapping;
+          delete nextMap[oldSubject][classId];
+          if (Object.keys(nextMap[oldSubject]).length === 0) {
+            delete nextMap[oldSubject];
+          }
+        }
+      }
+      return nextMap;
     });
   };
 
@@ -781,7 +909,8 @@ export const TimetableProvider = ({ children }) => {
       markTeacherAbsent,
       unmarkTeacherAbsent,
       addNewTeacher,
-      deleteTeacher
+      deleteTeacher,
+      syncStatus
     }}>
       {children}
     </TimetableContext.Provider>

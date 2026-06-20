@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
+import EnginePageLayout from "@/src/components/admin/EnginePageLayout";
+import { Plus, Save } from "lucide-react";
 
 interface PrivateNote {
   _id: string;
@@ -183,65 +185,96 @@ export default function PrivateNotesClient() {
   };
 
   if (loading) {
-    return <div className="p-4">Loading private notes...</div>;
+    return <div className="p-4 text-slate-300">Loading private notes...</div>;
   }
 
   return (
-    <div className="flex h-full">
-      <div className="w-1/4 border-r p-4">
-        <Button onClick={handleNewNote} className="w-full mb-4">
-          New Note
-        </Button>
-        {notes.length === 0 ? (
-          <p className="text-center text-gray-500">Your private folder is empty.</p>
-        ) : (
-          <ul className="space-y-2">
-            {notes.map((note) => (
-              <li
-                key={note._id}
-                className={`cursor-pointer p-2 rounded ${selectedNote?._id === note._id ? "bg-gray-200" : "hover:bg-gray-100"}`}
-                onClick={() => setSelectedNote(note)}
-              >
-                {note.title}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      <div className="flex-1 p-4">
-        {selectedNote ? (
-          <div>
-            <Input
-              type="text"
-              value={selectedNote.title}
-              onChange={handleTitleChange}
-              onBlur={() => handleNoteUpdate(selectedNote)}
-              className="text-2xl font-bold mb-4"
-            />
-            <Textarea
-              value={selectedNote.content}
-              onChange={handleContentChange}
-              onBlur={() => handleNoteUpdate(selectedNote)}
-              className="min-h-[400px] font-mono"
-            />
-            <div className="mt-4 flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => handleNoteDelete(selectedNote._id)}
-              >
-                Delete
-              </Button>
-              <Button onClick={() => handleNoteUpdate(selectedNote)} disabled={isSaving}>
-                {isSaving ? "Saving..." : "Save"}
-              </Button>
+    <EnginePageLayout
+      title="Private Vault"
+      category="Administration"
+      description="Access and manage highly confidential administration assets, templates, and server settings."
+      quickActions={[
+        {
+          label: "New Note",
+          onClick: handleNewNote,
+          icon: Plus
+        },
+        ...(selectedNote
+          ? [
+              {
+                label: isSaving ? "Saving..." : "Save Note",
+                onClick: () => handleNoteUpdate(selectedNote),
+                icon: Save,
+                disabled: isSaving
+              }
+            ]
+          : [])
+      ]}
+    >
+      <div className="flex h-full min-h-[500px] rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
+        <div className="w-1/4 border-r border-white/10 p-4 bg-black/20">
+          {notes.length === 0 ? (
+            <p className="text-center text-xs text-slate-400">Your private folder is empty.</p>
+          ) : (
+            <ul className="space-y-1.5">
+              {notes.map((note) => (
+                <li
+                  key={note._id}
+                  className={`cursor-pointer p-2 rounded-xl text-xs transition-all ${
+                    selectedNote?._id === note._id
+                      ? "bg-cyan-500/10 border border-cyan-400/20 text-white font-medium"
+                      : "text-slate-300 hover:bg-white/5 hover:text-white border border-transparent"
+                  }`}
+                  onClick={() => setSelectedNote(note)}
+                >
+                  {note.title}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="flex-1 p-5 bg-black/10">
+          {selectedNote ? (
+            <div className="space-y-4">
+              <input
+                type="text"
+                value={selectedNote.title}
+                onChange={handleTitleChange}
+                onBlur={() => handleNoteUpdate(selectedNote)}
+                className="w-full bg-transparent text-xl font-semibold text-white outline-none border-b border-white/10 pb-2 focus:border-cyan-400/55 transition-all"
+                placeholder="Note Title"
+              />
+              <textarea
+                value={selectedNote.content}
+                onChange={handleContentChange}
+                onBlur={() => handleNoteUpdate(selectedNote)}
+                className="w-full min-h-[360px] bg-transparent text-sm text-slate-300 font-mono outline-none border border-white/5 rounded-xl p-3 bg-black/20 focus:border-cyan-400/20 transition-all"
+                placeholder="Write note contents here..."
+              />
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => handleNoteDelete(selectedNote._id)}
+                  className="rounded-xl border-white/10 hover:bg-rose-500/10 hover:text-rose-300 hover:border-rose-500/20 transition-all text-xs"
+                >
+                  Delete
+                </Button>
+                <Button
+                  onClick={() => handleNoteUpdate(selectedNote)}
+                  disabled={isSaving}
+                  className="rounded-xl bg-cyan-500 text-black hover:bg-cyan-400 transition-all text-xs font-semibold"
+                >
+                  {isSaving ? "Saving..." : "Save"}
+                </Button>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            Select a note or create a new one.
-          </div>
-        )}
+          ) : (
+            <div className="flex items-center justify-center h-full text-slate-500 text-sm">
+              Select a note or create a new one.
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </EnginePageLayout>
   );
 }

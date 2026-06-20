@@ -22,7 +22,8 @@
       "@/*": ["./*"],
       "@/components/*": ["./src/components/*"],
       "@/lib/*": ["./lib/*"],
-      "@/models/*": ["./src/models/*"]
+      "@/models/lms/*": ["./src/models/lms/*"],
+      "@/models/*": ["./src/models/*", "./models/*"]
     }
   },
   "include": [

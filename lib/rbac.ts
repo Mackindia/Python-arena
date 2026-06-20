@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
+import { cookies } from "next/headers";
 
 export type AppRole = "super_admin" | "admin" | "teacher" | "student";
 
@@ -22,6 +23,30 @@ export async function getRequestUserContext() {
   const { userId } = await auth();
 
   if (!userId) {
+    try {
+      const cookieStore = await cookies();
+      const localUserId = cookieStore.get("local_user_id")?.value;
+      if (localUserId) {
+        await connectDB();
+        const dbUser = await User.findById(localUserId).lean();
+        if (dbUser) {
+          const dbRole = normalizeRole(dbUser.role);
+          let role = dbRole;
+          let email = dbUser.email || "";
+          if (email.toLowerCase() === "abhishekr474@gmail.com") {
+            role = "super_admin";
+          }
+          return {
+            userId: null,
+            role,
+            email,
+            dbUser,
+          };
+        }
+      }
+    } catch (cookieErr) {
+      console.error("Local session cookie check failed:", cookieErr);
+    }
     return { userId: null, role: "student" as AppRole, email: "", dbUser: null };
   }
 
