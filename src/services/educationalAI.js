@@ -17,17 +17,25 @@ async function parseResponse(response) {
   return payload;
 }
 
-async function call(path, options = {}) {
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: {
-      ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
-      ...(options.headers || {}),
-    },
-    cache: "no-store",
-  });
+async function call(path, options = {}, timeoutMs = 30_000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  return parseResponse(response);
+  try {
+    const response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+        ...(options.headers || {}),
+      },
+      cache: "no-store",
+    });
+
+    return parseResponse(response);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export async function uploadBook({ file, bookName, classLevel, subject, bookId }) {
@@ -43,7 +51,7 @@ export async function uploadBook({ file, bookName, classLevel, subject, bookId }
   return call("/educational/books/upload", {
     method: "POST",
     body: form,
-  });
+  }, 300_000);
 }
 
 export async function searchTopic({ classLevel, subject, query, chapter, bookId, k = 10 }) {
@@ -69,7 +77,7 @@ export async function generateNotes({ classLevel, subject, topic, bookId }) {
       topic,
       book_id: bookId || undefined,
     }),
-  });
+  }, 120_000);
 }
 
 export async function generateMCQs({ classLevel, subject, topic, difficulty, count, bookId }) {
@@ -83,7 +91,7 @@ export async function generateMCQs({ classLevel, subject, topic, difficulty, cou
       count,
       book_id: bookId || undefined,
     }),
-  });
+  }, 120_000);
 }
 
 export async function generateQuestionBank({ classLevel, subject, topic, count, bookId }) {
@@ -96,7 +104,7 @@ export async function generateQuestionBank({ classLevel, subject, topic, count, 
       count,
       book_id: bookId || undefined,
     }),
-  });
+  }, 120_000);
 }
 
 export async function generateWorksheet({ classLevel, subject, topic, bookId }) {
@@ -108,7 +116,7 @@ export async function generateWorksheet({ classLevel, subject, topic, bookId }) 
       topic,
       book_id: bookId || undefined,
     }),
-  });
+  }, 120_000);
 }
 
 export async function getBooks() {

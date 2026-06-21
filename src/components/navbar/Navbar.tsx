@@ -6,7 +6,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, X, ExternalLink, LayoutGrid, Box, ShieldAlert } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import MegaDropdown from "@/src/components/dropdown/MegaDropdown";
-import { learnMenu, primaryNavLinks } from "@/src/data/navigation";
+import { learnMenu as fallbackLearnMenu, primaryNavLinks } from "@/src/data/navigation";
+import type { LearnCategory } from "@/src/data/navigation";
 
 export default function Navbar() {
   const { isLoaded: isClerkLoaded, isSignedIn: isClerkSignedIn, user } = useUser();
@@ -49,6 +50,40 @@ export default function Navbar() {
   const learnRef = useRef<HTMLDivElement | null>(null);
   const appsRef = useRef<HTMLDivElement | null>(null);
   const adminRef = useRef<HTMLDivElement | null>(null);
+
+  const [learnMenu, setLearnMenu] = useState<LearnCategory[]>(fallbackLearnMenu);
+
+  useEffect(() => {
+    async function fetchLearnMenu() {
+      try {
+        const [subRes, clsRes] = await Promise.all([
+          fetch("/api/lms/subjects", { cache: "no-store" }),
+          fetch("/api/lms/classes", { cache: "no-store" }),
+        ]);
+        if (!subRes.ok || !clsRes.ok) return;
+        const subData = await subRes.json();
+        const clsData = await clsRes.json();
+        const subjects: { _id: string; name: string; slug: string }[] = subData.subjects || [];
+        const classes: { _id: string; name: string; slug: string; subject: string }[] = clsData.classes || [];
+
+        const menu: LearnCategory[] = subjects.map((s) => ({
+          id: s.slug,
+          title: s.name,
+          items: classes
+            .filter((c) => c.subject === s._id)
+            .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+            .map((c) => ({ label: c.name, href: `/learn/${s.slug}/${c.slug}` })),
+        }));
+
+        if (menu.length > 0) {
+          setLearnMenu(menu);
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchLearnMenu();
+  }, []);
 
   useEffect(() => {
     function onClickOutside(event: MouseEvent) {

@@ -1,21 +1,29 @@
 const DEFAULT_API_BASE = process.env.NEXT_PUBLIC_EDUCATIONAL_AI_API_URL || "http://localhost:8000";
 
-async function requestJSON<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${DEFAULT_API_BASE}${path}`, {
-    ...options,
-    headers: {
-      ...(options.headers || {}),
-      ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
-    },
-    cache: "no-store",
-  });
+async function requestJSON<T>(path: string, options: RequestInit = {}, timeoutMs = 30_000): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  if (!response.ok) {
-    const message = await response.text().catch(() => "");
-    throw new Error(message || `Request failed with status ${response.status}`);
+  try {
+    const response = await fetch(`${DEFAULT_API_BASE}${path}`, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        ...(options.headers || {}),
+        ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const message = await response.text().catch(() => "");
+      throw new Error(message || `Request failed with status ${response.status}`);
+    }
+
+    return response.json() as Promise<T>;
+  } finally {
+    clearTimeout(timer);
   }
-
-  return response.json() as Promise<T>;
 }
 
 export type EducationalBookRecord = {
@@ -33,7 +41,7 @@ export async function uploadEducationalBook(formData: FormData) {
   return requestJSON<{ success: boolean; book_id: string; chunks: number }>("/educational/books/upload", {
     method: "POST",
     body: formData,
-  });
+  }, 300_000);
 }
 
 export async function listEducationalBooks() {
@@ -71,7 +79,7 @@ export async function generateEducationalNotes(payload: {
   return requestJSON<any>("/educational/generate/notes", {
     method: "POST",
     body: JSON.stringify(payload),
-  });
+  }, 120_000);
 }
 
 export async function generateEducationalMcq(payload: {
@@ -85,7 +93,7 @@ export async function generateEducationalMcq(payload: {
   return requestJSON<any>("/educational/generate/mcq", {
     method: "POST",
     body: JSON.stringify(payload),
-  });
+  }, 120_000);
 }
 
 export async function generateEducationalQuestionBank(payload: {
@@ -98,7 +106,7 @@ export async function generateEducationalQuestionBank(payload: {
   return requestJSON<any>("/educational/generate/question-bank", {
     method: "POST",
     body: JSON.stringify(payload),
-  });
+  }, 120_000);
 }
 
 export async function generateEducationalWorksheet(payload: {
@@ -110,5 +118,50 @@ export async function generateEducationalWorksheet(payload: {
   return requestJSON<any>("/educational/generate/worksheet", {
     method: "POST",
     body: JSON.stringify(payload),
-  });
+  }, 120_000);
+}
+
+export {
+  generateEducationalNotes as generateNotes,
+  generateEducationalMcq as generateMCQs,
+  generateEducationalQuestionBank as generateQuestionBank,
+  generateEducationalWorksheet as generateWorksheet,
+  searchEducationalKnowledge as searchTopic,
+};
+
+export async function generateEducationalLessonPlan(payload: {
+  class_level: string;
+  subject: string;
+  topic: string;
+  duration_minutes?: number;
+  book_id?: string;
+}) {
+  return requestJSON<any>("/educational/generate/lesson-plan", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }, 120_000);
+}
+
+export async function generateEducationalBloom(payload: {
+  class_level: string;
+  subject: string;
+  topic: string;
+  book_id?: string;
+}) {
+  return requestJSON<any>("/educational/generate/bloom", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }, 120_000);
+}
+
+export async function generateEducationalConceptMap(payload: {
+  class_level: string;
+  subject: string;
+  topic: string;
+  book_id?: string;
+}) {
+  return requestJSON<any>("/educational/generate/concept-map", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }, 120_000);
 }

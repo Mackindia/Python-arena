@@ -8,6 +8,8 @@ langchain-text-splitters
 langchain-google-genai
 sentence-transformers
 pdfplumber
+pymupdf
+pypdf
 faiss-cpu
 pydantic
 python-multipart

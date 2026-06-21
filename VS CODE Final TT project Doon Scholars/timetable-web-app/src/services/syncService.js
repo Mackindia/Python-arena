@@ -124,14 +124,17 @@ class SyncService {
 
   async _pushToServer(payload) {
     try {
-      await fetch('/api/sync', {
+      const res = await fetch('/api/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientId: this._clientId, payload }),
         signal: AbortSignal.timeout(5000),
       });
-    } catch {
-      // Silent — BroadcastChannel already handled same-browser sync
+      if (!res.ok) {
+        console.error(`[sync] Push failed with status ${res.status}`);
+      }
+    } catch (err) {
+      console.warn('[sync] Push to server failed:', err.message || 'network error');
     }
   }
 }

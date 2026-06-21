@@ -314,3 +314,85 @@ body {
     margin: 0;
   }
 }
+
+/* ─── Educational AI Print Styles ─────────────────────────────────────────── */
+@media print {
+  /* Reset everything to white/black */
+  html, body {
+    background: white !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  * {
+    color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Nuclear override: every element gets white bg and black text */
+  div, section, article, nav, header, footer, main, aside, p, span, li, td, th,
+  form, label, input, select, textarea {
+    background: white !important;
+    color: #000 !important;
+    border-color: #ccc !important;
+    box-shadow: none !important;
+  }
+
+  /* Override the layout wrapper */
+  .min-h-screen {
+    background: white !important;
+    padding: 0 !important;
+    min-height: auto !important;
+  }
+
+  /* Override max-width container */
+  .mx-auto {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Hide form, nav, buttons, status */
+  form, nav, button, .print\:hidden, [class*="print:hidden"] {
+    display: none !important;
+  }
+
+  /* Keep colored section borders but make them print-friendly */
+  .border-blue-400\/30 { border-color: #3b82f6 !important; border-width: 2px !important; }
+  .border-amber-400\/30 { border-color: #f59e0b !important; border-width: 2px !important; }
+  .border-purple-400\/30 { border-color: #8b5cf6 !important; border-width: 2px !important; }
+  .border-emerald-400\/30 { border-color: #10b981 !important; border-width: 2px !important; }
+  .border-rose-400\/30 { border-color: #f43f5e !important; border-width: 2px !important; }
+  .border-cyan-600 { border-color: #0891b2 !important; border-width: 2px !important; }
+
+  /* Section backgrounds */
+  .bg-cyan-400\/10, .bg-cyan-400\/5, .bg-emerald-400\/5, .bg-amber-400\/5,
+  .bg-blue-400\/5, .bg-purple-400\/5, .bg-rose-400\/5 {
+    background: #f8fafc !important;
+  }
+
+  .bg-slate-950\/70, .bg-slate-950, .bg-slate-900\/70, .bg-slate-900,
+  .bg-white\/5, .bg-white\/10 {
+    background: #f1f5f9 !important;
+    border: 1px solid #ddd !important;
+  }
+
+  /* MCQ radio buttons */
+  input[type="radio"] {
+    border: 2px solid #555 !important;
+    appearance: auto !important;
+  }
+
+  /* Page setup */
+  @page {
+    margin: 12mm;
+    size: A4;
+  }
+
+  /* Avoid page breaks inside sections */
+  .rounded-2xl, .rounded-xl {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}

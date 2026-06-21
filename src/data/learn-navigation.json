@@ -36,6 +36,8 @@
       "description": "Computer Science fundamentals"
     },
     "classes": [
+      { "name": "Class 9", "slug": "class-9" },
+      { "name": "Class 10", "slug": "class-10" },
       { "name": "Class 11", "slug": "class-11" },
       { "name": "Class 12", "slug": "class-12" }
     ]

@@ -6,6 +6,9 @@ from typing import Any
 
 from app.core.llm import get_model
 from app.educational_ai.prompts.educational_prompts import (
+    build_bloom_prompt,
+    build_concept_map_prompt,
+    build_lesson_plan_prompt,
     build_mcq_prompt,
     build_notes_prompt,
     build_question_bank_prompt,
@@ -99,3 +102,48 @@ def generate_worksheet(class_level: str, subject: str, topic: str, book_id: str 
         lambda output, ctx: {"valid": bool(output), "issues": validate_text_grounding(json.dumps(output), ctx)},
     )
     return {"worksheet": payload, "validation": validation}
+
+
+def generate_lesson_plan(class_level: str, subject: str, topic: str, duration_minutes: int = 45, book_id: str | None = None) -> dict[str, Any]:
+    context_result = search(query=topic, class_level=class_level, subject=subject, book_id=book_id, k=20)
+    context = context_result["context"]
+    prompt = build_lesson_plan_prompt(topic, class_level, subject, duration_minutes, context)
+    payload, validation = _generate_with_retry(
+        prompt,
+        context,
+        lambda output, ctx: {
+            "valid": bool(output.get("lesson_structure")),
+            "issues": validate_text_grounding(json.dumps(output), ctx),
+        },
+    )
+    return {"lesson_plan": payload, "validation": validation}
+
+
+def generate_bloom_analysis(class_level: str, subject: str, topic: str, book_id: str | None = None) -> dict[str, Any]:
+    context_result = search(query=topic, class_level=class_level, subject=subject, book_id=book_id, k=20)
+    context = context_result["context"]
+    prompt = build_bloom_prompt(topic, class_level, subject, context)
+    payload, validation = _generate_with_retry(
+        prompt,
+        context,
+        lambda output, ctx: {
+            "valid": bool(output.get("bloom_analysis")),
+            "issues": validate_text_grounding(json.dumps(output), ctx),
+        },
+    )
+    return {"bloom_analysis": payload, "validation": validation}
+
+
+def generate_concept_map(class_level: str, subject: str, topic: str, book_id: str | None = None) -> dict[str, Any]:
+    context_result = search(query=topic, class_level=class_level, subject=subject, book_id=book_id, k=20)
+    context = context_result["context"]
+    prompt = build_concept_map_prompt(topic, class_level, subject, context)
+    payload, validation = _generate_with_retry(
+        prompt,
+        context,
+        lambda output, ctx: {
+            "valid": bool(output.get("nodes")),
+            "issues": validate_text_grounding(json.dumps(output), ctx),
+        },
+    )
+    return {"concept_map": payload, "validation": validation}

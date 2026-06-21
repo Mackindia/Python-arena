@@ -87,6 +87,8 @@ export const TimetableProvider = ({ children }) => {
       try {
         const parsed = JSON.parse(item);
         if (parsed === null) return fallback;
+        if (Array.isArray(parsed) && parsed.length === 0) return fallback;
+        if (typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length === 0) return fallback;
         return parsed;
       } catch (e) {
         console.warn(`Corrupted localStorage data for key: ${key}. Resetting to default.`);
@@ -960,6 +962,50 @@ export const TimetableProvider = ({ children }) => {
     }
   }, []);
 
+  const forcePushAllToServer = useCallback(async () => {
+    try {
+      const payload = {};
+      if (Object.keys(timetables).length > 0) payload.timetables = timetables;
+      if (teacherSubjectMap && Object.keys(teacherSubjectMap).length > 0) payload.teacherSubjectMap = teacherSubjectMap;
+      if (loadMaster.length > 0) payload.loadMaster = loadMaster;
+      if (masterClasses.length > 0) payload.masterClasses = masterClasses;
+      if (Object.keys(substitutions).length > 0) payload.substitutions = substitutions;
+      if (Object.keys(absentTeachers).length > 0) payload.absentTeachers = absentTeachers;
+
+      if (Object.keys(payload).length === 0) {
+        alert('No data to push. All engines are empty locally.');
+        return false;
+      }
+
+      const response = await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: syncService._clientId,
+          payload
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Server returned ' + response.status);
+      }
+
+      const resJson = await response.json();
+      if (resJson.success) {
+        syncService._knownVersion = resJson.version;
+        setSyncStatus('synced');
+        setTimeout(() => setSyncStatus('idle'), 2000);
+        alert(`Force sync complete! Pushed ${Object.keys(payload).join(', ')} to server (version ${resJson.version}).`);
+        return true;
+      } else {
+        throw new Error(resJson.error || 'Unknown server error');
+      }
+    } catch (err) {
+      alert('Force sync failed: ' + err.message);
+      return false;
+    }
+  }, [timetables, teacherSubjectMap, loadMaster, masterClasses, substitutions, absentTeachers]);
+
   return (
     <TimetableContext.Provider value={{
       timetables,
@@ -997,6 +1043,7 @@ export const TimetableProvider = ({ children }) => {
       addNewTeacher,
       deleteTeacher,
       importBackup,
+      forcePushAllToServer,
       syncStatus
     }}>
       {children}

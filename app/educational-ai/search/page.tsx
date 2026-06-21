@@ -1,25 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import { searchTopic } from "@/src/services/educationalAI";
+import { searchTopic, type EducationalBookRecord } from "@/lib/educational-ai";
+import BookSelector from "@/src/components/educational-ai/BookSelector";
 
 export default function EducationalAISearchPage() {
-  const [form, setForm] = useState({ classLevel: "11", subject: "Python", query: "Variables", chapter: "", bookId: "" });
+  const [classLevel, setClassLevel] = useState("");
+  const [subject, setSubject] = useState("");
+  const [query, setQuery] = useState("");
+  const [chapter, setChapter] = useState("");
+  const [bookId, setBookId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<any>(null);
 
+  function handleSelectBook(book: EducationalBookRecord) {
+    setBookId(book.book_id);
+    setClassLevel(book.class_level);
+    setSubject(book.subject);
+  }
+
   async function onSearch(e: React.FormEvent) {
     e.preventDefault();
+    if (!query) {
+      setError("Please enter a search query.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
       const data = await searchTopic({
-        classLevel: form.classLevel,
-        subject: form.subject,
-        query: form.query,
-        chapter: form.chapter,
-        bookId: form.bookId,
+        class_level: classLevel || undefined,
+        subject: subject || undefined,
+        query,
+        chapter: chapter || undefined,
+        book_id: bookId || undefined,
         k: 10,
       });
       setResult(data);
@@ -33,19 +48,14 @@ export default function EducationalAISearchPage() {
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-6">
       <h2 className="text-2xl font-semibold">Knowledge Search</h2>
-      <p className="mt-1 text-sm text-slate-300">Find chapter context automatically by class, subject, and topic.</p>
+      <p className="mt-1 text-sm text-slate-300">Select a book to scope search, or leave blank to search all books.</p>
 
       <form className="mt-5 grid gap-4 sm:grid-cols-2" onSubmit={onSearch}>
-        <input value={form.classLevel} onChange={(e) => setForm((p) => ({ ...p, classLevel: e.target.value }))} className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5" placeholder="Class" />
-        <input value={form.subject} onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))} className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5" placeholder="Subject" list="subjects" />
-        <datalist id="subjects">
-          <option>Artificial Intelligence</option>
-          <option>Python</option>
-          <option>Computer Science</option>
-        </datalist>
-        <input value={form.query} onChange={(e) => setForm((p) => ({ ...p, query: e.target.value }))} className="sm:col-span-2 rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5" placeholder="Topic" />
-        <input value={form.chapter} onChange={(e) => setForm((p) => ({ ...p, chapter: e.target.value }))} className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5" placeholder="Chapter (optional)" />
-        <input value={form.bookId} onChange={(e) => setForm((p) => ({ ...p, bookId: e.target.value }))} className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5" placeholder="Book ID (optional)" />
+        <BookSelector selectedBookId={bookId} onSelectBook={handleSelectBook} />
+        <input value={classLevel} onChange={(e) => setClassLevel(e.target.value)} className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5" placeholder="Class (auto-filled)" />
+        <input value={subject} onChange={(e) => setSubject(e.target.value)} className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5" placeholder="Subject (auto-filled)" />
+        <input value={query} onChange={(e) => setQuery(e.target.value)} className="sm:col-span-2 rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5" placeholder="Search query (e.g. Computational Thinking, Algorithms)" required />
+        <input value={chapter} onChange={(e) => setChapter(e.target.value)} className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5" placeholder="Chapter filter (optional)" />
         <button disabled={loading} className="sm:col-span-2 rounded-xl bg-cyan-400 px-4 py-2.5 font-semibold text-slate-950 disabled:opacity-70">{loading ? "Searching..." : "Search"}</button>
       </form>
 

@@ -40,6 +40,7 @@ def register_book(
     source_file: str | None = None,
     source_hash: str | None = None,
     chunk_count: int | None = None,
+    subject: str | None = None,
 ) -> dict[str, Any]:
     """Register or update a book entry in books_registry.json."""
     if not book_id.strip():
@@ -59,6 +60,8 @@ def register_book(
                 entry["source_hash"] = source_hash
             if chunk_count is not None:
                 entry["chunk_count"] = chunk_count
+            if subject is not None:
+                entry["subject"] = subject
             entry["updated_at"] = now
             updated = entry
             break
@@ -68,6 +71,7 @@ def register_book(
             "book_id": book_id,
             "book_name": book_name,
             "class_level": str(class_level),
+            "subject": subject or "",
             "source_file": source_file or "",
             "source_hash": source_hash or "",
             "chunk_count": chunk_count or 0,

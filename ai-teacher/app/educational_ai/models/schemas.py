@@ -56,6 +56,28 @@ class EducationalWorksheetRequest(BaseModel):
     book_id: str | None = None
 
 
+class EducationalLessonPlanRequest(BaseModel):
+    class_level: str
+    subject: str
+    topic: str
+    duration_minutes: int = Field(default=45, ge=10, le=180)
+    book_id: str | None = None
+
+
+class EducationalBloomRequest(BaseModel):
+    class_level: str
+    subject: str
+    topic: str
+    book_id: str | None = None
+
+
+class EducationalConceptMapRequest(BaseModel):
+    class_level: str
+    subject: str
+    topic: str
+    book_id: str | None = None
+
+
 class EducationalBookRecord(BaseModel):
     book_id: str
     book_name: str

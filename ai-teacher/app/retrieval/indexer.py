@@ -191,6 +191,7 @@ def index_book(
         source_file=path.name,
         source_hash=source_hash,
         chunk_count=len(chunks),
+        subject=subject,
     )
 
     return {

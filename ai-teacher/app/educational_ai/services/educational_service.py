@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.educational_ai.generation.engine import generate_mcq, generate_notes, generate_question_bank, generate_worksheet
+from app.educational_ai.generation.engine import generate_bloom_analysis, generate_concept_map, generate_lesson_plan, generate_mcq, generate_notes, generate_question_bank, generate_worksheet
 from app.educational_ai.ingestion.engine import ingest_pdf
 from app.educational_ai.registry.store import get_book, list_books, remove_book
 from app.educational_ai.retrieval.engine import global_search, search
@@ -38,3 +38,12 @@ class EducationalService:
 
     def worksheet(self, class_level: str, subject: str, topic: str, book_id: str | None = None) -> dict[str, Any]:
         return generate_worksheet(class_level=class_level, subject=subject, topic=topic, book_id=book_id)
+
+    def lesson_plan(self, class_level: str, subject: str, topic: str, duration_minutes: int = 45, book_id: str | None = None) -> dict[str, Any]:
+        return generate_lesson_plan(class_level=class_level, subject=subject, topic=topic, duration_minutes=duration_minutes, book_id=book_id)
+
+    def bloom_analysis(self, class_level: str, subject: str, topic: str, book_id: str | None = None) -> dict[str, Any]:
+        return generate_bloom_analysis(class_level=class_level, subject=subject, topic=topic, book_id=book_id)
+
+    def concept_map(self, class_level: str, subject: str, topic: str, book_id: str | None = None) -> dict[str, Any]:
+        return generate_concept_map(class_level=class_level, subject=subject, topic=topic, book_id=book_id)

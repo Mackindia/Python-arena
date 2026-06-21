@@ -9,6 +9,9 @@ const links = [
   { href: "/educational-ai/mcq", label: "Generate MCQs" },
   { href: "/educational-ai/question-bank", label: "Question Bank" },
   { href: "/educational-ai/worksheet", label: "Worksheet" },
+  { href: "/educational-ai/lesson-plan", label: "Lesson Plan" },
+  { href: "/educational-ai/bloom", label: "Bloom's Taxonomy" },
+  { href: "/educational-ai/concept-map", label: "Concept Map" },
   { href: "/educational-ai/library", label: "Book Library" },
   { href: "/educational-ai/upload", label: "Upload Books" },
 ];
@@ -27,7 +30,7 @@ export default function EducationalAIModuleLayout({ children }: { children: Reac
           </p>
         </header>
 
-        <nav className="grid gap-2 rounded-2xl border border-white/10 bg-white/5 p-3 sm:grid-cols-2 lg:grid-cols-4">
+        <nav className="grid gap-2 rounded-2xl border border-white/10 bg-white/5 p-3 sm:grid-cols-2 lg:grid-cols-5">
           {links.map((item) => {
             const active = pathname === item.href;
             return (

@@ -5,8 +5,11 @@ from typing import Any
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from app.educational_ai.models.schemas import (
+    EducationalBloomRequest,
     EducationalBookUploadRequest,
+    EducationalConceptMapRequest,
     EducationalGlobalSearchRequest,
+    EducationalLessonPlanRequest,
     EducationalMCQRequest,
     EducationalNotesRequest,
     EducationalQuestionBankRequest,
@@ -109,6 +112,37 @@ def question_bank(request: EducationalQuestionBankRequest) -> dict[str, Any]:
 @router.post("/generate/worksheet")
 def worksheet(request: EducationalWorksheetRequest) -> dict[str, Any]:
     return service.worksheet(
+        class_level=request.class_level,
+        subject=request.subject,
+        topic=request.topic,
+        book_id=request.book_id,
+    )
+
+
+@router.post("/generate/lesson-plan")
+def lesson_plan(request: EducationalLessonPlanRequest) -> dict[str, Any]:
+    return service.lesson_plan(
+        class_level=request.class_level,
+        subject=request.subject,
+        topic=request.topic,
+        duration_minutes=request.duration_minutes,
+        book_id=request.book_id,
+    )
+
+
+@router.post("/generate/bloom")
+def bloom_analysis(request: EducationalBloomRequest) -> dict[str, Any]:
+    return service.bloom_analysis(
+        class_level=request.class_level,
+        subject=request.subject,
+        topic=request.topic,
+        book_id=request.book_id,
+    )
+
+
+@router.post("/generate/concept-map")
+def concept_map(request: EducationalConceptMapRequest) -> dict[str, Any]:
+    return service.concept_map(
         class_level=request.class_level,
         subject=request.subject,
         topic=request.topic,

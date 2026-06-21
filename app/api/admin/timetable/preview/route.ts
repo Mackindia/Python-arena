@@ -18,14 +18,14 @@ async function isAdmin() {
   const { userId } = await auth();
   if (userId) {
     const user = await User.findOne({ clerkId: userId });
-    return user?.role === "admin";
+    return user?.role === "admin" || user?.role === "super_admin";
   }
 
   const cookieStore = await cookies();
   const localUserId = cookieStore.get("local_user_id")?.value;
   if (localUserId) {
     const user = await User.findById(localUserId);
-    return user?.role === "admin";
+    return user?.role === "admin" || user?.role === "super_admin";
   }
 
   return false;

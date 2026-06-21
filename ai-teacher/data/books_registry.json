@@ -28,5 +28,27 @@
     "chunk_count": 76,
     "created_at": "2026-06-09T08:42:20.520782+00:00",
     "updated_at": "2026-06-09T08:42:20.520782+00:00"
+  },
+  {
+    "book_id": "python-11-python-basics",
+    "book_name": "Python Basics",
+    "class_level": "11",
+    "subject": "Python",
+    "source_file": "test.pdf",
+    "source_hash": "53f488eb74802fc5754df7a999b0fae76e39c0c21052f99a84e7c3e7a39b8c66",
+    "chunk_count": 3,
+    "created_at": "2026-06-21T07:12:56.114706+00:00",
+    "updated_at": "2026-06-21T07:12:56.114706+00:00"
+  },
+  {
+    "book_id": "ai-6-class-6-computational-thinking",
+    "book_name": "Class 6 Computational thinking",
+    "class_level": "6",
+    "subject": "AI",
+    "source_file": "class_6_Computational_thinking_AI.pdf",
+    "source_hash": "954a20f628c3818b4fb71b35aea1524b35a656abfdc89db6658a4703bda3ba55",
+    "chunk_count": 176,
+    "created_at": "2026-06-21T07:15:15.097379+00:00",
+    "updated_at": "2026-06-21T07:15:15.097379+00:00"
   }
 ]
