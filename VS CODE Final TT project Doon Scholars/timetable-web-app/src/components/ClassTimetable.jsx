@@ -23,18 +23,22 @@ const ClassTimetable = () => {
     
     const normalizedClassId = classId.replace(/\s+/g, '').toUpperCase();
     
-    // Get expected load from loadMaster for this class
+    // Get deleted subjects from localStorage
+    const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
+    const deletedSubjects = savedDeletedSubjects ? JSON.parse(savedDeletedSubjects) : [];
+    
+    // Get expected load from loadMaster for this class (excluding deleted subjects)
     const expectedLoad = {};
     loadMaster.forEach(item => {
-      if (item.class_id.replace(/\s+/g, '').toUpperCase() === normalizedClassId) {
+      if (item.class_id.replace(/\s+/g, '').toUpperCase() === normalizedClassId && !deletedSubjects.includes(item.subject)) {
         expectedLoad[item.subject] = item.total_load;
       }
     });
     
-    // Count actual periods in timetable for each subject
+    // Count actual periods in timetable for each subject (excluding deleted subjects)
     const actualLoad = {};
     timetables[classId].forEach(slot => {
-      if (slot.subject) {
+      if (slot.subject && !deletedSubjects.includes(slot.subject)) {
         actualLoad[slot.subject] = (actualLoad[slot.subject] || 0) + 1;
       }
     });
