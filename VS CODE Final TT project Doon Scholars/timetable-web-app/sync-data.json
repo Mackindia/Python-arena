@@ -1,6 +1,6 @@
 {
-  "version": 23,
-  "updatedAt": 1782279427282,
+  "version": 27,
+  "updatedAt": 1782281405411,
   "updatedBy": "client-1782278716975-bt7ws9",
   "timetables": {
     "1a": [
@@ -7287,15 +7287,33 @@
       {
         "day": "Mon",
         "period": 8,
-        "subject": "VE",
-        "teacher": "GA",
+        "subject": "Skill",
+        "teacher": "GA,DV,HSC",
         "assignedTeachers": [
-          "GA"
+          {
+            "teacher": "GA",
+            "clash": true,
+            "clashWith": "7a P8"
+          },
+          {
+            "teacher": "DV",
+            "clash": true,
+            "clashWith": "9b P8"
+          },
+          {
+            "teacher": "HSC",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": [
           {
             "teacher": "GA",
             "classId": "7a"
+          },
+          {
+            "teacher": "DV",
+            "classId": "9b"
           }
         ]
       },

@@ -217,7 +217,8 @@ const TeacherSubjectMapping = () => {
     if (quickClassIds.length === 0) return {};
     const map = {};
     quickClassIds.forEach(clsId => {
-      const targetScheduleKey = Object.keys(timetables).find(k => k.replace(/\s+/g, '').toUpperCase() === clsId);
+      const normalizedClsId = clsId.replace(/\s+/g, '').toUpperCase();
+      const targetScheduleKey = Object.keys(timetables).find(k => k.replace(/\s+/g, '').toUpperCase() === normalizedClsId);
       const schedule = targetScheduleKey ? timetables[targetScheduleKey] : null;
       const subjs = new Set();
       if (schedule) {
@@ -229,13 +230,22 @@ const TeacherSubjectMapping = () => {
           }
         });
       }
-      // Always include subjects from the mapping grid wings for this class
-      const wing = config.wings.find(w => w.columns.includes(clsId));
+      // Include subjects from the mapping grid wings for this class
+      const wing = config.wings.find(w => w.columns.includes(clsId) || w.columns.includes(normalizedClsId));
       if (wing) wing.subjects.forEach(s => subjs.add(s));
+      // Also include subjects from teacherSubjectMap that have an entry for this class
+      // (catches subjects added via "Add Subject Row" that may not be in loadMaster)
+      if (teacherSubjectMap) {
+        Object.keys(teacherSubjectMap).forEach(subj => {
+          if (teacherSubjectMap[subj][normalizedClsId] !== undefined) {
+            subjs.add(subj);
+          }
+        });
+      }
       map[clsId] = Array.from(subjs).sort();
     });
     return map;
-  }, [quickClassIds, config, timetables]);
+  }, [quickClassIds, config, timetables, teacherSubjectMap]);
 
   useEffect(() => {
     setQuickSelections(prev => {
