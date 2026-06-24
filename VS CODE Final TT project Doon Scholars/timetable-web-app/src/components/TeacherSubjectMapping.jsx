@@ -285,6 +285,173 @@ const TeacherSubjectMapping = () => {
     return Array.from(subjs).sort();
   }, [config]);
 
+  // ===== Safe Subject Deletion Workflow =====
+  const [deleteSubjectName, setDeleteSubjectName] = useState('');
+  const [deleteImpact, setDeleteImpact] = useState(null);
+  const [selectedDeleteWings, setSelectedDeleteWings] = useState([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Analyze which wings a subject is used in
+  const analyzeSubjectImpact = (subject) => {
+    if (!subject || !teacherSubjectMap || !config) {
+      setDeleteImpact(null);
+      return;
+    }
+
+    const impact = {
+      subject,
+      wings: [],
+      totalMappings: 0,
+      totalClasses: 0,
+      totalTimetableCells: 0
+    };
+
+    WING_DEFS.forEach(wingDef => {
+      const wingClasses = [];
+      let wingMappings = 0;
+      let wingTimetableCells = 0;
+
+      // Check teacherSubjectMap for this subject in this wing's classes
+      if (teacherSubjectMap[subject]) {
+        Object.entries(teacherSubjectMap[subject]).forEach(([classId, teacher]) => {
+          const classNum = classId.match(/^(\d+)/)?.[1];
+          if (classNum && wingDef.match(classNum)) {
+            wingClasses.push(classId);
+            wingMappings++;
+            if (teacher && teacher.trim()) {
+              wingMappings++; // Count actual teacher assignments
+            }
+          }
+        });
+      }
+
+      // Check timetables for this subject in this wing's classes
+      if (timetables) {
+        wingClasses.forEach(classId => {
+          const schedule = timetables[classId] || [];
+          schedule.forEach(slot => {
+            if (slot.subject === subject) {
+              wingTimetableCells++;
+            }
+          });
+        });
+      }
+
+      if (wingClasses.length > 0) {
+        impact.wings.push({
+          id: wingDef.id,
+          title: wingDef.title,
+          classes: wingClasses,
+          classCount: wingClasses.length,
+          mappingCount: wingMappings,
+          timetableCells: wingTimetableCells
+        });
+        impact.totalMappings += wingMappings;
+        impact.totalClasses += wingClasses.length;
+        impact.totalTimetableCells += wingTimetableCells;
+      }
+    });
+
+    setDeleteImpact(impact);
+    setSelectedDeleteWings([]);
+    setShowDeleteConfirm(false);
+  };
+
+  // Analyze impact when subject selection changes
+  useEffect(() => {
+    analyzeSubjectImpact(deleteSubjectName);
+  }, [deleteSubjectName, teacherSubjectMap, timetables, config]);
+
+  // Toggle wing selection for deletion
+  const toggleDeleteWing = (wingId) => {
+    setSelectedDeleteWings(prev =>
+      prev.includes(wingId) ? prev.filter(w => w !== wingId) : [...prev, wingId]
+    );
+    setShowDeleteConfirm(false);
+  };
+
+  // Select all wings
+  const selectAllDeleteWings = () => {
+    if (deleteImpact) {
+      setSelectedDeleteWings(deleteImpact.wings.map(w => w.id));
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  // Execute scoped deletion
+  const executeScopedDeletion = () => {
+    if (!deleteSubjectName || selectedDeleteWings.length === 0) return;
+
+    const wingsToDelete = deleteImpact.wings.filter(w => selectedDeleteWings.includes(w.id));
+    const allClassIds = wingsToDelete.flatMap(w => w.classes);
+
+    // 1. Remove from teacherSubjectMap (only for selected wing classes)
+    setTeacherSubjectMap(prev => {
+      const nextMap = { ...prev };
+      if (nextMap[deleteSubjectName]) {
+        const nextSubjectMap = { ...nextMap[deleteSubjectName] };
+        allClassIds.forEach(classId => {
+          delete nextSubjectMap[classId];
+        });
+        if (Object.keys(nextSubjectMap).length === 0) {
+          delete nextMap[deleteSubjectName];
+        } else {
+          nextMap[deleteSubjectName] = nextSubjectMap;
+        }
+      }
+      return nextMap;
+    });
+
+    // 2. Remove from config wings (only selected wings)
+    setConfig(prev => {
+      const newWings = prev.wings.map(w => {
+        const wingDef = WING_DEFS.find(wd => wd.title === w.title);
+        if (wingDef && selectedDeleteWings.includes(wingDef.id)) {
+          return { ...w, subjects: w.subjects.filter(s => s !== deleteSubjectName) };
+        }
+        return w;
+      }).filter(w => w.columns.length > 0 && w.subjects.length > 0);
+      return { ...prev, wings: newWings };
+    });
+
+    // 3. Add to deletedSubjects localStorage (only if subject is completely removed from all wings)
+    const remainingWings = deleteImpact.wings.filter(w => !selectedDeleteWings.includes(w.id));
+    if (remainingWings.length === 0) {
+      const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
+      const deletedSubjectsList = savedDeletedSubjects ? JSON.parse(savedDeletedSubjects) : [];
+      if (!deletedSubjectsList.includes(deleteSubjectName)) {
+        deletedSubjectsList.push(deleteSubjectName);
+        localStorage.setItem('deletedSubjects', JSON.stringify(deletedSubjectsList));
+      }
+    }
+
+    // 4. Audit logging
+    const auditEntry = {
+      timestamp: new Date().toISOString(),
+      action: 'DELETE_SUBJECT',
+      subject: deleteSubjectName,
+      scope: selectedDeleteWings.length === WING_DEFS.length ? 'ALL_WINGS' : 'SELECTED_WINGS',
+      wings: wingsToDelete.map(w => w.title),
+      affectedClasses: allClassIds,
+      affectedCells: wingsToDelete.reduce((sum, w) => sum + w.timetableCells, 0),
+      mappingsDeleted: wingsToDelete.reduce((sum, w) => sum + w.mappingCount, 0)
+    };
+    const savedAuditLog = localStorage.getItem('subjectDeletionAudit');
+    const auditLog = savedAuditLog ? JSON.parse(savedAuditLog) : [];
+    auditLog.push(auditEntry);
+    localStorage.setItem('subjectDeletionAudit', JSON.stringify(auditLog));
+
+    // 5. Show success message
+    const wingNames = wingsToDelete.map(w => w.title.split(' (')[0]).join(', ');
+    alert(`Successfully deleted "${deleteSubjectName}" from: ${wingNames}\n\nAffected: ${allClassIds.length} classes, ${auditEntry.affectedCells} timetable cells`);
+
+    // Reset state
+    setDeleteSubjectName('');
+    setDeleteImpact(null);
+    setSelectedDeleteWings([]);
+    setShowDeleteConfirm(false);
+  };
+
   // Parse CSV and Initialize
   useEffect(() => {
     const parsed = parseCSVConfig(loadMaster);
@@ -605,54 +772,136 @@ const TeacherSubjectMapping = () => {
               </div>
             </div>
 
-            {/* Delete Subject */}
+            {/* Delete Subject - Safe Wing-Aware Workflow */}
             <div style={{ background: '#fffbeb', padding: '1.5rem', borderRadius: '8px', border: '1px solid #fde68a', flex: 1 }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#b45309', marginBottom: '0.5rem' }}>Delete Subject</h3>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#b45309', marginBottom: '0.5rem' }}>Delete Subject (Wing-Safe)</h3>
+              <p style={{ fontSize: '0.8rem', color: '#92400e', margin: '0 0 0.75rem 0' }}>
+                Subjects are deleted per-wing. Other wings will NOT be affected.
+              </p>
+              
+              {/* Step 1: Subject Selection */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#78350f' }}>Step 1: Select Subject</label>
                 <select 
-                  id="delete-subject-name" 
+                  value={deleteSubjectName}
+                  onChange={(e) => setDeleteSubjectName(e.target.value)}
                   style={{ width: '100%', padding: '0.5rem', border: '1px solid #fcd34d', borderRadius: '4px', background: '#fff' }} 
                 >
                   <option value="">- Select Subject -</option>
                   {allCurrentSubjects.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
-                <button 
-                  className="btn"
-                  style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer' }}
-                  onClick={() => {
-                    const val = document.getElementById('delete-subject-name').value;
-                    if (!val) return;
-                    if (window.confirm(`Are you sure you want to completely erase the subject "${val}" from the Mapping Grid?`)) {
-                      const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
-                      const deletedSubjectsList = savedDeletedSubjects ? JSON.parse(savedDeletedSubjects) : [];
-                      
-                      if (!deletedSubjectsList.includes(val)) {
-                        deletedSubjectsList.push(val);
-                        localStorage.setItem('deletedSubjects', JSON.stringify(deletedSubjectsList));
-                      }
-                      
-                      setTeacherSubjectMap(prev => {
-                        const nextMap = { ...prev };
-                        delete nextMap[val];
-                        return nextMap;
-                      });
-
-                      setConfig(prev => {
-                        const newWings = prev.wings.map(w => ({
-                          ...w,
-                          subjects: w.subjects.filter(s => s !== val)
-                        })).filter(w => w.columns.length > 0 && w.subjects.length > 0);
-                        return { ...prev, wings: newWings };
-                      });
-
-                      alert(`Successfully deleted the subject "${val}".`);
-                      document.getElementById('delete-subject-name').value = '';
-                    }
-                  }}
-                >
-                  Delete
-                </button>
               </div>
+
+              {/* Step 2: Impact Analysis */}
+              {deleteImpact && deleteImpact.wings.length > 0 && (
+                <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: '#fff7ed', borderRadius: '6px', border: '1px solid #fed7aa' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#9a3412', display: 'block', marginBottom: '0.5rem' }}>
+                    Step 2: Impact Analysis
+                  </label>
+                  <div style={{ fontSize: '0.8rem', color: '#78350f' }}>
+                    <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Subject: {deleteImpact.subject}</div>
+                    <div style={{ marginBottom: '0.5rem' }}>Found in {deleteImpact.wings.length} wing(s):</div>
+                    {deleteImpact.wings.map(wing => (
+                      <div key={wing.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                        <span style={{ color: '#16a34a' }}>✓</span>
+                        <span>{wing.title.split(' (')[0]}</span>
+                        <span style={{ color: '#6b7280' }}>({wing.classCount} classes, {wing.timetableCells} cells)</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Wing Selection */}
+              {deleteImpact && deleteImpact.wings.length > 0 && (
+                <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: '#fefce8', borderRadius: '6px', border: '1px solid #fef08a' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#713f12' }}>
+                      Step 3: Choose Wings to Delete
+                    </label>
+                    <button 
+                      onClick={selectAllDeleteWings}
+                      style={{ fontSize: '0.7rem', color: '#b45309', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                    >
+                      Select All
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    {deleteImpact.wings.map(wing => (
+                      <label 
+                        key={wing.id} 
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.8rem', color: '#78350f' }}
+                      >
+                        <input 
+                          type="checkbox"
+                          checked={selectedDeleteWings.includes(wing.id)}
+                          onChange={() => toggleDeleteWing(wing.id)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <span>{wing.title.split(' (')[0]}</span>
+                        <span style={{ color: '#6b7280', fontSize: '0.7rem' }}>({wing.classCount} classes, {wing.timetableCells} cells)</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* No wings found */}
+              {deleteImpact && deleteImpact.wings.length === 0 && deleteSubjectName && (
+                <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: '#f0fdf4', borderRadius: '6px', border: '1px solid #bbf7d0' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#166534' }}>
+                    Subject "{deleteSubjectName}" is not found in any wing. It may already be deleted.
+                  </div>
+                </div>
+              )}
+
+              {/* Step 4: Confirmation & Execute */}
+              {selectedDeleteWings.length > 0 && (
+                <div style={{ marginTop: '0.75rem' }}>
+                  {!showDeleteConfirm ? (
+                    <button 
+                      className="btn"
+                      style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', width: '100%' }}
+                      onClick={() => setShowDeleteConfirm(true)}
+                    >
+                      Preview Deletion
+                    </button>
+                  ) : (
+                    <div style={{ padding: '0.75rem', background: '#fef2f2', borderRadius: '6px', border: '1px solid #fecaca' }}>
+                      <div style={{ fontSize: '0.8rem', color: '#991b1b', marginBottom: '0.5rem' }}>
+                        <strong>⚠️ Confirm Deletion:</strong>
+                        <div style={{ marginTop: '0.25rem' }}>
+                          You are about to delete <strong>"{deleteSubjectName}"</strong> from:
+                        </div>
+                        <div style={{ marginTop: '0.25rem', paddingLeft: '1rem' }}>
+                          {deleteImpact.wings.filter(w => selectedDeleteWings.includes(w.id)).map(w => (
+                            <div key={w.id}>• {w.title.split(' (')[0]} ({w.classCount} classes, {w.timetableCells} cells)</div>
+                          ))}
+                        </div>
+                        <div style={{ marginTop: '0.25rem', fontStyle: 'italic' }}>
+                          Other wings will NOT be affected.
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button 
+                          className="btn"
+                          style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', flex: 1 }}
+                          onClick={executeScopedDeletion}
+                        >
+                          Confirm Delete
+                        </button>
+                        <button 
+                          className="btn"
+                          style={{ background: '#6b7280', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 600, cursor: 'pointer', flex: 1 }}
+                          onClick={() => setShowDeleteConfirm(false)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
