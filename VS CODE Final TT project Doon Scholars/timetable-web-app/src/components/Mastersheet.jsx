@@ -15,6 +15,42 @@ const Mastersheet = () => {
   const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
 
+  // Check if a subject has a valid mapping for a class
+  // Returns: { subjectExists: boolean, teacherAssigned: boolean, status: string }
+  const getMappingStatus = (classId, subject) => {
+    if (!subject) return { subjectExists: false, teacherAssigned: false, status: 'empty' };
+    
+    const normalizedClassId = classId.replace(/\s+/g, '').toUpperCase();
+    
+    // 1. Check if subject exists in loadMaster for this class
+    const subjectInLoadMaster = loadMaster.some(
+      item => item.class_id.replace(/\s+/g, '').toUpperCase() === normalizedClassId && item.subject === subject
+    );
+    
+    // 2. Check if subject exists in teacherSubjectMap for this class
+    const subjectInMap = teacherSubjectMap && teacherSubjectMap[subject] && 
+      teacherSubjectMap[subject][normalizedClassId] !== undefined;
+    
+    const subjectExists = subjectInLoadMaster || subjectInMap;
+    
+    // 3. Check if teacher is mapped
+    let teacherAssigned = false;
+    if (subjectExists && teacherSubjectMap && teacherSubjectMap[subject]) {
+      const mappedTeacher = teacherSubjectMap[subject][normalizedClassId];
+      teacherAssigned = mappedTeacher !== undefined && mappedTeacher !== null && mappedTeacher.trim() !== '';
+    }
+    
+    // 4. Determine status
+    let status = 'valid';
+    if (!subjectExists) {
+      status = 'no_subject';
+    } else if (!teacherAssigned) {
+      status = 'no_teacher';
+    }
+    
+    return { subjectExists, teacherAssigned, status };
+  };
+
   // Sort classes logically (1a, 1b, 2a... 10a, 11a, 11b)
   const sortedClasses = [...classes].sort((a, b) => {
     const numA = parseInt(a.replace(/\D/g, '')) || 0;
@@ -254,13 +290,37 @@ const Mastersheet = () => {
               <div className="grid-cell day-header">{cls.toUpperCase()}</div>
               {PERIODS.map(p => {
                 const slot = timetables[cls]?.find(s => s.day === selectedDay && parseInt(s.period) === p);
-                const collisionClass = slot?.teacher ? checkTeacherCollision(slot.teacher, selectedDay, p, cls) : false;
+                const mappingStatus = getMappingStatus(cls, slot?.subject);
+                const collisionClass = slot?.teacher && mappingStatus.status === 'valid' ? checkTeacherCollision(slot.teacher, selectedDay, p, cls) : false;
+                
+                // Determine cell CSS class: missing mapping takes priority, then collision
+                let cellClassName = 'grid-cell';
+                if (mappingStatus.status === 'no_subject') {
+                  // Deleted subject - show blue
+                  cellClassName += ' missing-mapping';
+                } else if (mappingStatus.status === 'no_teacher') {
+                  // Subject exists but no teacher - show blue
+                  cellClassName += ' missing-mapping';
+                } else if (collisionClass) {
+                  // Only show red for actual clashes when mapping is valid
+                  cellClassName += ' collision-warning';
+                }
+                
+                // Determine title tooltip
+                let cellTitle = '';
+                if (mappingStatus.status === 'no_subject') {
+                  cellTitle = 'No valid subject mapping exists - subject may be deleted';
+                } else if (mappingStatus.status === 'no_teacher') {
+                  cellTitle = 'Subject exists but teacher is not assigned';
+                } else if (collisionClass) {
+                  cellTitle = `Clash Detected: ${slot.teacher} is also teaching Class ${collisionClass.toUpperCase()} in Period ${p}`;
+                }
                 
                 return (
                   <div 
                     key={`${cls}-p${p}`} 
-                    className={`grid-cell ${collisionClass ? 'collision-warning' : ''}`}
-                    title={collisionClass ? `Clash Detected: ${slot.teacher} is also teaching Class ${collisionClass.toUpperCase()} in Period ${p}` : ''}
+                    className={cellClassName}
+                    title={cellTitle}
                     style={{ padding: editMode ? '4px' : '0.5rem' }}
                   >
                     {editMode ? (
@@ -290,19 +350,33 @@ const Mastersheet = () => {
                       <>
                         {slot?.subject ? (
                           <>
-                            <div className="slot-subject">{slot.subject}</div>
-                            <div className="slot-teacher">
-                              {slot.assignedTeachers && slot.assignedTeachers.length > 0 
-                                ? slot.assignedTeachers.map((at, idx) => {
-                                    if (typeof at === 'string') return <span key={idx}>{at}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}</span>;
-                                    return (
-                                      <span key={idx} style={{ color: at.clash ? '#ef4444' : 'inherit' }} title={at.clashWith ? `Clash: ${at.clashWith}` : ''}>
-                                        {at.teacher}{at.clash ? ` ⚠ (${at.clashWith})` : ''}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}
-                                      </span>
-                                    );
-                                  })
-                                : (slot.teacher ? slot.teacher : 'No Teacher')}
-                            </div>
+                            {mappingStatus.status === 'no_subject' ? (
+                              // Deleted subject - show message
+                              <div className="slot-subject" style={{ color: '#1e40af', fontSize: '0.75rem' }}>No Subject or Teacher Assigned</div>
+                            ) : mappingStatus.status === 'no_teacher' ? (
+                              // Subject exists but no teacher
+                              <>
+                                <div className="slot-subject">{slot.subject}</div>
+                                <div className="slot-teacher">No Teacher</div>
+                              </>
+                            ) : (
+                              // Valid mapping - show normally
+                              <>
+                                <div className="slot-subject">{slot.subject}</div>
+                                <div className="slot-teacher">
+                                  {slot.assignedTeachers && slot.assignedTeachers.length > 0 
+                                    ? slot.assignedTeachers.map((at, idx) => {
+                                        if (typeof at === 'string') return <span key={idx}>{at}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}</span>;
+                                        return (
+                                          <span key={idx} style={{ color: at.clash ? '#ef4444' : 'inherit' }} title={at.clashWith ? `Clash: ${at.clashWith}` : ''}>
+                                            {at.teacher}{at.clash ? ` ⚠ (${at.clashWith})` : ''}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}
+                                          </span>
+                                        );
+                                      })
+                                    : (slot.teacher ? slot.teacher : 'No Teacher')}
+                                </div>
+                              </>
+                            )}
                           </>
                         ) : (
                           <div className="slot-teacher" style={{opacity: 0.3}}>-</div>
