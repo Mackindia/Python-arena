@@ -148,7 +148,8 @@ const TeacherSubjectMapping = () => {
   const { 
     teacherSubjectMap, 
     setTeacherSubjectMap, 
-    timetables, 
+    timetables,
+    updateSlot,
     updateTeacherForSubject, 
     swapTeacherGlobal, 
     teachers, 
