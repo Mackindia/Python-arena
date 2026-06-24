@@ -416,8 +416,8 @@ const ClassTimetable = () => {
               
               // Determine cell CSS class: missing mapping takes priority, then collision
               let cellClassName = 'grid-cell';
-              if (mappingStatus.status === 'no_subject') {
-                // Deleted subject - show blue
+              if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
+                // Deleted subject or empty slot - show blue
                 cellClassName += ' missing-mapping';
               } else if (mappingStatus.status === 'no_teacher') {
                 // Subject exists but no teacher - show blue
@@ -429,7 +429,7 @@ const ClassTimetable = () => {
               
               // Determine title tooltip
               let cellTitle = '';
-              if (mappingStatus.status === 'no_subject') {
+              if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
                 cellTitle = 'No valid subject mapping exists - subject may be deleted';
               } else if (mappingStatus.status === 'no_teacher') {
                 cellTitle = 'Subject exists but teacher is not assigned';
@@ -499,7 +499,7 @@ const ClassTimetable = () => {
                           )}
                         </>
                       ) : (
-                        <div className="slot-teacher" style={{opacity: 0.3}}>-</div>
+                        <div className="slot-subject" style={{ color: '#1e40af', fontSize: '0.75rem', opacity: 1 }}>No Subject or Teacher Assigned</div>
                       )}
                     </>
                   )}
