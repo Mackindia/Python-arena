@@ -228,10 +228,10 @@ const TeacherSubjectMapping = () => {
             subjectTokens.forEach(t => { if (t) subjs.add(t); });
           }
         });
-      } else {
-        const wing = config.wings.find(w => w.columns.includes(clsId));
-        if (wing) wing.subjects.forEach(s => subjs.add(s));
       }
+      // Always include subjects from the mapping grid wings for this class
+      const wing = config.wings.find(w => w.columns.includes(clsId));
+      if (wing) wing.subjects.forEach(s => subjs.add(s));
       map[clsId] = Array.from(subjs).sort();
     });
     return map;
@@ -509,12 +509,18 @@ const TeacherSubjectMapping = () => {
                     return { ...prev, wings: newWings };
                   });
 
-                  // 3. Initialize mapping row
+                  // 3. Initialize mapping row with entries for all classes in the wing
+                  const wingColumns = config.wings.find(w => w.id === wingId)?.columns || [];
                   setTeacherSubjectMap(prev => {
                     const nextMap = { ...prev };
                     if (!nextMap[subjectName]) {
                       nextMap[subjectName] = {};
                     }
+                    wingColumns.forEach(col => {
+                      if (nextMap[subjectName][col.toUpperCase()] === undefined) {
+                        nextMap[subjectName][col.toUpperCase()] = "";
+                      }
+                    });
                     return nextMap;
                   });
 

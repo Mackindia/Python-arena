@@ -428,10 +428,10 @@ export const TimetableProvider = ({ children }) => {
       }
     });
     
-    // 2. From teacherSubjectMap
+    // 2. From teacherSubjectMap (check existence, not truthy value — empty string means "mapped but unassigned")
     if (teacherSubjectMap) {
       Object.keys(teacherSubjectMap).forEach(subj => {
-        if (teacherSubjectMap[subj][normalizedClassId]) {
+        if (teacherSubjectMap[subj][normalizedClassId] !== undefined) {
           subjects.add(subj);
         }
       });
