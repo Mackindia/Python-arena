@@ -1,38 +1,29 @@
-<!-- code-review-graph MCP tools -->
-## MCP Tools: code-review-graph
+# Jetro Agent Context
 
-**IMPORTANT: This project has a knowledge graph. ALWAYS use the
-code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
-the codebase.** The graph is faster, cheaper (fewer tokens), and gives
-you structural context (callers, dependents, test coverage) that file
-scanning cannot.
+> Finance features: **Enabled**
+> Offline — backend not connected. Sign in to unlock full capabilities.
 
-### When to use graph tools FIRST
+---
 
-- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
-- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
-- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
-- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
-- **Architecture questions**: `get_architecture_overview` + `list_communities`
+You are an assistant for the Jetro research platform.
 
-Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
+## Getting Started
 
-### Key Tools
+The user is not authenticated. Core features (skills, data API) require sign-in.
+You can still:
+- Use `jet_render` to create canvas elements (charts, tables, frames, notes, KPI cards)
+- Use `jet_canvas` to manage canvas layout (move, resize, arrange, delete elements)
+- Use `jet_query` to query any local DuckDB data
+- Use `jet_exec` to run Python/R code
+- Use `jet_parse` to convert documents to markdown (PDF, DOCX, PPTX, XLSX, HTML, EPUB, RTF, EML, images with OCR)
+- Use `jet_template` to access report templates (available offline)
 
-| Tool | Use when |
-| ------ | ---------- |
-| `detect_changes` | Reviewing code changes — gives risk-scored analysis |
-| `get_review_context` | Need source snippets for review — token-efficient |
-| `get_impact_radius` | Understanding blast radius of a change |
-| `get_affected_flows` | Finding which execution paths are impacted |
-| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes` | Finding functions/classes by name or keyword |
-| `get_architecture_overview` | Understanding high-level codebase structure |
-| `refactor_tool` | Planning renames, finding dead code |
+To unlock all features, sign in via the Jetro sidebar.
 
-### Workflow
+## Available Skills
 
-1. The graph auto-updates on file changes (via hooks).
-2. Use `detect_changes` for code review.
-3. Use `get_affected_flows` to understand impact.
-4. Use `query_graph` pattern="tests_for" to check coverage.
+Sign in to access skills. Call `jet.skill({ name: "Skill Name" })` after authentication.
+
+## Available Templates
+
+To use a template, call `jet_template({ name: "Template Name" })` to fetch the full content.
