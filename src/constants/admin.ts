@@ -1,18 +1,18 @@
-import { BookOpen, ChartColumn, GraduationCap, LayoutDashboard, Settings, UploadCloud, Users } from "lucide-react";
+import { FolderOpen, LayoutDashboard, Settings, Sparkles, Users, GraduationCap } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export type AdminNavItem = {
   label: string;
   href: string;
   icon: LucideIcon;
+  external?: boolean;
 };
 
 export const adminSidebarLinks: AdminNavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Upload Lesson", href: "/admin/upload", icon: UploadCloud },
-  { label: "Manage Lessons", href: "/admin/lessons", icon: BookOpen },
-  { label: "Manage Subjects", href: "/admin/courses", icon: GraduationCap },
+  { label: "Content Hub", href: "/admin/content", icon: FolderOpen },
+  { label: "Learn Navigation", href: "/admin/navigation", icon: GraduationCap },
   { label: "Students", href: "/admin/users", icon: Users },
-  { label: "Analytics", href: "/admin/analytics", icon: ChartColumn },
+  { label: "AI Engines", href: "/admin/engines", icon: Sparkles },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];

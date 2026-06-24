@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir *)",
+      "Bash(Select-Object FullName)",
+      "Bash(npm install *)",
+      "mcp__jetro__jet_exec",
+      "mcp__jetro__jet_render",
+      "PowerShell(npm run *)",
+      "PowerShell(railway *)",
+      "PowerShell(git push *)",
+      "PowerShell(node scripts/inspect-users.mjs)",
+      "PowerShell(node scripts/update-admin.mjs)",
+      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\Doon Scholars\\\\.claude\\\\projects\\\\C--Users-Doon-Scholars-Downloads-data--vscode-Python-arena\\\\533df040-70f7-457d-a8e2-db30ba8ae65d.jsonl\" | Measure-Object -Line\\).Lines)",
+      "Bash(railway *)",
+      "PowerShell(node scripts/inspect-clerk-user.mjs)",
+      "PowerShell(node scripts/update-clerk-user.mjs)",
+      "Bash(npm run *)",
+      "Bash(git push *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(node *)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "jetro"
+  ]
+}

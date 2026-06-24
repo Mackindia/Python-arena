@@ -22,6 +22,18 @@ export type CoursesMap = Record<string, Record<string, CourseClass>>;
 
 export const courses: CoursesMap = {
   python: {
+    basics: {
+      title: "Python Basics",
+      chapters: [],
+    },
+    "class-9": {
+      title: "Python Class 9",
+      chapters: [],
+    },
+    "class-10": {
+      title: "Python Class 10",
+      chapters: [],
+    },
     "class-11": {
       title: "Python Class 11",
       chapters: [
@@ -78,6 +90,14 @@ export const courses: CoursesMap = {
       ],
       quizFile: "quiz.json",
     },
+    "class-8": { title: "AI Class 8", chapters: [] },
+    "class-9": { title: "AI Class 9", chapters: [] },
+    "class-10": { title: "AI Class 10", chapters: [] },
+    "class-11": { title: "AI Class 11", chapters: [] },
+    "class-12": { title: "AI Class 12", chapters: [] },
   },
-  "computer-science": {},
+  "computer-science": {
+    "class-11": { title: "Computer Science Class 11", chapters: [] },
+    "class-12": { title: "Computer Science Class 12", chapters: [] },
+  },
 };

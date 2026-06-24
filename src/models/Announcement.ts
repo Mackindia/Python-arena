@@ -5,7 +5,8 @@ const AnnouncementSchema = new Schema(
     title: { type: String, required: true, trim: true },
     message: { type: String, required: true, trim: true },
     targetRoles: { type: [String], default: ["student", "teacher", "admin"] },
-    level: { type: String, enum: ["info", "warning", "exam"], default: "info" },
+    level: { type: String, enum: ["info", "warning", "exam", "urgent"], default: "info" },
+    targetClass: { type: String, default: "All" }, // Added for class-specific targeting
     isActive: { type: Boolean, default: true },
     createdBy: { type: String, default: "" },
   },

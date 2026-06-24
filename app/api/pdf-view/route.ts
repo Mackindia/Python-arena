@@ -34,8 +34,6 @@ function isLikelyPdfResponse(url: URL, headers: Headers) {
     return true;
   }
 
-  // Cloudinary raw uploads often serve PDFs as application/octet-stream
-  // without a .pdf suffix. Those assets are still valid PDF sources here.
   return isCloudinaryRawUpload(url) && contentType.includes("application/octet-stream");
 }
 

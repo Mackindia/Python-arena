@@ -8,11 +8,12 @@ import LessonModel from "@/models/lms/Lesson";
 export type LessonCreationInput = {
   title: string;
   slug?: string;
+  contentType?: "notes" | "cbse-pdf" | "mixed";
   subject: string;
   class: string;
   description: string;
-  pdfUrl: string;
-  thumbnailUrl: string;
+  pdfUrl?: string;
+  thumbnailUrl?: string;
   thumbnail?: string;
   content?: string;
   published: boolean;
@@ -50,6 +51,9 @@ function isValidHttpUrl(value: string) {
 
 export function validateLessonCreationInput(input: Partial<LessonCreationInput>) {
   const errors: string[] = [];
+  const hasContent = Boolean(input.content?.trim());
+  const hasPdf = Boolean(input.pdfUrl?.trim());
+  const contentType = input.contentType ?? (hasPdf && hasContent ? "mixed" : hasPdf ? "cbse-pdf" : "notes");
 
   if (!input.title?.trim()) {
     errors.push("title is required");
@@ -67,16 +71,20 @@ export function validateLessonCreationInput(input: Partial<LessonCreationInput>)
     errors.push("description is required");
   }
 
-  if (!input.pdfUrl?.trim()) {
-    errors.push("pdfUrl is required");
-  } else if (!isValidHttpUrl(input.pdfUrl)) {
+  if ((contentType === "cbse-pdf" || contentType === "mixed") && !input.pdfUrl?.trim()) {
+    errors.push("pdfUrl is required for cbse-pdf or mixed lessons");
+  } else if (input.pdfUrl?.trim() && !isValidHttpUrl(input.pdfUrl)) {
     errors.push("pdfUrl must be a valid http/https URL");
   }
 
-  if (!input.thumbnailUrl?.trim()) {
-    errors.push("thumbnailUrl is required");
-  } else if (!isValidHttpUrl(input.thumbnailUrl)) {
+  if ((contentType === "cbse-pdf" || contentType === "mixed") && !input.thumbnailUrl?.trim()) {
+    errors.push("thumbnailUrl is required for cbse-pdf or mixed lessons");
+  } else if (input.thumbnailUrl?.trim() && !isValidHttpUrl(input.thumbnailUrl)) {
     errors.push("thumbnailUrl must be a valid http/https URL");
+  }
+
+  if ((contentType === "notes" || contentType === "mixed") && !input.content?.trim()) {
+    errors.push("content is required for notes or mixed lessons");
   }
 
   if (typeof input.published !== "boolean") {
@@ -141,9 +149,22 @@ export async function createLmsLesson(input: LessonCreationInput) {
 
   const slug = input.slug?.trim() ? toSlug(input.slug) : toSlug(input.title);
 
-  const pdfProcessing = await processLessonPdfContent({
-    pdfUrl: input.pdfUrl.trim(),
-  });
+  const hasContent = Boolean(input.content?.trim());
+  const hasPdf = Boolean(input.pdfUrl?.trim());
+  const resolvedContentType = input.contentType ?? (hasPdf && hasContent ? "mixed" : hasPdf ? "cbse-pdf" : "notes");
+
+  const pdfProcessing = hasPdf
+    ? await processLessonPdfContent({
+      pdfUrl: String(input.pdfUrl).trim(),
+    })
+    : {
+      ok: false as const,
+      sourceUrl: "",
+      pageCount: 0,
+      extractedAt: null,
+      extractedText: "",
+      message: "PDF not attached",
+    };
 
   const extractedContent = pdfProcessing.ok ? pdfProcessing.extractedText : "";
   const finalContent = input.content?.trim() || extractedContent;
@@ -151,31 +172,41 @@ export async function createLmsLesson(input: LessonCreationInput) {
   const lesson = await (LessonModel as mongoose.Model<unknown>).create({
     title: input.title.trim(),
     slug,
+    contentType: resolvedContentType,
     subject: String(resolvedSubject._id),
     class: String(resolvedClass._id),
     description: input.description.trim(),
     content: finalContent,
-    pdfUrl: input.pdfUrl.trim(),
-    pdfTextExtraction: pdfProcessing.ok
-      ? {
-        status: "succeeded",
-        sourceUrl: pdfProcessing.sourceUrl,
-        pageCount: pdfProcessing.pageCount,
-        extractedAt: pdfProcessing.extractedAt,
-        contentLength: pdfProcessing.extractedText.length,
-        error: "",
-      }
+    pdfUrl: input.pdfUrl?.trim() || "",
+    pdfTextExtraction: hasPdf
+      ? (pdfProcessing.ok
+        ? {
+          status: "succeeded",
+          sourceUrl: pdfProcessing.sourceUrl,
+          pageCount: pdfProcessing.pageCount,
+          extractedAt: pdfProcessing.extractedAt,
+          contentLength: pdfProcessing.extractedText.length,
+          error: "",
+        }
+        : {
+          status: "failed",
+          sourceUrl: pdfProcessing.sourceUrl,
+          pageCount: 0,
+          extractedAt: null,
+          contentLength: 0,
+          error: pdfProcessing.message,
+        })
       : {
-        status: "failed",
-        sourceUrl: pdfProcessing.sourceUrl,
+        status: "skipped",
+        sourceUrl: "",
         pageCount: 0,
         extractedAt: null,
         contentLength: 0,
-        error: pdfProcessing.message,
+        error: "",
       },
-    thumbnailUrl: input.thumbnailUrl.trim(),
+    thumbnailUrl: input.thumbnailUrl?.trim() || "",
     // Keep legacy field populated for existing readers/components.
-    thumbnail: input.thumbnailUrl.trim(),
+    thumbnail: input.thumbnailUrl?.trim() || "",
     published: input.published,
     createdBy: input.createdBy,
   });

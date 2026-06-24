@@ -1,0 +1,25 @@
+=IF(
+INDIRECT("TT_"&$B3&"!"&
+ADDRESS(
+MATCH(LOOKUP(ROW($A3),ROW($A$1:$A3)/($A$1:$A3<>""),$A$1:$A3),
+{"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"},0)+1,
+COLUMN()-1
+)
+)="","",
+INDIRECT("TT_"&$B3&"!"&
+ADDRESS(
+MATCH(LOOKUP(ROW($A3),ROW($A$1:$A3)/($A$1:$A3<>""),$A$1:$A3),
+{"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"},0)+1,
+COLUMN()-1
+)
+)
+& " (" &
+INDIRECT("TT_"&$B3&"!"&
+ADDRESS(
+MATCH(LOOKUP(ROW($A3),ROW($A$1:$A3)/($A$1:$A3<>""),$A$1:$A3),
+{"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"},0)+9,
+COLUMN()-1
+)
+)
+& ")"
+)

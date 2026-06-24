@@ -3,6 +3,15 @@ import { connectDB } from "@/lib/mongodb";
 import { requireAdminApi } from "@/lib/admin-api";
 import Course from "@/models/Course";
 
+function toSlug(text: string) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
 export async function GET() {
   try {
     const access = await requireAdminApi();
@@ -38,7 +47,9 @@ export async function POST(request: NextRequest) {
       title: body.title,
       description: body.description ?? "",
       subject: body.subject,
+      subjectSlug: body.subjectSlug ?? toSlug(body.subject),
       classLevel: body.classLevel,
+      classSlug: body.classSlug ?? toSlug(body.classLevel),
       difficulty: body.difficulty ?? "beginner",
       thumbnail: body.thumbnail ?? "",
       category: body.category ?? "",

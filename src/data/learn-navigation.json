@@ -1,0 +1,45 @@
+[
+  {
+    "subject": {
+      "name": "AI",
+      "slug": "ai",
+      "description": "Artificial Intelligence lessons"
+    },
+    "classes": [
+      { "name": "Class 6", "slug": "class-6" },
+      { "name": "Class 7", "slug": "class-7" },
+      { "name": "Class 8", "slug": "class-8" },
+      { "name": "Class 9", "slug": "class-9" },
+      { "name": "Class 10", "slug": "class-10" },
+      { "name": "Class 11", "slug": "class-11" },
+      { "name": "Class 12", "slug": "class-12" }
+    ]
+  },
+  {
+    "subject": {
+      "name": "Python",
+      "slug": "python",
+      "description": "Python programming lessons"
+    },
+    "classes": [
+      { "name": "Basics", "slug": "basics" },
+      { "name": "Class 9", "slug": "class-9" },
+      { "name": "Class 10", "slug": "class-10" },
+      { "name": "Class 11", "slug": "class-11" },
+      { "name": "Class 12", "slug": "class-12" }
+    ]
+  },
+  {
+    "subject": {
+      "name": "Computer Science",
+      "slug": "computer-science",
+      "description": "Computer Science fundamentals"
+    },
+    "classes": [
+      { "name": "Class 9", "slug": "class-9" },
+      { "name": "Class 10", "slug": "class-10" },
+      { "name": "Class 11", "slug": "class-11" },
+      { "name": "Class 12", "slug": "class-12" }
+    ]
+  }
+]

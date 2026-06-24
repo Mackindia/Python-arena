@@ -3,9 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { adminSidebarLinks } from "@/src/constants/admin";
+import type { AppRole } from "@/lib/rbac";
 
-export default function AdminSidebar() {
+type AdminSidebarProps = {
+  role: AppRole;
+};
+
+export default function AdminSidebar({ role }: AdminSidebarProps) {
   const pathname = usePathname();
+  const links = adminSidebarLinks;
 
   return (
     <aside className="w-full shrink-0 rounded-[28px] border border-white/10 bg-slate-900/80 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.35)] ring-1 ring-white/5 backdrop-blur sm:p-5 lg:sticky lg:top-6 lg:w-80 lg:self-start">
@@ -26,7 +32,7 @@ export default function AdminSidebar() {
         </div>
 
         <nav className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-1">
-        {adminSidebarLinks.map((section) => {
+        {links.map((section) => {
           const active = pathname === section.href || (section.href !== "/admin" && pathname.startsWith(section.href));
           const Icon = section.icon;
 
@@ -34,6 +40,8 @@ export default function AdminSidebar() {
             <Link
               key={section.href}
               href={section.href}
+              target={section.external ? "_blank" : undefined}
+              rel={section.external ? "noopener noreferrer" : undefined}
               className={[
                 "flex items-center gap-3 rounded-2xl border px-3 py-3 text-sm transition",
                 active
@@ -48,6 +56,7 @@ export default function AdminSidebar() {
                 <Icon className="h-4 w-4" />
               </span>
               {section.label}
+              {section.external && <span className="ml-auto opacity-50"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>}
             </Link>
           );
         })}

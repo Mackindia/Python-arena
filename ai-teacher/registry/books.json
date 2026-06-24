@@ -1,0 +1,120 @@
+[
+  {
+    "book_id": "class6_ai",
+    "book_name": "Class 6 AI",
+    "class_level": "6",
+    "subject": "Artificial Intelligence",
+    "chapters": [
+      {
+        "book_id": "class6_ai",
+        "chapter_number": 1,
+        "chapter_name": "Computational",
+        "subject": "Artificial Intelligence",
+        "class_level": "6",
+        "start_page": 1,
+        "end_page": 84
+      }
+    ],
+    "indexed_at": "",
+    "source_file": "class_6_Computational_thinking_AI.pdf",
+    "chunk_count": 0
+  },
+  {
+    "book_id": "class6_ai_run_232021",
+    "book_name": "Class 6 AI",
+    "class_level": "6",
+    "subject": "Artificial Intelligence",
+    "chapters": [
+      {
+        "book_id": "class6_ai_run_232021",
+        "chapter_number": 1,
+        "chapter_name": "Computational",
+        "subject": "Artificial Intelligence",
+        "class_level": "6",
+        "start_page": 1,
+        "end_page": 84
+      }
+    ],
+    "indexed_at": "2026-06-01T17:50:42.496221+00:00",
+    "source_file": "class_6_Computational_thinking_AI.pdf",
+    "chunk_count": 176
+  },
+  {
+    "book_id": "ai-3-to-8-curriculum-3-to-8",
+    "book_name": "Curriculum 3 to 8",
+    "class_level": "3 to 8",
+    "subject": "AI",
+    "chapters": [
+      {
+        "book_id": "ai-3-to-8-curriculum-3-to-8",
+        "chapter_number": 1,
+        "chapter_name": "Computational Thinking",
+        "subject": "AI",
+        "class_level": "3 to 8",
+        "start_page": 1,
+        "end_page": 32
+      }
+    ],
+    "indexed_at": "",
+    "source_file": "CURRICULUM_3_TO_8_AI.pdf",
+    "chunk_count": 0
+  },
+  {
+    "book_id": "python-11-python-basics",
+    "book_name": "Python Basics",
+    "class_level": "11",
+    "subject": "Python",
+    "chapters": [
+      {
+        "book_id": "python-11-python-basics",
+        "chapter_number": 1,
+        "chapter_name": "Introduction to Python Python is a programming language. Variables store data values. Loops repeat code blocks.",
+        "subject": "Python",
+        "class_level": "11",
+        "start_page": 1,
+        "end_page": 1
+      },
+      {
+        "book_id": "python-11-python-basics",
+        "chapter_number": 2,
+        "chapter_name": "Introduction to Python Python is a programming language. Variables store data values. Loops repeat code blocks.",
+        "subject": "Python",
+        "class_level": "11",
+        "start_page": 2,
+        "end_page": 2
+      },
+      {
+        "book_id": "python-11-python-basics",
+        "chapter_number": 3,
+        "chapter_name": "Introduction to Python Python is a programming language. Variables store data values. Loops repeat code blocks.",
+        "subject": "Python",
+        "class_level": "11",
+        "start_page": 3,
+        "end_page": 3
+      }
+    ],
+    "indexed_at": "2026-06-21T07:12:56.114706+00:00",
+    "source_file": "test.pdf",
+    "chunk_count": 3
+  },
+  {
+    "book_id": "ai-6-class-6-computational-thinking",
+    "book_name": "Class 6 Computational thinking",
+    "class_level": "6",
+    "subject": "AI",
+    "chapters": [
+      {
+        "book_id": "ai-6-class-6-computational-thinking",
+        "chapter_number": 1,
+        "chapter_name": "Computational",
+        "subject": "AI",
+        "class_level": "6",
+        "start_page": 1,
+        "end_page": 84
+      }
+    ],
+    "indexed_at": "2026-06-21T07:15:15.097379+00:00",
+    "source_file": "class_6_Computational_thinking_AI.pdf",
+    "chunk_count": 176
+  }
+]

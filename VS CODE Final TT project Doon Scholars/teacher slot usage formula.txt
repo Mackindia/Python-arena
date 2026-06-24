@@ -1,0 +1,113 @@
+=--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_1a!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))
++--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_1b!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))
++
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_2a!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))
++
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_2b!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))
++
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_3a!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))
++
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_3b!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))
++
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_4a!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))
++
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_4b!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))
++
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_5a!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))
++
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_5b!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))
++
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_6a!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))+
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_6b!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))+
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_7a!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))+
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_7b!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))+
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_8a!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))+
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_8b!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))+
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_9a!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))+
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_9b!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_10a!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))+
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_11a!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))+
+--ISNUMBER(FIND(","&$A2&",",","&
+INDIRECT("TT_11b!" &
+ADDRESS(10+INT((COLUMN()-2)/8),
+MOD(COLUMN()-2,8)+2)
+)&","))

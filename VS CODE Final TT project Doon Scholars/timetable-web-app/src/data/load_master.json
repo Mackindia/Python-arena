@@ -1,0 +1,3143 @@
+[
+  {
+    "subject": "English_Lit",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "EVS",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "GK",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "VE",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "STEM_Junior",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "Music",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "Games",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "Skating",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "Library",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "CCA",
+    "class_val": "1",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "1a"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "EVS",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "GK",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "VE",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "STEM_Junior",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "Music",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "Games",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "Skating",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "Library",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "CCA",
+    "class_val": "1",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "1b"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "EVS",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "GK",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "Music",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "Library",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "Games",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "Skating",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "STEM_Junior",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "VE",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "CCA",
+    "class_val": "2",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "2a"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "EVS",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "GK",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "STEM_Junior",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "Music",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "Library",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "Games",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "Skating",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "VE",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "CCA",
+    "class_val": "2",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "2b"
+  },
+  {
+    "subject": "Science",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "GK",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "Music",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "Library",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "Games",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "Skating",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "VE",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "STEM_Junior",
+    "class_val": "3",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "3a"
+  },
+  {
+    "subject": "Science",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "Maths_DK",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "Maths_VR",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "GK",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "Music",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "Library",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "Games",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "Skating",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "VE",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "STEM_Junior",
+    "class_val": "3",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "3b"
+  },
+  {
+    "subject": "Science",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "GK",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "Music",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "Library",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "Games",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "Skating",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "VE",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "STEM_Junior",
+    "class_val": "4",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "4a"
+  },
+  {
+    "subject": "Science",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "GK",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "Music",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "Library",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "Games",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "Skating",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "VE",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "STEM_Junior",
+    "class_val": "4",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "4b"
+  },
+  {
+    "subject": "Science",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "GK",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "Music",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "Library",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "Games",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "Skating",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "VE",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "STEM_Junior",
+    "class_val": "5",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "5a"
+  },
+  {
+    "subject": "Science",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "GK",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "Music",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "Library",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "Games",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "Skating",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "VE",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "STEM_Junior",
+    "class_val": "5",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "5b"
+  },
+  {
+    "subject": "Science",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "SST",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "GK",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "Music",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "Library",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "Games",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "VE",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "STEM",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "Skill",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "F/S",
+    "class_val": "6",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "6a"
+  },
+  {
+    "subject": "Science",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "SST",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "GK",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "Music",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "Library",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "Games",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "VE",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "STEM",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "Skill",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "F/S",
+    "class_val": "6",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "6b"
+  },
+  {
+    "subject": "Science",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "GK",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "Music",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "Library",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "Games",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "VE",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "STEM",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "Skill",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "F/S",
+    "class_val": "7",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "7a"
+  },
+  {
+    "subject": "Science",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "GK",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "Music",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "Library",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "Games",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "VE",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "STEM",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "Skill",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "F/S",
+    "class_val": "7",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "7b"
+  },
+  {
+    "subject": "Biology",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Physics",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Chemistry",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "GK",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Music",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Library",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Games",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "VE",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "STEM",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Skill",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "F/S",
+    "class_val": "8",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8a"
+  },
+  {
+    "subject": "Biology",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Physics",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Chemistry",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "GK",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Music",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Library",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "A/C",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Computer",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Games",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "VE",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "STEM",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Skill",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "F/S",
+    "class_val": "8",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "8b"
+  },
+  {
+    "subject": "Biology",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "Physics",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "Chemistry",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "Library",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "Computer/HSC",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 5.0,
+    "used_load": 5.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "Games",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "VE",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "STEM",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "Skill",
+    "class_val": "9",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9a"
+  },
+  {
+    "subject": "Biology",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "Physics",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "Chemistry",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "English_lang",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 6.0,
+    "used_load": 6.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "Library",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "Computer/HSC",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 5.0,
+    "used_load": 5.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "Games",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "VE",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "STEM",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "Skill",
+    "class_val": "9",
+    "section": "B",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "9b"
+  },
+  {
+    "subject": "Biology",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "Physics",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "Chemistry",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "Maths",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "English_Lit",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "English_Lang",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "Hindi_Lit",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "Hindi_Lang",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 3.0,
+    "used_load": 3.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "SSt",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 5.0,
+    "used_load": 5.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "Economics_SA",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "Library",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "Computer/HSC",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 5.0,
+    "used_load": 5.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "Games",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "VE",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "Dance",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "Skill",
+    "class_val": "10",
+    "section": "A",
+    "total_load": 4.0,
+    "used_load": 4.0,
+    "remaining_load": 0.0,
+    "class_id": "10a"
+  },
+  {
+    "subject": "English",
+    "class_val": "11",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "11a"
+  },
+  {
+    "subject": "Physics",
+    "class_val": "11",
+    "section": "A",
+    "total_load": 8.0,
+    "used_load": 8.0,
+    "remaining_load": 0.0,
+    "class_id": "11a"
+  },
+  {
+    "subject": "Chemistry",
+    "class_val": "11",
+    "section": "A",
+    "total_load": 8.0,
+    "used_load": 8.0,
+    "remaining_load": 0.0,
+    "class_id": "11a"
+  },
+  {
+    "subject": "Bio/Eco/Phy_Edu",
+    "class_val": "11",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "11a"
+  },
+  {
+    "subject": "Food_P/AI/Lib_Sc",
+    "class_val": "11",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "11a"
+  },
+  {
+    "subject": "Maths/Music/Hindi",
+    "class_val": "11",
+    "section": "A",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "11a"
+  },
+  {
+    "subject": "Library",
+    "class_val": "11",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "11a"
+  },
+  {
+    "subject": "Games",
+    "class_val": "11",
+    "section": "A",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "11a"
+  },
+  {
+    "subject": "VE",
+    "class_val": "11",
+    "section": "A",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "11a"
+  },
+  {
+    "subject": "English",
+    "class_val": "11",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "11b"
+  },
+  {
+    "subject": "Accounts/HIST",
+    "class_val": "11",
+    "section": "B",
+    "total_load": 8.0,
+    "used_load": 8.0,
+    "remaining_load": 0.0,
+    "class_id": "11b"
+  },
+  {
+    "subject": "BSt/Pol_Sc",
+    "class_val": "11",
+    "section": "B",
+    "total_load": 8.0,
+    "used_load": 8.0,
+    "remaining_load": 0.0,
+    "class_id": "11b"
+  },
+  {
+    "subject": "Bio/Eco/Phy_Edu",
+    "class_val": "11",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "11b"
+  },
+  {
+    "subject": "Food_P/AI/Lib_Sc",
+    "class_val": "11",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "11b"
+  },
+  {
+    "subject": "Maths/Music/Hindi",
+    "class_val": "11",
+    "section": "B",
+    "total_load": 7.0,
+    "used_load": 7.0,
+    "remaining_load": 0.0,
+    "class_id": "11b"
+  },
+  {
+    "subject": "Library",
+    "class_val": "11",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "11b"
+  },
+  {
+    "subject": "Games",
+    "class_val": "11",
+    "section": "B",
+    "total_load": 2.0,
+    "used_load": 2.0,
+    "remaining_load": 0.0,
+    "class_id": "11b"
+  },
+  {
+    "subject": "VE",
+    "class_val": "11",
+    "section": "B",
+    "total_load": 1.0,
+    "used_load": 1.0,
+    "remaining_load": 0.0,
+    "class_id": "11b"
+  }
+]

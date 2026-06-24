@@ -6,7 +6,8 @@ type Announcement = {
   _id: string;
   title: string;
   message: string;
-  level: "info" | "warning" | "exam";
+  level: "info" | "warning" | "exam" | "urgent";
+  targetClass: string;
   isActive: boolean;
 };
 
@@ -19,6 +20,7 @@ export default function AdminAnnouncementsPage() {
     title: "",
     message: "",
     level: "info",
+    targetClass: "All",
     isActive: true,
   });
 
@@ -55,7 +57,7 @@ export default function AdminAnnouncementsPage() {
       return;
     }
 
-    setForm({ title: "", message: "", level: "info", isActive: true });
+    setForm({ title: "", message: "", level: "info", targetClass: "All", isActive: true });
     load();
   }
 
@@ -121,12 +123,23 @@ export default function AdminAnnouncementsPage() {
       <form onSubmit={onSubmit} className="mt-6 space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
         <input className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm" placeholder="Title" value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} required />
         <textarea className="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm" rows={4} placeholder="Message" value={form.message} onChange={(e) => setForm((prev) => ({ ...prev, message: e.target.value }))} required />
-        <div className="grid gap-3 sm:grid-cols-2">
-          <select className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm" value={form.level} onChange={(e) => setForm((prev) => ({ ...prev, level: e.target.value as "info" | "warning" | "exam" }))}>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <select className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm" value={form.level} onChange={(e) => setForm((prev) => ({ ...prev, level: e.target.value as any }))}>
             <option value="info">Info</option>
             <option value="warning">Warning</option>
             <option value="exam">Exam Alert</option>
+            <option value="urgent">Urgent / Flash</option>
           </select>
+          
+          <select className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm" value={form.targetClass} onChange={(e) => setForm((prev) => ({ ...prev, targetClass: e.target.value }))}>
+            <option value="All">Global (All Students)</option>
+            <option value="X-A">X-A</option>
+            <option value="XI - SCIENCE-A">XI - SCIENCE-A</option>
+            <option value="XI - COMMERCE-B">XI - COMMERCE-B</option>
+            <option value="XI - HUMANITIES-B">XI - HUMANITIES-B</option>
+            <option value="Class 11">Class 11</option>
+          </select>
+
           <label className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm">
             <input type="checkbox" checked={form.isActive} onChange={(e) => setForm((prev) => ({ ...prev, isActive: e.target.checked }))} />
             Active

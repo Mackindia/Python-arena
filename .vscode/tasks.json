@@ -2,10 +2,35 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "Run Python Arena (Dev)",
+			"type": "shell",
+			"command": "npm run dev",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
 			"label": "Build Python Arena",
 			"type": "shell",
 			"command": "npm run build",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
 			"group": "build"
+		},
+		{
+			"label": "Sync Timetable Static Files",
+			"type": "shell",
+			"command": "$src = \"VS CODE Final TT project Doon Scholars/timetable-web-app/dist\"; $dst = \"public/timetable\"; New-Item -ItemType Directory -Path $dst -Force | Out-Null; Copy-Item -Path \"$src/*\" -Destination $dst -Recurse -Force",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
 		}
 	]
 }

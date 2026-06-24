@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 /**
  * PDF Viewer Component - Usage Examples
  * 

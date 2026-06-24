@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { requireAdminApi } from "@/lib/admin-api";
+import { requireAdminApi, requireSuperAdminApi } from "@/lib/admin-api";
 import Comment from "@/models/Comment";
 import BlockedUser from "@/models/BlockedUser";
 
@@ -48,7 +48,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
-    const access = await requireAdminApi();
+    const access = await requireSuperAdminApi();
     if (!access.ok) {
       return access.response;
     }
@@ -66,3 +66,4 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ message: "Failed to delete comment", error: error instanceof Error ? error.message : "Unknown" }, { status: 500 });
   }
 }
+

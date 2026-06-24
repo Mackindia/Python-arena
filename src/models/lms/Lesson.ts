@@ -5,6 +5,12 @@ const LessonSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
     slug: { type: String, required: true, trim: true },
+    contentType: {
+      type: String,
+      enum: ["notes", "cbse-pdf", "mixed"],
+      default: "notes",
+      index: true,
+    },
     subject: { type: Schema.Types.ObjectId, ref: "Subject", required: true, index: true },
     class: { type: Schema.Types.ObjectId, ref: "Class", required: true, index: true },
     description: { type: String, default: "", trim: true },
@@ -38,6 +44,7 @@ LessonSchema.pre("validate", function () {
 
 LessonSchema.index({ class: 1, slug: 1 }, { unique: true });
 LessonSchema.index({ subject: 1, class: 1, published: 1 });
+LessonSchema.index({ subject: 1, class: 1, contentType: 1, published: 1 });
 LessonSchema.index({ title: "text", description: "text", content: "text" });
 
 export type LessonDocument = InferSchemaType<typeof LessonSchema> & {

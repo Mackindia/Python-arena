@@ -61,15 +61,25 @@ export async function syncCurrentUser() {
 
   await connectDB();
 
-  // Don't overwrite role — it is managed in MongoDB, not in Clerk publicMetadata
-  const { role: _role, ...profileWithoutRole } = profile;
+  // Don't overwrite admin-managed fields from Clerk after the user exists.
+  const profileWithoutManagedFields = {
+    ...profile,
+  };
+
+  delete profileWithoutManagedFields.role;
+  delete profileWithoutManagedFields.email;
+  delete profileWithoutManagedFields.studentClass;
 
   const user = await User.findOneAndUpdate(
     { clerkId: profile.clerkId },
     {
-      $set: profileWithoutRole,
-      // Only set role on first insert (upsert), never overwrite it afterwards
-      $setOnInsert: { role: profile.role },
+      $set: profileWithoutManagedFields,
+      // Only set admin-managed fields on first insert; later edits live in MongoDB.
+      $setOnInsert: {
+        role: profile.role,
+        email: profile.email,
+        studentClass: profile.studentClass,
+      },
     },
     { returnDocument: "after", upsert: true, setDefaultsOnInsert: true },
   );

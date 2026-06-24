@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import ClerkUserSync from "@/src/components/auth/ClerkUserSync";
+import HashEducationalAIRedirect from "@/src/components/educational-ai/HashEducationalAIRedirect";
+import Navbar from "@/src/components/navbar/Navbar";
+import NoticeBoard from "@/src/components/dashboard/NoticeBoard";
+import Footer from "@/src/components/footer/Footer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,8 +37,9 @@ export default function RootLayout({
       <html
         lang="en"
         className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+        suppressHydrationWarning
       >
-        <body className="min-h-full bg-slate-950 text-slate-100">
+        <body className="min-h-full bg-slate-950 text-slate-100" suppressHydrationWarning>
           <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center justify-center px-6 text-center">
             <h1 className="text-3xl font-bold sm:text-4xl">Deployment Configuration Required</h1>
             <p className="mt-4 text-sm text-slate-300 sm:text-base">
@@ -54,16 +59,21 @@ export default function RootLayout({
   }
 
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
-      >
-        <body className="min-h-full flex flex-col">
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <ClerkProvider>
           <ClerkUserSync />
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+          <HashEducationalAIRedirect />
+          <Navbar />
+          <NoticeBoard />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }
