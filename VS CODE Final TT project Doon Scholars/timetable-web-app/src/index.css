@@ -380,17 +380,12 @@ select:focus, input:focus {
     display: block !important;
   }
   
-  .print-all-days-view {
-    display: block !important;
-  }
-  
-  .print-day-section {
+  .day-timetable-section {
     page-break-after: always;
     break-after: page;
-    margin-bottom: 2rem;
   }
   
-  .print-day-section:last-child {
+  .day-timetable-section:last-child {
     page-break-after: auto;
     break-after: auto;
   }
