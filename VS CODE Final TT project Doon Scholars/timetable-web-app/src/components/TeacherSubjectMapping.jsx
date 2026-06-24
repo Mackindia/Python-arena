@@ -497,23 +497,15 @@ const TeacherSubjectMapping = () => {
     }
 
     let removedCount = 0;
-    const updatedTimetables = { ...timetables };
 
-    Object.keys(updatedTimetables).forEach(classId => {
-      updatedTimetables[classId] = updatedTimetables[classId].map(slot => {
+    // Iterate through all classes and slots
+    Object.keys(timetables).forEach(classId => {
+      const classSchedule = timetables[classId] || [];
+      classSchedule.forEach(slot => {
         if (slot.subject === subjectName) {
-          removedCount++;
-          return { ...slot, subject: '', teacher: '', assignedTeachers: [], clashes: [] };
-        }
-        return slot;
-      });
-    });
-
-    // Update timetables via context
-    Object.keys(updatedTimetables).forEach(classId => {
-      updatedTimetables[classId].forEach(slot => {
-        if (slot.subject === '' && timetables[classId]?.find(s => s.day === slot.day && parseInt(s.period) === parseInt(slot.period))?.subject === subjectName) {
+          // Clear the slot by setting empty subject and teacher
           updateSlot(classId, slot.day, slot.period, '', '', [], []);
+          removedCount++;
         }
       });
     });
@@ -525,7 +517,7 @@ const TeacherSubjectMapping = () => {
       return nextMap;
     });
 
-    // Also remove from loadMaster
+    // Also remove from config wings
     setConfig(prev => {
       const newWings = prev.wings.map(w => ({
         ...w,
@@ -553,9 +545,11 @@ const TeacherSubjectMapping = () => {
     }
 
     let totalRemoved = 0;
+    
     deletedSubjects.forEach(subjectName => {
       Object.keys(timetables).forEach(classId => {
-        timetables[classId].forEach(slot => {
+        const classSchedule = timetables[classId] || [];
+        classSchedule.forEach(slot => {
           if (slot.subject === subjectName) {
             updateSlot(classId, slot.day, slot.period, '', '', [], []);
             totalRemoved++;
