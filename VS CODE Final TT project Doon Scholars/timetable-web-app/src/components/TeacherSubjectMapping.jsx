@@ -452,6 +452,129 @@ const TeacherSubjectMapping = () => {
     setShowDeleteConfirm(false);
   };
 
+  // ===== Deep Clean Engine =====
+  const [deepCleanResults, setDeepCleanResults] = useState(null);
+  const [showDeepClean, setShowDeepClean] = useState(false);
+
+  // Scan all timetables for deleted subjects
+  const scanDeletedSubjects = () => {
+    const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
+    const deletedSubjects = savedDeletedSubjects ? JSON.parse(savedDeletedSubjects) : [];
+    
+    if (deletedSubjects.length === 0) {
+      setDeepCleanResults({ deletedSubjects: [], occurrences: [], totalFound: 0 });
+      return;
+    }
+
+    const occurrences = [];
+    
+    // Scan all classes in timetables
+    Object.keys(timetables).forEach(classId => {
+      timetables[classId].forEach(slot => {
+        if (slot.subject && deletedSubjects.includes(slot.subject)) {
+          occurrences.push({
+            classId,
+            day: slot.day,
+            period: slot.period,
+            subject: slot.subject,
+            teacher: slot.teacher || 'No Teacher'
+          });
+        }
+      });
+    });
+
+    setDeepCleanResults({
+      deletedSubjects,
+      occurrences,
+      totalFound: occurrences.length
+    });
+  };
+
+  // Force delete a subject from all timetables
+  const forceDeleteSubject = (subjectName) => {
+    if (!window.confirm(`FORCE DELETE: Remove "${subjectName}" from ALL timetables?\n\nThis will clear the subject from every class period where it appears.`)) {
+      return;
+    }
+
+    let removedCount = 0;
+    const updatedTimetables = { ...timetables };
+
+    Object.keys(updatedTimetables).forEach(classId => {
+      updatedTimetables[classId] = updatedTimetables[classId].map(slot => {
+        if (slot.subject === subjectName) {
+          removedCount++;
+          return { ...slot, subject: '', teacher: '', assignedTeachers: [], clashes: [] };
+        }
+        return slot;
+      });
+    });
+
+    // Update timetables via context
+    Object.keys(updatedTimetables).forEach(classId => {
+      updatedTimetables[classId].forEach(slot => {
+        if (slot.subject === '' && timetables[classId]?.find(s => s.day === slot.day && parseInt(s.period) === parseInt(slot.period))?.subject === subjectName) {
+          updateSlot(classId, slot.day, slot.period, '', '', [], []);
+        }
+      });
+    });
+
+    // Also remove from teacherSubjectMap
+    setTeacherSubjectMap(prev => {
+      const nextMap = { ...prev };
+      delete nextMap[subjectName];
+      return nextMap;
+    });
+
+    // Also remove from loadMaster
+    setConfig(prev => {
+      const newWings = prev.wings.map(w => ({
+        ...w,
+        subjects: w.subjects.filter(s => s !== subjectName)
+      })).filter(w => w.columns.length > 0 && w.subjects.length > 0);
+      return { ...prev, wings: newWings };
+    });
+
+    alert(`Force deleted "${subjectName}" from ${removedCount} timetable cells.`);
+    scanDeletedSubjects(); // Refresh the scan
+  };
+
+  // Force delete ALL deleted subjects from timetables
+  const forceDeleteAll = () => {
+    const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
+    const deletedSubjects = savedDeletedSubjects ? JSON.parse(savedDeletedSubjects) : [];
+    
+    if (deletedSubjects.length === 0) {
+      alert("No deleted subjects found.");
+      return;
+    }
+
+    if (!window.confirm(`FORCE DELETE ALL: Remove ${deletedSubjects.length} deleted subject(s) from ALL timetables?\n\nSubjects: ${deletedSubjects.join(', ')}`)) {
+      return;
+    }
+
+    let totalRemoved = 0;
+    deletedSubjects.forEach(subjectName => {
+      Object.keys(timetables).forEach(classId => {
+        timetables[classId].forEach(slot => {
+          if (slot.subject === subjectName) {
+            updateSlot(classId, slot.day, slot.period, '', '', [], []);
+            totalRemoved++;
+          }
+        });
+      });
+
+      // Remove from teacherSubjectMap
+      setTeacherSubjectMap(prev => {
+        const nextMap = { ...prev };
+        delete nextMap[subjectName];
+        return nextMap;
+      });
+    });
+
+    alert(`Force deleted ${deletedSubjects.length} subjects from ${totalRemoved} timetable cells total.`);
+    scanDeletedSubjects(); // Refresh the scan
+  };
+
   // Parse CSV and Initialize
   useEffect(() => {
     const parsed = parseCSVConfig(loadMaster);
@@ -903,6 +1026,199 @@ const TeacherSubjectMapping = () => {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Deep Clean Engine */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: '1', minWidth: '300px' }}>
+          <div style={{ background: '#fef2f2', padding: '1.5rem', borderRadius: '8px', border: '1px solid #fecaca' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#991b1b', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              🔍 Deep Clean Engine
+            </h3>
+            <p style={{ fontSize: '0.875rem', color: '#b91c1c', margin: '0 0 1rem 0' }}>
+              Scan all timetables for deleted subjects and force remove them.
+            </p>
+            
+            <button 
+              className="btn"
+              style={{ 
+                background: '#dc2626', 
+                color: 'white', 
+                border: 'none', 
+                padding: '0.5rem 1rem', 
+                borderRadius: '4px', 
+                fontWeight: 600, 
+                cursor: 'pointer',
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}
+              onClick={() => {
+                setShowDeepClean(true);
+                scanDeletedSubjects();
+              }}
+            >
+              🔍 Scan for Deleted Subjects
+            </button>
+
+            {/* Deep Clean Results */}
+            {showDeepClean && deepCleanResults && (
+              <div style={{ marginTop: '1rem' }}>
+                {deepCleanResults.deletedSubjects.length === 0 ? (
+                  <div style={{ padding: '1rem', background: '#f0fdf4', borderRadius: '6px', border: '1px solid #bbf7d0', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.875rem', color: '#166534', fontWeight: 600 }}>✓ No deleted subjects found</div>
+                    <div style={{ fontSize: '0.75rem', color: '#15803d', marginTop: '0.25rem' }}>All subjects are clean</div>
+                  </div>
+                ) : (
+                  <>
+                    {/* Summary */}
+                    <div style={{ padding: '0.75rem', background: deepCleanResults.totalFound > 0 ? '#fef2f2' : '#f0fdf4', borderRadius: '6px', border: `1px solid ${deepCleanResults.totalFound > 0 ? '#fecaca' : '#bbf7d0'}`, marginBottom: '0.75rem' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 600, color: deepCleanResults.totalFound > 0 ? '#991b1b' : '#166534' }}>
+                        {deepCleanResults.deletedSubjects.length} deleted subject(s) registered
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: deepCleanResults.totalFound > 0 ? '#b91c1c' : '#15803d', marginTop: '0.25rem' }}>
+                        {deepCleanResults.totalFound > 0 
+                          ? `⚠️ Found in ${deepCleanResults.totalFound} timetable cell(s) — needs force delete`
+                          : '✓ Not found in any timetable — clean'}
+                      </div>
+                    </div>
+
+                    {/* Deleted Subjects List */}
+                    <div style={{ marginBottom: '0.75rem' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#78350f', marginBottom: '0.5rem' }}>Deleted Subjects:</div>
+                      {deepCleanResults.deletedSubjects.map((subject, idx) => {
+                        const count = deepCleanResults.occurrences.filter(o => o.subject === subject).length;
+                        return (
+                          <div key={idx} style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'space-between',
+                            padding: '0.5rem 0.75rem', 
+                            background: count > 0 ? '#fef2f2' : '#f9fafb', 
+                            borderRadius: '4px', 
+                            border: `1px solid ${count > 0 ? '#fecaca' : '#e5e7eb'}`,
+                            marginBottom: '0.5rem'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{ 
+                                width: '8px', 
+                                height: '8px', 
+                                borderRadius: '50%', 
+                                background: count > 0 ? '#ef4444' : '#10b981' 
+                              }}></span>
+                              <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1e293b' }}>{subject}</span>
+                              {count > 0 && (
+                                <span style={{ 
+                                  fontSize: '0.7rem', 
+                                  background: '#fecaca', 
+                                  color: '#991b1b', 
+                                  padding: '2px 6px', 
+                                  borderRadius: '10px',
+                                  fontWeight: 600
+                                }}>
+                                  {count} cell(s)
+                                </span>
+                              )}
+                            </div>
+                            {count > 0 && (
+                              <button
+                                onClick={() => forceDeleteSubject(subject)}
+                                style={{
+                                  background: '#dc2626',
+                                  color: 'white',
+                                  border: 'none',
+                                  padding: '4px 10px',
+                                  borderRadius: '4px',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                Force Delete
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Occurrences Detail */}
+                    {deepCleanResults.occurrences.length > 0 && (
+                      <div style={{ marginBottom: '0.75rem' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#78350f', marginBottom: '0.5rem' }}>Found in Timetable:</div>
+                        <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #fecaca', borderRadius: '4px' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
+                            <thead>
+                              <tr style={{ background: '#fef2f2' }}>
+                                <th style={{ padding: '6px 8px', textAlign: 'left', borderBottom: '1px solid #fecaca' }}>Class</th>
+                                <th style={{ padding: '6px 8px', textAlign: 'left', borderBottom: '1px solid #fecaca' }}>Day</th>
+                                <th style={{ padding: '6px 8px', textAlign: 'center', borderBottom: '1px solid #fecaca' }}>Period</th>
+                                <th style={{ padding: '6px 8px', textAlign: 'left', borderBottom: '1px solid #fecaca' }}>Subject</th>
+                                <th style={{ padding: '6px 8px', textAlign: 'left', borderBottom: '1px solid #fecaca' }}>Teacher</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {deepCleanResults.occurrences.map((occ, idx) => (
+                                <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fef2f2' }}>
+                                  <td style={{ padding: '4px 8px', borderBottom: '1px solid #fee2e2', fontWeight: 600 }}>{occ.classId.toUpperCase()}</td>
+                                  <td style={{ padding: '4px 8px', borderBottom: '1px solid #fee2e2' }}>{occ.day}</td>
+                                  <td style={{ padding: '4px 8px', textAlign: 'center', borderBottom: '1px solid #fee2e2' }}>{occ.period}</td>
+                                  <td style={{ padding: '4px 8px', borderBottom: '1px solid #fee2e2', color: '#dc2626', fontWeight: 600 }}>{occ.subject}</td>
+                                  <td style={{ padding: '4px 8px', borderBottom: '1px solid #fee2e2' }}>{occ.teacher}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    {deepCleanResults.totalFound > 0 && (
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          onClick={forceDeleteAll}
+                          style={{
+                            flex: 1,
+                            background: '#991b1b',
+                            color: 'white',
+                            border: 'none',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '4px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            fontSize: '0.875rem'
+                          }}
+                        >
+                          🧹 Force Delete ALL
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowDeepClean(false);
+                            setDeepCleanResults(null);
+                          }}
+                          style={{
+                            flex: 1,
+                            background: '#6b7280',
+                            color: 'white',
+                            border: 'none',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '4px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            fontSize: '0.875rem'
+                          }}
+                        >
+                          Close
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
