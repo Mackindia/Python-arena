@@ -13,6 +13,7 @@ const Mastersheet = () => {
   const [editMode, setEditMode] = useState(false);
   const [adminOverride, setAdminOverride] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [printAllDays, setPrintAllDays] = useState(false);
   const navigate = useNavigate();
 
   // Check if a subject has a valid mapping for a class
@@ -134,6 +135,61 @@ const Mastersheet = () => {
     }
   };
 
+  const handlePrintFullWeek = () => {
+    setPrintAllDays(true);
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => setPrintAllDays(false), 1000);
+    }, 100);
+  };
+
+  const renderDayTable = (day) => {
+    return (
+      <div key={day} className="print-day-section" style={{ marginBottom: '2rem', pageBreakAfter: 'always' }}>
+        <h2 style={{ textAlign: 'center', fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b' }}>
+          Doon Scholars - Master Timetable ({day})
+        </h2>
+        <div className="master-grid" style={{ gridTemplateColumns: `80px repeat(${PERIODS.length}, minmax(100px, 1fr))`, border: '1px solid #000' }}>
+          <div className="grid-cell grid-header">Class</div>
+          {PERIODS.map(p => (
+            <div key={`p${p}`} className="grid-cell grid-header">Period {p}</div>
+          ))}
+          {sortedClasses.map(cls => (
+            <React.Fragment key={cls}>
+              <div className="grid-cell day-header">{cls.toUpperCase()}</div>
+              {PERIODS.map(p => {
+                const slot = timetables[cls]?.find(s => s.day === day && parseInt(s.period) === p);
+                const mappingStatus = getMappingStatus(cls, slot?.subject);
+                let cellClassName = 'grid-cell';
+                if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'no_teacher') {
+                  cellClassName += ' missing-mapping';
+                }
+                return (
+                  <div key={`${cls}-${day}-p${p}`} className={cellClassName} style={{ padding: '4px', fontSize: '0.75rem' }}>
+                    {slot?.subject ? (
+                      mappingStatus.status === 'no_subject' ? (
+                        <div style={{ color: '#1e40af', fontSize: '0.7rem' }}>No Subject</div>
+                      ) : (
+                        <>
+                          <div className="slot-subject" style={{ fontWeight: 600 }}>{slot.subject}</div>
+                          <div className="slot-teacher" style={{ fontSize: '0.65rem', color: '#555' }}>
+                            {slot.teacher || 'No Teacher'}
+                          </div>
+                        </>
+                      )
+                    ) : (
+                      <div style={{ opacity: 0.3 }}>-</div>
+                    )}
+                  </div>
+                );
+              })}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -145,7 +201,15 @@ const Mastersheet = () => {
             onClick={() => window.print()}
             title="Download this day's Mastersheet as a Landscape PDF"
           >
-            🖨️ Print to PDF
+            🖨️ Print Today
+          </button>
+          <button
+            className="btn btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem', background: '#1d4ed8', border: 'none' }}
+            onClick={handlePrintFullWeek}
+            title="Print full Mastersheet for all days (Monday to Saturday)"
+          >
+            📅 Print Full Week
           </button>
           <button 
             className="btn btn-primary" 
@@ -236,8 +300,15 @@ const Mastersheet = () => {
       </div>
 
       <h1 className="print-only-title" style={{ display: 'none', textAlign: 'center', marginBottom: '20px', fontSize: '24px' }}>
-        Doon Scholars - Master Timetable ({selectedDay})
+        Doon Scholars - Master Timetable ({printAllDays ? 'Full Week' : selectedDay})
       </h1>
+
+      {/* Print All Days View - Hidden on screen, shown in print */}
+      {printAllDays && (
+        <div className="print-all-days-view" style={{ display: 'none' }}>
+          {DAYS.map(day => renderDayTable(day))}
+        </div>
+      )}
 
       {notification && (
         <div style={{
