@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Python Arena",
-  description: "Learn Python and AI from Class 6 to Class 12",
+  description: "Learn Python and AI from Class 8 to Class 11",
 };
 
 export default function RootLayout({
