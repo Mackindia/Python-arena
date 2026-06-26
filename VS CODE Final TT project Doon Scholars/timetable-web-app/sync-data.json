@@ -1,7 +1,7 @@
 {
-  "version": 27,
-  "updatedAt": 1782281405411,
-  "updatedBy": "client-1782278716975-bt7ws9",
+  "version": 210,
+  "updatedAt": 1782328733189,
+  "updatedBy": "client-1782317366395-wqjb1f",
   "timetables": {
     "1a": [
       {
@@ -74,7 +74,8 @@
         "teacher": "SL",
         "assignedTeachers": [
           "SL"
-        ]
+        ],
+        "clashes": []
       },
       {
         "day": "Tue",
@@ -89,9 +90,9 @@
         "day": "Tue",
         "period": 2,
         "subject": "Computer",
-        "teacher": "RADHIKA",
+        "teacher": "NM",
         "assignedTeachers": [
-          "RADHIKA"
+          "NM"
         ]
       },
       {
@@ -269,9 +270,9 @@
         "day": "Thu",
         "period": 6,
         "subject": "Computer",
-        "teacher": "RADHIKA",
+        "teacher": "NM",
         "assignedTeachers": [
-          "RADHIKA"
+          "NM"
         ]
       },
       {
@@ -350,9 +351,12 @@
         "day": "Fri",
         "period": 7,
         "subject": "CCA",
-        "teacher": "MP",
+        "teacher": "MP,SL,SZ,MG",
         "assignedTeachers": [
-          "MP"
+          "MP",
+          "SL",
+          "SZ",
+          "MG"
         ]
       },
       {
@@ -395,9 +399,9 @@
         "day": "Sat",
         "period": 4,
         "subject": "Computer",
-        "teacher": "RADHIKA",
+        "teacher": "NM",
         "assignedTeachers": [
-          "RADHIKA"
+          "NM"
         ]
       },
       {
@@ -747,11 +751,12 @@
       {
         "day": "Fri",
         "period": 3,
-        "subject": "Hindi_Lang",
-        "teacher": "TP",
+        "subject": "Music",
+        "teacher": "MG",
         "assignedTeachers": [
-          "TP"
-        ]
+          "MG"
+        ],
+        "clashes": []
       },
       {
         "day": "Fri",
@@ -784,19 +789,23 @@
         "day": "Fri",
         "period": 7,
         "subject": "CCA",
-        "teacher": "MP",
+        "teacher": "MP,SL,SZ,MG",
         "assignedTeachers": [
-          "MP"
+          "MP",
+          "SL",
+          "SZ",
+          "MG"
         ]
       },
       {
         "day": "Fri",
         "period": 8,
-        "subject": "Music",
-        "teacher": "MG",
+        "subject": "Hindi_Lang",
+        "teacher": "TP",
         "assignedTeachers": [
-          "MG"
-        ]
+          "TP"
+        ],
+        "clashes": []
       },
       {
         "day": "Sat",
@@ -1055,11 +1064,12 @@
       {
         "day": "Wed",
         "period": 5,
-        "subject": "Library",
-        "teacher": "SP",
+        "subject": "Maths",
+        "teacher": "PB",
         "assignedTeachers": [
-          "SP"
-        ]
+          "PB"
+        ],
+        "clashes": []
       },
       {
         "day": "Wed",
@@ -1073,11 +1083,12 @@
       {
         "day": "Wed",
         "period": 7,
-        "subject": "Maths",
-        "teacher": "PB",
+        "subject": "Library",
+        "teacher": "SP",
         "assignedTeachers": [
-          "PB"
-        ]
+          "SP"
+        ],
+        "clashes": []
       },
       {
         "day": "Wed",
@@ -1218,9 +1229,12 @@
         "day": "Fri",
         "period": 7,
         "subject": "CCA",
-        "teacher": "MP",
+        "teacher": "MP,SL,SZ,MG",
         "assignedTeachers": [
-          "MP"
+          "MP",
+          "SL",
+          "SZ",
+          "MG"
         ]
       },
       {
@@ -1336,11 +1350,12 @@
       {
         "day": "Mon",
         "period": 4,
-        "subject": "Maths",
-        "teacher": "SU",
+        "subject": "EVS",
+        "teacher": "VR",
         "assignedTeachers": [
-          "SU"
-        ]
+          "VR"
+        ],
+        "clashes": []
       },
       {
         "day": "Mon",
@@ -1381,11 +1396,12 @@
       {
         "day": "Tue",
         "period": 1,
-        "subject": "EVS",
-        "teacher": "VR",
+        "subject": "Hindi_Lit",
+        "teacher": "SU",
         "assignedTeachers": [
-          "VR"
-        ]
+          "SU"
+        ],
+        "clashes": []
       },
       {
         "day": "Tue",
@@ -1426,11 +1442,12 @@
       {
         "day": "Tue",
         "period": 6,
-        "subject": "Hindi_Lit",
-        "teacher": "SU",
+        "subject": "EVS",
+        "teacher": "VR",
         "assignedTeachers": [
-          "SU"
-        ]
+          "VR"
+        ],
+        "clashes": []
       },
       {
         "day": "Tue",
@@ -1453,11 +1470,12 @@
       {
         "day": "Wed",
         "period": 1,
-        "subject": "EVS",
-        "teacher": "VR",
+        "subject": "Hindi_Lit",
+        "teacher": "SU",
         "assignedTeachers": [
-          "VR"
-        ]
+          "SU"
+        ],
+        "clashes": []
       },
       {
         "day": "Wed",
@@ -1489,11 +1507,12 @@
       {
         "day": "Wed",
         "period": 5,
-        "subject": "Hindi_Lit",
-        "teacher": "SU",
+        "subject": "EVS",
+        "teacher": "VR",
         "assignedTeachers": [
-          "SU"
-        ]
+          "VR"
+        ],
+        "clashes": []
       },
       {
         "day": "Wed",
@@ -1525,11 +1544,12 @@
       {
         "day": "Thu",
         "period": 1,
-        "subject": "GK",
-        "teacher": "SU",
+        "subject": "EVS",
+        "teacher": "VR",
         "assignedTeachers": [
-          "SU"
-        ]
+          "VR"
+        ],
+        "clashes": []
       },
       {
         "day": "Thu",
@@ -1579,11 +1599,12 @@
       {
         "day": "Thu",
         "period": 7,
-        "subject": "EVS",
-        "teacher": "VR",
+        "subject": "GK",
+        "teacher": "SU",
         "assignedTeachers": [
-          "VR"
-        ]
+          "SU"
+        ],
+        "clashes": []
       },
       {
         "day": "Thu",
@@ -1628,7 +1649,8 @@
         "teacher": "NP",
         "assignedTeachers": [
           "NP"
-        ]
+        ],
+        "clashes": []
       },
       {
         "day": "Fri",
@@ -1652,9 +1674,18 @@
         "day": "Fri",
         "period": 7,
         "subject": "CCA",
-        "teacher": "MP",
+        "teacher": "MP,SL,SZ,MG",
         "assignedTeachers": [
-          "MP"
+          "MP",
+          "SL",
+          "SZ",
+          "MG"
+        ],
+        "clashes": [
+          {
+            "teacher": "MP",
+            "classId": "1a"
+          }
         ]
       },
       {
@@ -1669,11 +1700,12 @@
       {
         "day": "Sat",
         "period": 1,
-        "subject": "EVS",
-        "teacher": "VR",
+        "subject": "Hindi_Lang",
+        "teacher": "SU",
         "assignedTeachers": [
-          "VR"
-        ]
+          "SU"
+        ],
+        "clashes": []
       },
       {
         "day": "Sat",
@@ -1696,11 +1728,12 @@
       {
         "day": "Sat",
         "period": 4,
-        "subject": "Hindi_Lang",
-        "teacher": "SU",
+        "subject": "EVS",
+        "teacher": "VR",
         "assignedTeachers": [
-          "SU"
-        ]
+          "VR"
+        ],
+        "clashes": []
       },
       {
         "day": "Sat",
@@ -2190,7 +2223,8 @@
         "teacher": "VR",
         "assignedTeachers": [
           "VR"
-        ]
+        ],
+        "clashes": []
       },
       {
         "day": "Mon",
@@ -2204,8 +2238,17 @@
       {
         "day": "Mon",
         "period": 4,
-        "subject": "Maths_VR",
-        "teacher": "NP"
+        "subject": "Maths",
+        "teacher": "SU",
+        "assignedTeachers": [
+          "SU"
+        ],
+        "clashes": [
+          {
+            "teacher": "SU",
+            "classId": "2b"
+          }
+        ]
       },
       {
         "day": "Mon",
@@ -2237,8 +2280,12 @@
       {
         "day": "Mon",
         "period": 8,
-        "subject": "Maths_VR",
-        "teacher": "KB"
+        "subject": "Maths",
+        "teacher": "SU",
+        "assignedTeachers": [
+          "SU"
+        ],
+        "clashes": []
       },
       {
         "day": "Tue",
@@ -2265,7 +2312,8 @@
         "teacher": "NT",
         "assignedTeachers": [
           "NT"
-        ]
+        ],
+        "clashes": []
       },
       {
         "day": "Tue",
@@ -2288,8 +2336,12 @@
       {
         "day": "Tue",
         "period": 6,
-        "subject": "Maths_VR",
-        "teacher": "MB"
+        "subject": "Maths",
+        "teacher": "SU",
+        "assignedTeachers": [
+          "SU"
+        ],
+        "clashes": []
       },
       {
         "day": "Tue",
@@ -2366,8 +2418,12 @@
       {
         "day": "Wed",
         "period": 7,
-        "subject": "Maths_VR",
-        "teacher": "MB"
+        "subject": "Science",
+        "teacher": "VR",
+        "assignedTeachers": [
+          "VR"
+        ],
+        "clashes": []
       },
       {
         "day": "Wed",
@@ -2399,8 +2455,12 @@
       {
         "day": "Thu",
         "period": 3,
-        "subject": "Maths_VR",
-        "teacher": "NP"
+        "subject": "Hindi_Lang",
+        "teacher": "MB",
+        "assignedTeachers": [
+          "MB"
+        ],
+        "clashes": []
       },
       {
         "day": "Thu",
@@ -2423,11 +2483,12 @@
       {
         "day": "Thu",
         "period": 6,
-        "subject": "Hindi_Lang",
+        "subject": "Hindi_Lit",
         "teacher": "MB",
         "assignedTeachers": [
           "MB"
-        ]
+        ],
+        "clashes": []
       },
       {
         "day": "Thu",
@@ -2513,8 +2574,12 @@
       {
         "day": "Fri",
         "period": 8,
-        "subject": "Maths_VR",
-        "teacher": ""
+        "subject": "SSt",
+        "teacher": "NT",
+        "assignedTeachers": [
+          "NT"
+        ],
+        "clashes": []
       },
       {
         "day": "Sat",
@@ -2564,8 +2629,12 @@
       {
         "day": "Sat",
         "period": 6,
-        "subject": "Maths_DK",
-        "teacher": ""
+        "subject": "Maths",
+        "teacher": "SU",
+        "assignedTeachers": [
+          "SU"
+        ],
+        "clashes": []
       },
       {
         "day": "Sat",
@@ -2639,7 +2708,8 @@
         "teacher": "DK",
         "assignedTeachers": [
           "DK"
-        ]
+        ],
+        "clashes": []
       },
       {
         "day": "Mon",
@@ -3069,11 +3139,12 @@
       {
         "day": "Mon",
         "period": 6,
-        "subject": "Music",
-        "teacher": "MG",
+        "subject": "STEM_Junior",
+        "teacher": "NP",
         "assignedTeachers": [
-          "MG"
-        ]
+          "NP"
+        ],
+        "clashes": []
       },
       {
         "day": "Mon",
@@ -3087,11 +3158,12 @@
       {
         "day": "Mon",
         "period": 8,
-        "subject": "STEM_Junior",
-        "teacher": "NP",
+        "subject": "Music",
+        "teacher": "MG",
         "assignedTeachers": [
-          "NP"
-        ]
+          "MG"
+        ],
+        "clashes": []
       },
       {
         "day": "Tue",
@@ -3521,12 +3593,11 @@
       {
         "day": "Mon",
         "period": 8,
-        "subject": "Music",
-        "teacher": "MG",
+        "subject": "English_Lit",
+        "teacher": "KB",
         "assignedTeachers": [
-          "MG"
-        ],
-        "clashes": []
+          "KB"
+        ]
       },
       {
         "day": "Tue",
@@ -3630,20 +3701,19 @@
       {
         "day": "Wed",
         "period": 4,
-        "subject": "English_Lit",
-        "teacher": "KB",
+        "subject": "Music",
+        "teacher": "MG",
         "assignedTeachers": [
-          "KB"
-        ],
-        "clashes": []
+          "MG"
+        ]
       },
       {
         "day": "Wed",
         "period": 5,
         "subject": "VE",
-        "teacher": "KB",
+        "teacher": "SW",
         "assignedTeachers": [
-          "KB"
+          "SW"
         ]
       },
       {
@@ -3703,11 +3773,12 @@
       {
         "day": "Thu",
         "period": 4,
-        "subject": "Dance",
-        "teacher": "SL",
+        "subject": "Music",
+        "teacher": "MG",
         "assignedTeachers": [
-          "SL"
-        ]
+          "MG"
+        ],
+        "clashes": []
       },
       {
         "day": "Thu",
@@ -3739,11 +3810,12 @@
       {
         "day": "Thu",
         "period": 8,
-        "subject": "Music",
-        "teacher": "MG",
+        "subject": "Dance",
+        "teacher": "SL",
         "assignedTeachers": [
-          "MG"
-        ]
+          "SL"
+        ],
+        "clashes": []
       },
       {
         "day": "Fri",
@@ -4119,12 +4191,11 @@
       {
         "day": "Thu",
         "period": 2,
-        "subject": "Maths",
-        "teacher": "NG",
+        "subject": "Science",
+        "teacher": "SB",
         "assignedTeachers": [
-          "NG"
-        ],
-        "clashes": []
+          "SB"
+        ]
       },
       {
         "day": "Thu",
@@ -4156,12 +4227,11 @@
       {
         "day": "Thu",
         "period": 6,
-        "subject": "Science",
-        "teacher": "SB",
+        "subject": "Maths",
+        "teacher": "NG",
         "assignedTeachers": [
-          "SB"
-        ],
-        "clashes": []
+          "NG"
+        ]
       },
       {
         "day": "Thu",
@@ -4194,9 +4264,9 @@
         "day": "Fri",
         "period": 2,
         "subject": "VE",
-        "teacher": "AN",
+        "teacher": "SW",
         "assignedTeachers": [
-          "AN"
+          "SW"
         ]
       },
       {
@@ -4334,8 +4404,7 @@
         "teacher": "MP",
         "assignedTeachers": [
           "MP"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -4344,8 +4413,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -4354,8 +4422,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -4364,8 +4431,7 @@
         "teacher": "SL",
         "assignedTeachers": [
           "SL"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -4374,27 +4440,25 @@
         "teacher": "NG",
         "assignedTeachers": [
           "NG"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
         "period": 6,
-        "subject": "F/S",
-        "teacher": "SW,MS",
+        "subject": "French",
+        "teacher": "SW",
         "assignedTeachers": [
-          "SW",
-          "MS"
+          "SW"
         ],
         "clashes": []
       },
       {
         "day": "Mon",
         "period": 7,
-        "subject": "Hindi_Lit",
-        "teacher": "SH",
+        "subject": "Science",
+        "teacher": "SB",
         "assignedTeachers": [
-          "SH"
+          "SB"
         ],
         "clashes": []
       },
@@ -4405,8 +4469,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -4437,8 +4500,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -4447,8 +4509,7 @@
         "teacher": "NG",
         "assignedTeachers": [
           "NG"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -4459,16 +4520,14 @@
           "GA",
           "SA",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
         "period": 6,
-        "subject": "F/S",
-        "teacher": "SW,MS",
+        "subject": "Sanskrit",
+        "teacher": "MS",
         "assignedTeachers": [
-          "SW",
           "MS"
         ],
         "clashes": []
@@ -4476,10 +4535,10 @@
       {
         "day": "Tue",
         "period": 7,
-        "subject": "Hindi_Lit",
-        "teacher": "SH",
+        "subject": "Maths",
+        "teacher": "NG",
         "assignedTeachers": [
-          "SH"
+          "NG"
         ],
         "clashes": []
       },
@@ -4500,8 +4559,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -4510,8 +4568,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -4520,8 +4577,7 @@
         "teacher": "NG",
         "assignedTeachers": [
           "NG"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -4530,16 +4586,15 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
         "period": 5,
-        "subject": "Computer",
-        "teacher": "GA",
+        "subject": "Science",
+        "teacher": "SB",
         "assignedTeachers": [
-          "GA"
+          "SB"
         ],
         "clashes": []
       },
@@ -4550,8 +4605,7 @@
         "teacher": "MG",
         "assignedTeachers": [
           "MG"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -4560,32 +4614,11 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
         "period": 8,
-        "subject": "Science",
-        "teacher": "SB",
-        "assignedTeachers": [
-          "SB"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 1,
-        "subject": "English_Lang",
-        "teacher": "RD",
-        "assignedTeachers": [
-          "RD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 2,
         "subject": "Computer",
         "teacher": "GA",
         "assignedTeachers": [
@@ -4595,13 +4628,30 @@
       },
       {
         "day": "Thu",
+        "period": 1,
+        "subject": "English_Lang",
+        "teacher": "RD",
+        "assignedTeachers": [
+          "RD"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 2,
+        "subject": "Computer",
+        "teacher": "GA",
+        "assignedTeachers": [
+          "GA"
+        ]
+      },
+      {
+        "day": "Thu",
         "period": 3,
         "subject": "SST",
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -4610,8 +4660,7 @@
         "teacher": "SZ",
         "assignedTeachers": [
           "SZ"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -4620,8 +4669,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -4630,8 +4678,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -4640,27 +4687,25 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
         "period": 8,
-        "subject": "Maths",
-        "teacher": "NG",
+        "subject": "Hindi_Lit",
+        "teacher": "SH",
         "assignedTeachers": [
-          "NG"
+          "SH"
         ],
         "clashes": []
       },
       {
         "day": "Fri",
         "period": 1,
-        "subject": "STEM",
-        "teacher": "GA, AB",
+        "subject": "Maths",
+        "teacher": "NG",
         "assignedTeachers": [
-          "GA",
-          "AB"
+          "NG"
         ],
         "clashes": []
       },
@@ -4671,8 +4716,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -4681,8 +4725,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -4691,16 +4734,15 @@
         "teacher": "SL",
         "assignedTeachers": [
           "SL"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
         "period": 5,
-        "subject": "Science",
-        "teacher": "SB",
+        "subject": "Hindi_Lit",
+        "teacher": "SH",
         "assignedTeachers": [
-          "SB"
+          "SH"
         ],
         "clashes": []
       },
@@ -4711,8 +4753,7 @@
         "teacher": "SZ",
         "assignedTeachers": [
           "SZ"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -4727,10 +4768,11 @@
       {
         "day": "Fri",
         "period": 8,
-        "subject": "Maths",
-        "teacher": "NG",
+        "subject": "STEM",
+        "teacher": "AR, AB",
         "assignedTeachers": [
-          "NG"
+          "AR",
+          "AB"
         ],
         "clashes": []
       },
@@ -4741,8 +4783,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -4751,8 +4792,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -4761,8 +4801,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -4771,8 +4810,7 @@
         "teacher": "SP",
         "assignedTeachers": [
           "SP"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -4781,8 +4819,7 @@
         "teacher": "NG",
         "assignedTeachers": [
           "NG"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -4791,8 +4828,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -4801,8 +4837,7 @@
         "teacher": "NG",
         "assignedTeachers": [
           "NG"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -4811,8 +4846,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       }
     ],
     "6b": [
@@ -4823,8 +4857,7 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -4833,8 +4866,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -4843,16 +4875,15 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
         "period": 4,
-        "subject": "Computer",
-        "teacher": "GA",
+        "subject": "Maths",
+        "teacher": "DP",
         "assignedTeachers": [
-          "GA"
+          "DP"
         ],
         "clashes": []
       },
@@ -4863,27 +4894,25 @@
         "teacher": "GA",
         "assignedTeachers": [
           "GA"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
         "period": 6,
-        "subject": "F/S",
-        "teacher": "SW,MS",
+        "subject": "Computer",
+        "teacher": "GA",
         "assignedTeachers": [
-          "SW",
-          "MS"
+          "GA"
         ],
         "clashes": []
       },
       {
         "day": "Mon",
         "period": 7,
-        "subject": "Maths",
-        "teacher": "NG",
+        "subject": "English_Lit",
+        "teacher": "RD",
         "assignedTeachers": [
-          "NG"
+          "RD"
         ],
         "clashes": []
       },
@@ -4894,8 +4923,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -4904,16 +4932,15 @@
         "teacher": "MG",
         "assignedTeachers": [
           "MG"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
         "period": 2,
-        "subject": "Computer",
-        "teacher": "GA",
+        "subject": "Sanskrit",
+        "teacher": "MS",
         "assignedTeachers": [
-          "GA"
+          "MS"
         ],
         "clashes": []
       },
@@ -4924,16 +4951,19 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
         "period": 4,
-        "subject": "SST",
+        "subject": "GK",
         "teacher": "PR",
         "assignedTeachers": [
-          "PR"
+          {
+            "teacher": "PR",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": []
       },
@@ -4944,27 +4974,25 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
         "period": 6,
-        "subject": "F/S",
-        "teacher": "SW,MS",
+        "subject": "French",
+        "teacher": "SW",
         "assignedTeachers": [
-          "SW",
-          "MS"
+          "SW"
         ],
         "clashes": []
       },
       {
         "day": "Tue",
         "period": 7,
-        "subject": "Maths",
-        "teacher": "NG",
+        "subject": "SST",
+        "teacher": "PR",
         "assignedTeachers": [
-          "NG"
+          "PR"
         ],
         "clashes": []
       },
@@ -4975,8 +5003,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -4985,16 +5012,15 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
         "period": 2,
-        "subject": "English_Lit",
-        "teacher": "RD",
+        "subject": "Maths",
+        "teacher": "DP",
         "assignedTeachers": [
-          "RD"
+          "DP"
         ],
         "clashes": []
       },
@@ -5005,8 +5031,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -5015,18 +5040,16 @@
         "teacher": "SL",
         "assignedTeachers": [
           "SL"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
         "period": 5,
         "subject": "Maths",
-        "teacher": "NG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "NG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Wed",
@@ -5035,8 +5058,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -5045,8 +5067,7 @@
         "teacher": "SZ",
         "assignedTeachers": [
           "SZ"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -5055,19 +5076,17 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
         "period": 1,
         "subject": "STEM",
-        "teacher": "GA, SB",
+        "teacher": "AR, SB",
         "assignedTeachers": [
-          "GA",
+          "AR",
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5083,11 +5102,10 @@
         "day": "Thu",
         "period": 3,
         "subject": "Maths",
-        "teacher": "NG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "NG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Thu",
@@ -5106,8 +5124,7 @@
         "teacher": "SZ",
         "assignedTeachers": [
           "SZ"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5116,8 +5133,7 @@
         "teacher": "MP",
         "assignedTeachers": [
           "MP"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5126,8 +5142,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5136,18 +5151,16 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
         "period": 1,
         "subject": "Maths",
-        "teacher": "NG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "NG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Fri",
@@ -5156,8 +5169,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -5168,8 +5180,7 @@
           "GA",
           "SA",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -5178,26 +5189,29 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
         "period": 5,
-        "subject": "Maths",
-        "teacher": "NG",
+        "subject": "Computer",
+        "teacher": "GA",
         "assignedTeachers": [
-          "NG"
+          {
+            "teacher": "GA",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": []
       },
       {
         "day": "Fri",
         "period": 6,
-        "subject": "GK",
-        "teacher": "PR",
+        "subject": "Maths",
+        "teacher": "DP",
         "assignedTeachers": [
-          "PR"
+          "DP"
         ],
         "clashes": []
       },
@@ -5208,8 +5222,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -5220,8 +5233,7 @@
           "GA",
           "SA",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5230,8 +5242,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5240,8 +5251,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5250,18 +5260,16 @@
         "teacher": "SP",
         "assignedTeachers": [
           "SP"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 4,
         "subject": "Maths",
-        "teacher": "NG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "NG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Sat",
@@ -5270,8 +5278,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5280,8 +5287,7 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5290,8 +5296,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5300,31 +5305,33 @@
         "teacher": "SL",
         "assignedTeachers": [
           "SL"
-        ],
-        "clashes": []
+        ]
       }
     ],
     "7a": [
       {
         "day": "Mon",
         "period": 1,
-        "subject": "Computer",
-        "teacher": "GA",
+        "subject": "Maths",
+        "teacher": "SD",
         "assignedTeachers": [
-          "GA"
-        ],
-        "clashes": []
+          "SD"
+        ]
       },
       {
         "day": "Mon",
         "period": 2,
-        "subject": "F/S",
-        "teacher": "SW,MS",
+        "subject": "Sanskrit",
+        "teacher": "SH",
         "assignedTeachers": [
-          "SW",
-          "MS"
+          "SH"
         ],
-        "clashes": []
+        "clashes": [
+          {
+            "teacher": "SH",
+            "classId": "9b"
+          }
+        ]
       },
       {
         "day": "Mon",
@@ -5333,8 +5340,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -5343,8 +5349,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -5353,8 +5358,7 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -5363,18 +5367,16 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
         "period": 7,
-        "subject": "Maths",
-        "teacher": "SD",
+        "subject": "Computer",
+        "teacher": "GA",
         "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
+          "GA"
+        ]
       },
       {
         "day": "Mon",
@@ -5383,8 +5385,7 @@
         "teacher": "GA",
         "assignedTeachers": [
           "GA"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -5393,8 +5394,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -5403,20 +5403,18 @@
         "teacher": "MG",
         "assignedTeachers": [
           "MG"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
         "period": 3,
         "subject": "Skill",
-        "teacher": "GA, SA, TEST",
+        "teacher": "GA, SA, HSC",
         "assignedTeachers": [
           "GA",
           "SA",
-          "TEST"
-        ],
-        "clashes": []
+          "HSC"
+        ]
       },
       {
         "day": "Tue",
@@ -5425,8 +5423,7 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -5435,8 +5432,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -5445,8 +5441,7 @@
         "teacher": "SD",
         "assignedTeachers": [
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -5455,8 +5450,7 @@
         "teacher": "GA",
         "assignedTeachers": [
           "GA"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -5465,8 +5459,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -5475,29 +5468,26 @@
         "teacher": "SD",
         "assignedTeachers": [
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
         "period": 2,
         "subject": "Skill",
-        "teacher": "GA, SA, TEST",
+        "teacher": "GA, SA, HSC",
         "assignedTeachers": [
           "GA",
           "SA",
-          "TEST"
-        ],
-        "clashes": []
+          "HSC"
+        ]
       },
       {
         "day": "Wed",
         "period": 3,
-        "subject": "F/S",
-        "teacher": "SW,MS",
+        "subject": "French",
+        "teacher": "SW",
         "assignedTeachers": [
-          "SW",
-          "MS"
+          "SW"
         ],
         "clashes": []
       },
@@ -5508,8 +5498,7 @@
         "teacher": "SD",
         "assignedTeachers": [
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -5518,8 +5507,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -5528,8 +5516,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -5538,8 +5525,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -5548,8 +5534,7 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5558,8 +5543,7 @@
         "teacher": "SD",
         "assignedTeachers": [
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5568,8 +5552,7 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5578,8 +5561,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5588,8 +5570,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5598,8 +5579,7 @@
         "teacher": "MP",
         "assignedTeachers": [
           "MP"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5608,8 +5588,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5618,8 +5597,7 @@
         "teacher": "SL",
         "assignedTeachers": [
           "SL"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -5628,8 +5606,7 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -5638,8 +5615,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -5648,8 +5624,7 @@
         "teacher": "DV",
         "assignedTeachers": [
           "DV"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -5658,8 +5633,7 @@
         "teacher": "SD",
         "assignedTeachers": [
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -5668,8 +5642,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -5678,8 +5651,7 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -5688,8 +5660,7 @@
         "teacher": "SL",
         "assignedTeachers": [
           "SL"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -5698,8 +5669,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -5708,8 +5678,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5718,8 +5687,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5728,8 +5696,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5738,18 +5705,17 @@
         "teacher": "SD",
         "assignedTeachers": [
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 4,
         "subject": "STEM",
-        "teacher": "GA",
+        "teacher": "AR, GA",
         "assignedTeachers": [
+          "AR",
           "GA"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5758,8 +5724,7 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5768,8 +5733,7 @@
         "teacher": "PR",
         "assignedTeachers": [
           "PR"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5778,8 +5742,7 @@
         "teacher": "DV",
         "assignedTeachers": [
           "DV"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -5788,23 +5751,12 @@
         "teacher": "SP",
         "assignedTeachers": [
           "SP"
-        ],
-        "clashes": []
+        ]
       }
     ],
     "7b": [
       {
         "day": "Mon",
-        "period": 1,
-        "subject": "F/S",
-        "teacher": "SW,SH",
-        "assignedTeachers": [
-          "SW",
-          "SH"
-        ]
-      },
-      {
-        "day": "Mon",
         "period": 2,
         "subject": "Skill",
         "teacher": "GA, SA, HSC",
@@ -5836,9 +5788,9 @@
         "day": "Mon",
         "period": 5,
         "subject": "STEM",
-        "teacher": "GA, AB",
+        "teacher": "AR, AB",
         "assignedTeachers": [
-          "GA",
+          "AR",
           "AB"
         ]
       },
@@ -5971,12 +5923,12 @@
       {
         "day": "Wed",
         "period": 4,
-        "subject": "F/S",
-        "teacher": "SW,SH",
+        "subject": "Sanskrit",
+        "teacher": "SH",
         "assignedTeachers": [
-          "SW",
           "SH"
-        ]
+        ],
+        "clashes": []
       },
       {
         "day": "Wed",
@@ -6199,20 +6151,22 @@
       {
         "day": "Sat",
         "period": 5,
-        "subject": "Maths",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ]
-      },
-      {
-        "day": "Sat",
-        "period": 6,
         "subject": "Computer",
         "teacher": "GA",
         "assignedTeachers": [
           "GA"
-        ]
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Sat",
+        "period": 6,
+        "subject": "Maths",
+        "teacher": "SD",
+        "assignedTeachers": [
+          "SD"
+        ],
+        "clashes": []
       },
       {
         "day": "Sat",
@@ -6237,9 +6191,10 @@
       {
         "day": "Mon",
         "period": 1,
-        "subject": "Maths",
-        "teacher": "NG",
+        "subject": "STEM",
+        "teacher": "AR, NG",
         "assignedTeachers": [
+          "AR",
           "NG"
         ],
         "clashes": []
@@ -6251,8 +6206,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -6261,8 +6215,7 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -6271,8 +6224,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -6281,8 +6233,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -6291,18 +6242,16 @@
         "teacher": "DV",
         "assignedTeachers": [
           "DV"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
         "period": 7,
-        "subject": "SSt",
-        "teacher": "RD",
+        "subject": "Maths",
+        "teacher": "NG",
         "assignedTeachers": [
-          "RD"
-        ],
-        "clashes": []
+          "NG"
+        ]
       },
       {
         "day": "Mon",
@@ -6311,29 +6260,26 @@
         "teacher": "SP",
         "assignedTeachers": [
           "SP"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
         "period": 1,
-        "subject": "Chemistry",
-        "teacher": "AB",
+        "subject": "SSt",
+        "teacher": "RD",
         "assignedTeachers": [
-          "AB"
+          "RD"
         ],
         "clashes": []
       },
       {
         "day": "Tue",
         "period": 2,
-        "subject": "STEM",
-        "teacher": "GA, NG",
+        "subject": "Chemistry",
+        "teacher": "AB",
         "assignedTeachers": [
-          "GA",
-          "NG"
-        ],
-        "clashes": []
+          "AB"
+        ]
       },
       {
         "day": "Tue",
@@ -6342,8 +6288,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -6352,8 +6297,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -6362,8 +6306,7 @@
         "teacher": "MG",
         "assignedTeachers": [
           "MG"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -6372,8 +6315,7 @@
         "teacher": "NG",
         "assignedTeachers": [
           "NG"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -6382,22 +6324,60 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
         "period": 8,
-        "subject": "SSt",
-        "teacher": "RD",
+        "subject": "French",
+        "teacher": "SW",
         "assignedTeachers": [
-          "RD"
+          "SW"
         ],
         "clashes": []
       },
       {
         "day": "Wed",
         "period": 1,
+        "subject": "Maths",
+        "teacher": "NG",
+        "assignedTeachers": [
+          "NG"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Wed",
+        "period": 2,
+        "subject": "Games",
+        "teacher": "DV",
+        "assignedTeachers": [
+          "DV"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 3,
+        "subject": "Skill",
+        "teacher": "GA, SA, HSC",
+        "assignedTeachers": [
+          "GA",
+          "SA",
+          "HSC"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 4,
+        "subject": "Computer",
+        "teacher": "GA",
+        "assignedTeachers": [
+          "GA"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 5,
         "subject": "A/C",
         "teacher": "MP",
         "assignedTeachers": [
@@ -6407,63 +6387,20 @@
       },
       {
         "day": "Wed",
-        "period": 2,
-        "subject": "Games",
-        "teacher": "DV",
-        "assignedTeachers": [
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 3,
-        "subject": "Skill",
-        "teacher": "GA, SA, HSC",
-        "assignedTeachers": [
-          "GA",
-          "SA",
-          "HSC"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 4,
-        "subject": "Maths",
-        "teacher": "NG",
-        "assignedTeachers": [
-          "NG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 5,
-        "subject": "English_Lit",
-        "teacher": "SW",
-        "assignedTeachers": [
-          "SW"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
         "period": 6,
         "subject": "Computer",
         "teacher": "GA",
         "assignedTeachers": [
           "GA"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
         "period": 7,
-        "subject": "Computer",
-        "teacher": "GA",
+        "subject": "English_Lit",
+        "teacher": "SW",
         "assignedTeachers": [
-          "GA"
+          "SW"
         ],
         "clashes": []
       },
@@ -6474,17 +6411,15 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
         "period": 1,
-        "subject": "F/S",
-        "teacher": "SW,SH",
+        "subject": "Sanskrit",
+        "teacher": "MS",
         "assignedTeachers": [
-          "SW",
-          "SH"
+          "MS"
         ],
         "clashes": []
       },
@@ -6495,8 +6430,7 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -6505,8 +6439,7 @@
         "teacher": "GA",
         "assignedTeachers": [
           "GA"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -6515,8 +6448,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -6525,172 +6457,10 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
-        "period": 6,
-        "subject": "Maths",
-        "teacher": "NG",
-        "assignedTeachers": [
-          "NG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 7,
-        "subject": "English_Lang",
-        "teacher": "SW",
-        "assignedTeachers": [
-          "SW"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 8,
-        "subject": "Biology",
-        "teacher": "SB",
-        "assignedTeachers": [
-          "SB"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 1,
-        "subject": "Dance",
-        "teacher": "SL",
-        "assignedTeachers": [
-          "SL"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 2,
-        "subject": "Maths",
-        "teacher": "NG",
-        "assignedTeachers": [
-          "NG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 3,
-        "subject": "Maths",
-        "teacher": "NG",
-        "assignedTeachers": [
-          "NG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 4,
-        "subject": "English_Lang",
-        "teacher": "SW",
-        "assignedTeachers": [
-          "SW"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 5,
-        "subject": "SSt",
-        "teacher": "RD",
-        "assignedTeachers": [
-          "RD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 6,
-        "subject": "F/S",
-        "teacher": "SW,SH",
-        "assignedTeachers": [
-          "SW",
-          "SH"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 7,
-        "subject": "English_Lit",
-        "teacher": "SW",
-        "assignedTeachers": [
-          "SW"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 8,
-        "subject": "Hindi_Lit",
-        "teacher": "SH",
-        "assignedTeachers": [
-          "SH"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 1,
-        "subject": "Physics",
-        "teacher": "AB",
-        "assignedTeachers": [
-          "AB"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 2,
-        "subject": "SSt",
-        "teacher": "RD",
-        "assignedTeachers": [
-          "RD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 3,
-        "subject": "Maths",
-        "teacher": "NG",
-        "assignedTeachers": [
-          "NG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 4,
-        "subject": "SSt",
-        "teacher": "RD",
-        "assignedTeachers": [
-          "RD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 5,
-        "subject": "Hindi_Lang",
-        "teacher": "SH",
-        "assignedTeachers": [
-          "SH"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
         "period": 6,
         "subject": "VE",
         "teacher": "SL",
@@ -6700,6 +6470,152 @@
         "clashes": []
       },
       {
+        "day": "Thu",
+        "period": 7,
+        "subject": "English_Lang",
+        "teacher": "SW",
+        "assignedTeachers": [
+          "SW"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 8,
+        "subject": "Biology",
+        "teacher": "SB",
+        "assignedTeachers": [
+          "SB"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 1,
+        "subject": "Dance",
+        "teacher": "SL",
+        "assignedTeachers": [
+          "SL"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 2,
+        "subject": "Hindi_Lit",
+        "teacher": "SH",
+        "assignedTeachers": [
+          "SH"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 3,
+        "subject": "Maths",
+        "teacher": "NG",
+        "assignedTeachers": [
+          "NG"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 4,
+        "subject": "English_Lang",
+        "teacher": "SW",
+        "assignedTeachers": [
+          "SW"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 5,
+        "subject": "SSt",
+        "teacher": "RD",
+        "assignedTeachers": [
+          "RD"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 6,
+        "subject": "SSt",
+        "teacher": "RD",
+        "assignedTeachers": [
+          "RD"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Fri",
+        "period": 7,
+        "subject": "English_Lit",
+        "teacher": "SW",
+        "assignedTeachers": [
+          "SW"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 8,
+        "subject": "Maths",
+        "teacher": "NG",
+        "assignedTeachers": [
+          "NG"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 1,
+        "subject": "Physics",
+        "teacher": "AB",
+        "assignedTeachers": [
+          "AB"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 2,
+        "subject": "SSt",
+        "teacher": "RD",
+        "assignedTeachers": [
+          "RD"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 3,
+        "subject": "Maths",
+        "teacher": "NG",
+        "assignedTeachers": [
+          "NG"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 4,
+        "subject": "SSt",
+        "teacher": "RD",
+        "assignedTeachers": [
+          "RD"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 5,
+        "subject": "Hindi_Lang",
+        "teacher": "SH",
+        "assignedTeachers": [
+          "SH"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 6,
+        "subject": "Maths",
+        "teacher": "NG",
+        "assignedTeachers": [
+          "NG"
+        ],
+        "clashes": []
+      },
+      {
         "day": "Sat",
         "period": 7,
         "subject": "Skill",
@@ -6708,8 +6624,7 @@
           "GA",
           "SA",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -6718,8 +6633,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       }
     ],
     "8b": [
@@ -6730,8 +6644,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -6740,20 +6653,18 @@
         "teacher": "NT",
         "assignedTeachers": [
           "NT"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
         "period": 3,
         "subject": "Skill",
-        "teacher": "GA, SA, HSC",
+        "teacher": "AR, SA, HSC",
         "assignedTeachers": [
-          "GA",
+          "AR",
           "SA",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -6762,204 +6673,11 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
         "period": 5,
-        "subject": "Hindi_Lang",
-        "teacher": "MS",
-        "assignedTeachers": [
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 6,
-        "subject": "SSt",
-        "teacher": "RD",
-        "assignedTeachers": [
-          "RD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 7,
-        "subject": "Chemistry",
-        "teacher": "AB",
-        "assignedTeachers": [
-          "AB"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 8,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 1,
-        "subject": "Games",
-        "teacher": "DV",
-        "assignedTeachers": [
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 2,
-        "subject": "English_Lang",
-        "teacher": "SW",
-        "assignedTeachers": [
-          "SW"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 3,
-        "subject": "Hindi_Lang",
-        "teacher": "MS",
-        "assignedTeachers": [
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 4,
-        "subject": "Skill",
-        "teacher": "GA, SA, HSC",
-        "assignedTeachers": [
-          "GA",
-          "SA",
-          "HSC"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 5,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 6,
-        "subject": "SSt",
-        "teacher": "RD",
-        "assignedTeachers": [
-          "RD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 7,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 8,
-        "subject": "Biology",
-        "teacher": "SB",
-        "assignedTeachers": [
-          "SB"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 1,
-        "subject": "Computer",
-        "teacher": "GA",
-        "assignedTeachers": [
-          "GA"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 2,
-        "subject": "Hindi_Lang",
-        "teacher": "MS",
-        "assignedTeachers": [
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 3,
-        "subject": "Games",
-        "teacher": "DV",
-        "assignedTeachers": [
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 4,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 5,
-        "subject": "Computer",
-        "teacher": "GA",
-        "assignedTeachers": [
-          "GA"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 6,
-        "subject": "English_Lang",
-        "teacher": "SW",
-        "assignedTeachers": [
-          "SW"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 7,
-        "subject": "SSt",
-        "teacher": "RD",
-        "assignedTeachers": [
-          "RD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 8,
         "subject": "Dance",
         "teacher": "SL",
         "assignedTeachers": [
@@ -6968,88 +6686,113 @@
         "clashes": []
       },
       {
-        "day": "Thu",
-        "period": 1,
-        "subject": "F/S",
-        "teacher": "SW,SH",
-        "assignedTeachers": [
-          "SW",
-          "SH"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 2,
+        "day": "Mon",
+        "period": 6,
         "subject": "SSt",
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
-        "day": "Thu",
-        "period": 3,
-        "subject": "Hindi_Lit",
-        "teacher": "MS",
-        "assignedTeachers": [
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 4,
-        "subject": "VE",
-        "teacher": "GA",
-        "assignedTeachers": [
-          "GA"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 5,
-        "subject": "Physics",
+        "day": "Mon",
+        "period": 7,
+        "subject": "Chemistry",
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
-        "day": "Thu",
-        "period": 6,
+        "day": "Mon",
+        "period": 8,
+        "subject": "Maths",
+        "teacher": "DP",
+        "assignedTeachers": [
+          "DP"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 1,
+        "subject": "Games",
+        "teacher": "DV",
+        "assignedTeachers": [
+          "DV"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 2,
         "subject": "English_Lang",
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
-        "day": "Thu",
-        "period": 7,
-        "subject": "Maths",
-        "teacher": "AG",
+        "day": "Tue",
+        "period": 3,
+        "subject": "English_Lit",
+        "teacher": "SW",
         "assignedTeachers": [
-          "AG"
+          {
+            "teacher": "SW",
+            "clash": true,
+            "clashWith": "8a P7"
+          }
         ],
         "clashes": []
       },
       {
-        "day": "Thu",
-        "period": 8,
+        "day": "Tue",
+        "period": 4,
+        "subject": "Skill",
+        "teacher": "AR, SA, HSC",
+        "assignedTeachers": [
+          "AR",
+          "SA",
+          "HSC"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 5,
+        "subject": "Maths",
+        "teacher": "DP",
+        "assignedTeachers": [
+          "DP"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 6,
         "subject": "SSt",
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
-        "day": "Fri",
+        "day": "Tue",
+        "period": 7,
+        "subject": "Maths",
+        "teacher": "DP",
+        "assignedTeachers": [
+          "DP"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 8,
+        "subject": "Biology",
+        "teacher": "SB",
+        "assignedTeachers": [
+          "SB"
+        ]
+      },
+      {
+        "day": "Wed",
         "period": 1,
         "subject": "English_Lit",
         "teacher": "SW",
@@ -7059,23 +6802,161 @@
         "clashes": []
       },
       {
-        "day": "Fri",
+        "day": "Wed",
         "period": 2,
-        "subject": "STEM",
-        "teacher": "GA, AB",
+        "subject": "Computer",
+        "teacher": "AR",
         "assignedTeachers": [
-          "GA",
+          "AR"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Wed",
+        "period": 3,
+        "subject": "Games",
+        "teacher": "DV",
+        "assignedTeachers": [
+          "DV"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 4,
+        "subject": "Maths",
+        "teacher": "DP",
+        "assignedTeachers": [
+          "DP"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 5,
+        "subject": "Hindi_Lang",
+        "teacher": "MS",
+        "assignedTeachers": [
+          "MS"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Wed",
+        "period": 6,
+        "subject": "English_Lang",
+        "teacher": "SW",
+        "assignedTeachers": [
+          "SW"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 7,
+        "subject": "SSt",
+        "teacher": "RD",
+        "assignedTeachers": [
+          "RD"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 8,
+        "subject": "Hindi_Lang",
+        "teacher": "MS",
+        "assignedTeachers": [
+          "MS"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Thu",
+        "period": 2,
+        "subject": "SSt",
+        "teacher": "RD",
+        "assignedTeachers": [
+          "RD"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 3,
+        "subject": "Hindi_Lit",
+        "teacher": "MS",
+        "assignedTeachers": [
+          "MS"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 4,
+        "subject": "VE",
+        "teacher": "AR",
+        "assignedTeachers": [
+          "AR"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 5,
+        "subject": "Physics",
+        "teacher": "AB",
+        "assignedTeachers": [
+          "AB"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 6,
+        "subject": "English_Lang",
+        "teacher": "SW",
+        "assignedTeachers": [
+          "SW"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 7,
+        "subject": "Maths",
+        "teacher": "DP",
+        "assignedTeachers": [
+          "DP"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 8,
+        "subject": "SSt",
+        "teacher": "RD",
+        "assignedTeachers": [
+          "RD"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 1,
+        "subject": "STEM",
+        "teacher": "AR, AB",
+        "assignedTeachers": [
+          "AR",
           "AB"
         ],
         "clashes": []
       },
       {
         "day": "Fri",
-        "period": 3,
+        "period": 2,
         "subject": "Computer",
-        "teacher": "GA",
+        "teacher": "AR",
         "assignedTeachers": [
-          "GA"
+          "AR"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 3,
+        "subject": "Hindi_Lit",
+        "teacher": "MS",
+        "assignedTeachers": [
+          "MS"
         ],
         "clashes": []
       },
@@ -7086,34 +6967,21 @@
         "teacher": "SP",
         "assignedTeachers": [
           "SP"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
         "period": 5,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 6,
-        "subject": "F/S",
-        "teacher": "SW,SH",
-        "assignedTeachers": [
-          "SW",
-          "SH"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Fri",
         "period": 7,
-        "subject": "Hindi_Lit",
+        "subject": "Hindi_Lang",
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
@@ -7127,16 +6995,19 @@
         "teacher": "SW",
         "assignedTeachers": [
           "SW"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 1,
-        "subject": "English_Lit",
-        "teacher": "SW",
+        "subject": "Computer",
+        "teacher": "AR",
         "assignedTeachers": [
-          "SW"
+          {
+            "teacher": "AR",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": []
       },
@@ -7147,18 +7018,16 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 3,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Sat",
@@ -7167,8 +7036,7 @@
         "teacher": "SL",
         "assignedTeachers": [
           "SL"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -7177,8 +7045,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -7187,8 +7054,7 @@
         "teacher": "RD",
         "assignedTeachers": [
           "RD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -7197,8 +7063,7 @@
         "teacher": "MG",
         "assignedTeachers": [
           "MG"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -7207,32 +7072,27 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       }
     ],
     "9a": [
       {
         "day": "Mon",
         "period": 1,
-        "subject": "Skill",
-        "teacher": "GA, DV, HSC",
+        "subject": "English_Lit",
+        "teacher": "MN",
         "assignedTeachers": [
-          "GA",
-          "DV",
-          "HSC"
-        ],
-        "clashes": []
+          "MN"
+        ]
       },
       {
         "day": "Mon",
         "period": 2,
-        "subject": "Games",
-        "teacher": "DV",
+        "subject": "Maths",
+        "teacher": "DP",
         "assignedTeachers": [
-          "DV"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Mon",
@@ -7240,7 +7100,11 @@
         "subject": "Games",
         "teacher": "DV",
         "assignedTeachers": [
-          "DV"
+          {
+            "teacher": "DV",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": []
       },
@@ -7251,8 +7115,7 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -7261,8 +7124,7 @@
         "teacher": "SD",
         "assignedTeachers": [
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -7271,8 +7133,7 @@
         "teacher": "MN",
         "assignedTeachers": [
           "MN"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -7281,36 +7142,19 @@
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
         "period": 8,
         "subject": "Skill",
-        "teacher": "GA,DV,HSC",
+        "teacher": "AR, DV, HSC",
         "assignedTeachers": [
-          {
-            "teacher": "GA",
-            "clash": true,
-            "clashWith": "7a P8"
-          },
-          {
-            "teacher": "DV",
-            "clash": true,
-            "clashWith": "9b P8"
-          },
-          {
-            "teacher": "HSC",
-            "clash": false,
-            "clashWith": null
-          }
+          "AR",
+          "DV",
+          "HSC"
         ],
         "clashes": [
-          {
-            "teacher": "GA",
-            "classId": "7a"
-          },
           {
             "teacher": "DV",
             "classId": "9b"
@@ -7324,28 +7168,35 @@
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
         "period": 2,
-        "subject": "Maths",
-        "teacher": "AG",
+        "subject": "Sanskrit",
+        "teacher": "SH",
         "assignedTeachers": [
-          "AG"
+          {
+            "teacher": "SH",
+            "clash": true,
+            "clashWith": "9b P2"
+          }
         ],
-        "clashes": []
+        "clashes": [
+          {
+            "teacher": "SH",
+            "classId": "9b"
+          }
+        ]
       },
       {
         "day": "Tue",
         "period": 3,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Tue",
@@ -7354,8 +7205,7 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -7364,8 +7214,7 @@
         "teacher": "SD",
         "assignedTeachers": [
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -7374,30 +7223,29 @@
         "teacher": "MN",
         "assignedTeachers": [
           "MN"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
         "period": 7,
-        "subject": "English_Lit",
-        "teacher": "MN",
+        "subject": "Skill",
+        "teacher": "AR, DV, HSC",
         "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
+          "AR",
+          "DV",
+          "HSC"
+        ]
       },
       {
         "day": "Tue",
         "period": 8,
         "subject": "Skill",
-        "teacher": "GA, DV, HSC",
+        "teacher": "AR, DV, HSC",
         "assignedTeachers": [
-          "GA",
+          "AR",
           "DV",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -7406,8 +7254,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -7416,18 +7263,16 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
         "period": 3,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Wed",
@@ -7436,8 +7281,7 @@
         "teacher": "MN",
         "assignedTeachers": [
           "MN"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -7446,8 +7290,7 @@
         "teacher": "SD",
         "assignedTeachers": [
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -7456,8 +7299,7 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -7466,18 +7308,16 @@
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
         "period": 8,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Thu",
@@ -7486,8 +7326,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -7496,16 +7335,19 @@
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
         "period": 3,
-        "subject": "Dance",
-        "teacher": "SL",
+        "subject": "Sanskrit",
+        "teacher": "SH",
         "assignedTeachers": [
-          "SL"
+          {
+            "teacher": "SH",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": []
       },
@@ -7513,47 +7355,42 @@
         "day": "Thu",
         "period": 4,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Thu",
         "period": 5,
-        "subject": "Computer/HSC",
-        "teacher": "GA,HSC",
+        "subject": "computer_application",
+        "teacher": "GA",
         "assignedTeachers": [
-          "GA",
-          "HSC"
+          {
+            "teacher": "GA",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": []
       },
       {
         "day": "Thu",
         "period": 6,
-        "subject": "Computer/HSC",
-        "teacher": "GA,HSC",
+        "subject": "computer_application",
+        "teacher": "GA",
         "assignedTeachers": [
-          "GA",
-          "HSC"
+          {
+            "teacher": "GA",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": []
       },
       {
         "day": "Thu",
         "period": 7,
-        "subject": "English_Lang",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 8,
         "subject": "Hindi_Lit",
         "teacher": "MS",
         "assignedTeachers": [
@@ -7562,24 +7399,40 @@
         "clashes": []
       },
       {
+        "day": "Thu",
+        "period": 8,
+        "subject": "English_Lang",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ],
+        "clashes": []
+      },
+      {
         "day": "Fri",
         "period": 1,
-        "subject": "Computer/HSC",
-        "teacher": "GA,HSC",
+        "subject": "computer_application",
+        "teacher": "GA",
         "assignedTeachers": [
-          "GA",
-          "HSC"
+          {
+            "teacher": "GA",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": []
       },
       {
         "day": "Fri",
         "period": 2,
-        "subject": "Computer/HSC",
-        "teacher": "GA,HSC",
+        "subject": "computer_application",
+        "teacher": "GA",
         "assignedTeachers": [
-          "GA",
-          "HSC"
+          {
+            "teacher": "GA",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": []
       },
@@ -7590,18 +7443,16 @@
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
         "period": 4,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Fri",
@@ -7610,8 +7461,7 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -7620,8 +7470,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -7630,8 +7479,7 @@
         "teacher": "MN",
         "assignedTeachers": [
           "MN"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -7640,17 +7488,19 @@
         "teacher": "SP",
         "assignedTeachers": [
           "SP"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 1,
-        "subject": "Computer/HSC",
-        "teacher": "GA,HSC",
+        "subject": "computer_application",
+        "teacher": "GA",
         "assignedTeachers": [
-          "GA",
-          "HSC"
+          {
+            "teacher": "GA",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": []
       },
@@ -7658,11 +7508,10 @@
         "day": "Sat",
         "period": 2,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Sat",
@@ -7671,8 +7520,7 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -7681,8 +7529,7 @@
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -7691,8 +7538,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -7701,108 +7547,34 @@
         "teacher": "MN",
         "assignedTeachers": [
           "MN"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 7,
         "subject": "STEM",
-        "teacher": "GA, SD",
+        "teacher": "AR, SD",
         "assignedTeachers": [
-          "GA",
+          "AR",
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 8,
         "subject": "Skill",
-        "teacher": "GA, DV, HSC",
+        "teacher": "AR, DV, HSC",
         "assignedTeachers": [
-          "GA",
+          "AR",
           "DV",
           "HSC"
-        ],
-        "clashes": []
+        ]
       }
     ],
     "9b": [
       {
         "day": "Mon",
         "period": 1,
-        "subject": "Dance",
-        "teacher": "SL",
-        "assignedTeachers": [
-          "SL"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 2,
-        "subject": "Hindi_Lit",
-        "teacher": "SH",
-        "assignedTeachers": [
-          "SH"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 3,
-        "subject": "Physics",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 4,
-        "subject": "English_Lit",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 5,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 6,
-        "subject": "Biology",
-        "teacher": "SB",
-        "assignedTeachers": [
-          "SB"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 7,
-        "subject": "Computer/HSC",
-        "teacher": "GA,HSC",
-        "assignedTeachers": [
-          "GA",
-          "HSC"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 8,
         "subject": "Games",
         "teacher": "DV",
         "assignedTeachers": [
@@ -7811,27 +7583,17 @@
         "clashes": []
       },
       {
-        "day": "Tue",
-        "period": 1,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
+        "day": "Mon",
         "period": 2,
-        "subject": "Hindi_Lit",
-        "teacher": "SH",
+        "subject": "Biology",
+        "teacher": "SB",
         "assignedTeachers": [
-          "SH"
+          "SB"
         ],
         "clashes": []
       },
       {
-        "day": "Tue",
+        "day": "Mon",
         "period": 3,
         "subject": "Physics",
         "teacher": "SD",
@@ -7841,14 +7603,104 @@
         "clashes": []
       },
       {
+        "day": "Mon",
+        "period": 4,
+        "subject": "Computer/HSC",
+        "teacher": "GA,HSC",
+        "assignedTeachers": [
+          "GA",
+          "HSC"
+        ]
+      },
+      {
+        "day": "Mon",
+        "period": 5,
+        "subject": "Sanskrit",
+        "teacher": "MS",
+        "assignedTeachers": [
+          {
+            "teacher": "MS",
+            "clash": true,
+            "clashWith": "8b P5"
+          }
+        ],
+        "clashes": [
+          {
+            "teacher": "MS",
+            "classId": "8b"
+          }
+        ]
+      },
+      {
+        "day": "Mon",
+        "period": 6,
+        "subject": "Hindi_Lit",
+        "teacher": "SH",
+        "assignedTeachers": [
+          "SH"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Mon",
+        "period": 7,
+        "subject": "English_Lit",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Mon",
+        "period": 8,
+        "subject": "Maths",
+        "teacher": "NG",
+        "assignedTeachers": [
+          "NG"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Tue",
+        "period": 1,
+        "subject": "Chemistry",
+        "teacher": "AB",
+        "assignedTeachers": [
+          "AB"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Tue",
+        "period": 2,
+        "subject": "Skill",
+        "teacher": "AR, DV, HSC",
+        "assignedTeachers": [
+          "AR",
+          "DV",
+          "HSC"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Tue",
+        "period": 3,
+        "subject": "STEM",
+        "teacher": "AR, SD",
+        "assignedTeachers": [
+          "AR",
+          "SD"
+        ],
+        "clashes": []
+      },
+      {
         "day": "Tue",
         "period": 4,
         "subject": "SSt",
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -7857,8 +7709,7 @@
         "teacher": "MN",
         "assignedTeachers": [
           "MN"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
@@ -7868,18 +7719,19 @@
         "assignedTeachers": [
           "GA",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Tue",
         "period": 7,
-        "subject": "Skill",
-        "teacher": "GA, DV, HSC",
+        "subject": "English_Lang",
+        "teacher": "MN",
         "assignedTeachers": [
-          "GA",
-          "DV",
-          "HSC"
+          {
+            "teacher": "MN",
+            "clash": true,
+            "clashWith": "11a P7"
+          }
         ],
         "clashes": []
       },
@@ -7887,13 +7739,12 @@
         "day": "Tue",
         "period": 8,
         "subject": "Skill",
-        "teacher": "GA, DV, HSC",
+        "teacher": "AR, DV, HSC",
         "assignedTeachers": [
-          "GA",
+          "AR",
           "DV",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -7902,28 +7753,25 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
         "period": 2,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "NG",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "NG"
+        ]
       },
       {
         "day": "Wed",
         "period": 3,
-        "subject": "English_lang",
-        "teacher": "SS",
+        "subject": "English_Lit",
+        "teacher": "MN",
         "assignedTeachers": [
-          "SS"
-        ],
-        "clashes": []
+          "MN"
+        ]
       },
       {
         "day": "Wed",
@@ -7932,8 +7780,7 @@
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -7942,19 +7789,16 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
         "period": 6,
-        "subject": "STEM",
-        "teacher": "GA, SD",
+        "subject": "Physics",
+        "teacher": "SD",
         "assignedTeachers": [
-          "GA",
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Wed",
@@ -7963,18 +7807,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 8,
-        "subject": "English_Lit",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -7983,26 +7816,24 @@
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
         "period": 2,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "NG",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "NG"
+        ]
       },
       {
         "day": "Thu",
         "period": 3,
-        "subject": "Chemistry",
-        "teacher": "AB",
+        "subject": "Maths",
+        "teacher": "NG",
         "assignedTeachers": [
-          "AB"
+          "NG"
         ],
         "clashes": []
       },
@@ -8014,18 +7845,7 @@
         "assignedTeachers": [
           "GA",
           "HSC"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 5,
-        "subject": "English_lang",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -8034,8 +7854,7 @@
         "teacher": "SP",
         "assignedTeachers": [
           "SP"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
@@ -8044,18 +7863,16 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Thu",
         "period": 8,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "NG",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "NG"
+        ]
       },
       {
         "day": "Fri",
@@ -8064,18 +7881,16 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
         "period": 2,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "NG",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "NG"
+        ]
       },
       {
         "day": "Fri",
@@ -8084,8 +7899,7 @@
         "teacher": "AB",
         "assignedTeachers": [
           "AB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -8094,8 +7908,7 @@
         "teacher": "SD",
         "assignedTeachers": [
           "SD"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -8104,15 +7917,20 @@
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
         "period": 6,
-        "subject": "English_lang",
-        "teacher": "",
-        "assignedTeachers": [],
+        "subject": "English_Lang",
+        "teacher": "MN",
+        "assignedTeachers": [
+          {
+            "teacher": "MN",
+            "clash": false,
+            "clashWith": null
+          }
+        ],
         "clashes": []
       },
       {
@@ -8122,8 +7940,7 @@
         "teacher": "SP",
         "assignedTeachers": [
           "SP"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Fri",
@@ -8132,16 +7949,19 @@
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 1,
-        "subject": "Maths",
-        "teacher": "AG",
+        "subject": "Sanskrit",
+        "teacher": "MS",
         "assignedTeachers": [
-          "AG"
+          {
+            "teacher": "MS",
+            "clash": true,
+            "clashWith": "11a P5"
+          }
         ],
         "clashes": []
       },
@@ -8153,8 +7973,7 @@
         "assignedTeachers": [
           "GA",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -8164,25 +7983,26 @@
         "assignedTeachers": [
           "GA",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 4,
-        "subject": "Games",
-        "teacher": "DV",
+        "subject": "Maths",
+        "teacher": "NG",
         "assignedTeachers": [
-          "DV"
+          "NG"
         ],
         "clashes": []
       },
       {
         "day": "Sat",
         "period": 5,
-        "subject": "English_lang",
-        "teacher": "",
-        "assignedTeachers": [],
+        "subject": "SSt",
+        "teacher": "SS",
+        "assignedTeachers": [
+          "SS"
+        ],
         "clashes": []
       },
       {
@@ -8192,12 +8012,44 @@
         "teacher": "SH",
         "assignedTeachers": [
           "SH"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 7,
+        "subject": "Hindi_Lit",
+        "teacher": "SH",
+        "assignedTeachers": [
+          "SH"
         ],
         "clashes": []
       },
       {
         "day": "Sat",
-        "period": 7,
+        "period": 8,
+        "subject": "Skill",
+        "teacher": "AR, DV, HSC",
+        "assignedTeachers": [
+          "AR",
+          "DV",
+          "HSC"
+        ]
+      }
+    ],
+    "10a": [
+      {
+        "day": "Mon",
+        "period": 1,
+        "subject": "Maths",
+        "teacher": "DP",
+        "assignedTeachers": [
+          "DP"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Mon",
+        "period": 2,
         "subject": "SSt",
         "teacher": "SS",
         "assignedTeachers": [
@@ -8206,46 +8058,16 @@
         "clashes": []
       },
       {
-        "day": "Sat",
-        "period": 8,
-        "subject": "Skill",
-        "teacher": "GA, DV, HSC",
-        "assignedTeachers": [
-          "GA",
-          "DV",
-          "HSC"
-        ],
-        "clashes": []
-      }
-    ],
-    "10a": [
-      {
-        "day": "Mon",
-        "period": 1,
-        "subject": "Chemistry",
-        "teacher": "AB",
-        "assignedTeachers": [
-          "AB"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 2,
-        "subject": "Physics",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
-      },
-      {
         "day": "Mon",
         "period": 3,
-        "subject": "Maths",
-        "teacher": "AG",
+        "subject": "Library",
+        "teacher": "SP",
         "assignedTeachers": [
-          "AG"
+          {
+            "teacher": "SP",
+            "clash": false,
+            "clashWith": null
+          }
         ],
         "clashes": []
       },
@@ -8256,8 +8078,7 @@
         "teacher": "SS",
         "assignedTeachers": [
           "SS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -8266,12 +8087,125 @@
         "teacher": "MN",
         "assignedTeachers": [
           "MN"
+        ]
+      },
+      {
+        "day": "Mon",
+        "period": 6,
+        "subject": "Chemistry",
+        "teacher": "AB",
+        "assignedTeachers": [
+          "AB"
         ],
         "clashes": []
       },
       {
         "day": "Mon",
+        "period": 7,
+        "subject": "Games",
+        "teacher": "DV",
+        "assignedTeachers": [
+          "DV"
+        ]
+      },
+      {
+        "day": "Mon",
+        "period": 8,
+        "subject": "Hindi_Lit",
+        "teacher": "MS",
+        "assignedTeachers": [
+          "MS"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 1,
+        "subject": "Maths",
+        "teacher": "DP",
+        "assignedTeachers": [
+          {
+            "teacher": "DP",
+            "clash": false,
+            "clashWith": null
+          }
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Tue",
+        "period": 2,
+        "subject": "Physics",
+        "teacher": "SD",
+        "assignedTeachers": [
+          "SD"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 3,
+        "subject": "Chemistry",
+        "teacher": "AB",
+        "assignedTeachers": [
+          "AB"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 4,
+        "subject": "English_Lit",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 5,
+        "subject": "SSt",
+        "teacher": "SS",
+        "assignedTeachers": [
+          "SS"
+        ]
+      },
+      {
+        "day": "Tue",
         "period": 6,
+        "subject": "Maths",
+        "teacher": "DP",
+        "assignedTeachers": [
+          "DP"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 7,
+        "subject": "Hindi_Lang",
+        "teacher": "MS",
+        "assignedTeachers": [
+          "MS"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 8,
+        "subject": "English_Lit",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 1,
+        "subject": "Maths",
+        "teacher": "DP",
+        "assignedTeachers": [
+          "DP"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 2,
         "subject": "VE",
         "teacher": "RN",
         "assignedTeachers": [
@@ -8280,353 +8214,217 @@
         "clashes": []
       },
       {
-        "day": "Mon",
+        "day": "Wed",
+        "period": 3,
+        "subject": "Physics",
+        "teacher": "SD",
+        "assignedTeachers": [
+          "SD"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 4,
+        "subject": "Hindi_Lit",
+        "teacher": "MS",
+        "assignedTeachers": [
+          "MS"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 5,
+        "subject": "SSt",
+        "teacher": "SS",
+        "assignedTeachers": [
+          "SS"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Wed",
+        "period": 6,
+        "subject": "English_Lang",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Wed",
         "period": 7,
+        "subject": "Skill",
+        "teacher": "DV, AR, HSC",
+        "assignedTeachers": [
+          "DV",
+          "AR",
+          "HSC"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 8,
+        "subject": "Computer/HSC",
+        "teacher": "AR,HSC",
+        "assignedTeachers": [
+          "AR",
+          "HSC"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Thu",
+        "period": 1,
+        "subject": "Maths",
+        "teacher": "DP",
+        "assignedTeachers": [
+          "DP"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 2,
+        "subject": "Skill",
+        "teacher": "DV, AR, HSC",
+        "assignedTeachers": [
+          "DV",
+          "AR",
+          "HSC"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Thu",
+        "period": 3,
+        "subject": "SSt",
+        "teacher": "SS",
+        "assignedTeachers": [
+          "SS"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 4,
+        "subject": "English_Lang",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 5,
+        "subject": "Hindi_Lit",
+        "teacher": "MS",
+        "assignedTeachers": [
+          "MS"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 6,
+        "subject": "Chemistry",
+        "teacher": "AB",
+        "assignedTeachers": [
+          "AB"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 7,
+        "subject": "Skill",
+        "teacher": "DV, AR, HSC",
+        "assignedTeachers": [
+          "DV",
+          "AR",
+          "HSC"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 8,
+        "subject": "Skill",
+        "teacher": "DV, AR, HSC",
+        "assignedTeachers": [
+          "DV",
+          "AR",
+          "HSC"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 1,
+        "subject": "Hindi_Lang",
+        "teacher": "MS",
+        "assignedTeachers": [
+          "MS"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 2,
+        "subject": "Maths",
+        "teacher": "DP",
+        "assignedTeachers": [
+          "DP"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Fri",
+        "period": 3,
         "subject": "Games",
         "teacher": "DV",
         "assignedTeachers": [
           "DV"
-        ],
-        "clashes": []
+        ]
       },
       {
-        "day": "Mon",
-        "period": 8,
-        "subject": "Hindi_Lit",
-        "teacher": "MS",
-        "assignedTeachers": [
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 1,
-        "subject": "Library",
-        "teacher": "SP",
-        "assignedTeachers": [
-          "SP"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 2,
-        "subject": "Physics",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 3,
-        "subject": "Chemistry",
-        "teacher": "AB",
-        "assignedTeachers": [
-          "AB"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
+        "day": "Fri",
         "period": 4,
-        "subject": "English_Lit",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 5,
-        "subject": "SSt",
-        "teacher": "SS",
-        "assignedTeachers": [
-          "SS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 6,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 7,
-        "subject": "Hindi_Lang",
-        "teacher": "MS",
-        "assignedTeachers": [
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 8,
-        "subject": "English_Lit",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 1,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 2,
-        "subject": "SSt",
-        "teacher": "SS",
-        "assignedTeachers": [
-          "SS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 3,
-        "subject": "Physics",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 4,
-        "subject": "Hindi_Lit",
-        "teacher": "MS",
-        "assignedTeachers": [
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 5,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 6,
         "subject": "English_Lang",
         "teacher": "MN",
         "assignedTeachers": [
           "MN"
-        ],
-        "clashes": []
+        ]
       },
       {
-        "day": "Wed",
-        "period": 7,
-        "subject": "Skill",
-        "teacher": "DV, GA, HSC",
-        "assignedTeachers": [
-          "DV",
-          "GA",
-          "HSC"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 8,
-        "subject": "Skill",
-        "teacher": "DV, GA, HSC",
-        "assignedTeachers": [
-          "DV",
-          "GA",
-          "HSC"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 1,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 2,
+        "day": "Fri",
+        "period": 5,
         "subject": "Computer/HSC",
-        "teacher": "GA,HSC",
+        "teacher": "AR,HSC",
         "assignedTeachers": [
-          "GA",
+          "AR",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
-        "day": "Thu",
-        "period": 3,
-        "subject": "SSt",
-        "teacher": "SS",
-        "assignedTeachers": [
-          "SS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 4,
-        "subject": "English_Lang",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 5,
-        "subject": "Hindi_Lit",
-        "teacher": "MS",
-        "assignedTeachers": [
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
+        "day": "Fri",
         "period": 6,
-        "subject": "Chemistry",
-        "teacher": "AB",
+        "subject": "Computer/HSC",
+        "teacher": "AR,HSC",
         "assignedTeachers": [
-          "AB"
-        ],
-        "clashes": []
+          "AR",
+          "HSC"
+        ]
       },
       {
-        "day": "Thu",
+        "day": "Fri",
         "period": 7,
-        "subject": "Skill",
-        "teacher": "DV, GA, HSC",
+        "subject": "Physics",
+        "teacher": "SD",
         "assignedTeachers": [
-          "DV",
-          "GA",
-          "HSC"
+          "SD"
         ],
         "clashes": []
       },
       {
-        "day": "Thu",
+        "day": "Fri",
         "period": 8,
-        "subject": "Skill",
-        "teacher": "DV, GA, HSC",
-        "assignedTeachers": [
-          "DV",
-          "GA",
-          "HSC"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 1,
-        "subject": "Hindi_Lang",
-        "teacher": "MS",
-        "assignedTeachers": [
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 2,
         "subject": "Biology",
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 3,
-        "subject": "Games",
-        "teacher": "DV",
-        "assignedTeachers": [
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 4,
-        "subject": "English_Lang",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 5,
-        "subject": "Computer/HSC",
-        "teacher": "GA,HSC",
-        "assignedTeachers": [
-          "GA",
-          "HSC"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 6,
-        "subject": "Computer/HSC",
-        "teacher": "GA,HSC",
-        "assignedTeachers": [
-          "GA",
-          "HSC"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 7,
-        "subject": "SSt",
-        "teacher": "SS",
-        "assignedTeachers": [
-          "SS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 8,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
         ],
         "clashes": []
       },
@@ -8637,8 +8435,7 @@
         "teacher": "SL",
         "assignedTeachers": [
           "SL"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -8647,8 +8444,7 @@
         "teacher": "SB",
         "assignedTeachers": [
           "SB"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -8657,8 +8453,7 @@
         "teacher": "MN",
         "assignedTeachers": [
           "MN"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
@@ -8667,40 +8462,36 @@
         "teacher": "MS",
         "assignedTeachers": [
           "MS"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 5,
         "subject": "Computer/HSC",
-        "teacher": "GA,HSC",
+        "teacher": "AR,HSC",
         "assignedTeachers": [
-          "GA",
+          "AR",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 6,
         "subject": "Computer/HSC",
-        "teacher": "GA,HSC",
+        "teacher": "AR,HSC",
         "assignedTeachers": [
-          "GA",
+          "AR",
           "HSC"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Sat",
         "period": 7,
         "subject": "Maths",
-        "teacher": "AG",
+        "teacher": "DP",
         "assignedTeachers": [
-          "AG"
-        ],
-        "clashes": []
+          "DP"
+        ]
       },
       {
         "day": "Sat",
@@ -8709,38 +8500,37 @@
         "teacher": "SA",
         "assignedTeachers": [
           "SA"
-        ],
-        "clashes": []
+        ]
       }
     ],
     "11a": [
       {
         "day": "Mon",
         "period": 1,
-        "subject": "Physics",
-        "teacher": "SD",
+        "subject": "Chemistry",
+        "teacher": "P",
         "assignedTeachers": [
-          "SD"
+          "P"
         ],
         "clashes": []
       },
       {
         "day": "Mon",
         "period": 2,
-        "subject": "Library",
-        "teacher": "SP",
+        "subject": "Chemistry",
+        "teacher": "P",
         "assignedTeachers": [
-          "SP"
+          "P"
         ],
         "clashes": []
       },
       {
         "day": "Mon",
         "period": 3,
-        "subject": "Chemistry",
-        "teacher": "P",
+        "subject": "English",
+        "teacher": "MN",
         "assignedTeachers": [
-          "P"
+          "MN"
         ],
         "clashes": []
       },
@@ -8753,8 +8543,7 @@
           "RN",
           "AR",
           "SP"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
@@ -8765,657 +8554,65 @@
           "SB",
           "SA",
           "DV"
-        ],
-        "clashes": []
+        ]
       },
       {
         "day": "Mon",
         "period": 6,
         "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
+        "teacher": "DP,MG,MS",
         "assignedTeachers": [
-          "AG",
+          "DP",
           "MG",
           "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 7,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Mon",
-        "period": 8,
-        "subject": "Chemistry",
-        "teacher": "P",
-        "assignedTeachers": [
-          "P"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 1,
-        "subject": "Physics",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 2,
-        "subject": "English",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 3,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 4,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 5,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 6,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 7,
-        "subject": "Chemistry",
-        "teacher": "P",
-        "assignedTeachers": [
-          "P"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Tue",
-        "period": 8,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 1,
-        "subject": "English",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 2,
-        "subject": "Physics",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 3,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 4,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 5,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 6,
-        "subject": "Games",
-        "teacher": "DV",
-        "assignedTeachers": [
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 7,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Wed",
-        "period": 8,
-        "subject": "Chemistry",
-        "teacher": "P",
-        "assignedTeachers": [
-          "P"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 1,
-        "subject": "English",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 2,
-        "subject": "Physics",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 3,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 4,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 5,
-        "subject": "Physics",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 6,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 7,
-        "subject": "Chemistry",
-        "teacher": "P",
-        "assignedTeachers": [
-          "P"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Thu",
-        "period": 8,
-        "subject": "Physics",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 1,
-        "subject": "Chemistry",
-        "teacher": "P",
-        "assignedTeachers": [
-          "P"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 2,
-        "subject": "English",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 3,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 4,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 5,
-        "subject": "Chemistry",
-        "teacher": "P",
-        "assignedTeachers": [
-          "P"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 6,
-        "subject": "Physics",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 7,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Fri",
-        "period": 8,
-        "subject": "Chemistry",
-        "teacher": "P",
-        "assignedTeachers": [
-          "P"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 1,
-        "subject": "English",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 2,
-        "subject": "Physics",
-        "teacher": "SD",
-        "assignedTeachers": [
-          "SD"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 3,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 4,
-        "subject": "Chemistry",
-        "teacher": "P",
-        "assignedTeachers": [
-          "P"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 5,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 6,
-        "subject": "Games",
-        "teacher": "DV",
-        "assignedTeachers": [
-          "DV"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 7,
-        "subject": "English",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ],
-        "clashes": []
-      },
-      {
-        "day": "Sat",
-        "period": 8,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ],
-        "clashes": []
-      }
-    ],
-    "11b": [
-      {
-        "day": "Mon",
-        "period": 1,
-        "subject": "Maths",
-        "teacher": "AG",
-        "assignedTeachers": [
-          "AG"
         ],
         "clashes": [
           {
             "teacher": "AG",
-            "classId": "9b"
+            "classId": "10a"
+          },
+          {
+            "teacher": "MG",
+            "classId": "4b"
+          },
+          {
+            "teacher": "MS",
+            "classId": "6a"
           }
         ]
       },
       {
         "day": "Mon",
-        "period": 2,
+        "period": 7,
         "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
+        "teacher": "DP,MG,MS",
         "assignedTeachers": [
-          "AG",
+          "DP",
           "MG",
           "MS"
+        ]
+      },
+      {
+        "day": "Mon",
+        "period": 8,
+        "subject": "Physics",
+        "teacher": "SD",
+        "assignedTeachers": [
+          "SD"
         ],
         "clashes": []
       },
       {
-        "day": "Mon",
-        "period": 4,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ]
-      },
-      {
-        "day": "Mon",
-        "period": 5,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ]
-      },
-      {
-        "day": "Mon",
-        "period": 6,
-        "subject": "BSt/Pol_Sc",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Mon",
-        "period": 7,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ]
-      },
-      {
-        "day": "Mon",
-        "period": 8,
-        "subject": "BSt/Pol_Sc",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
         "day": "Tue",
         "period": 1,
-        "subject": "English",
-        "teacher": "MN",
+        "subject": "Physics",
+        "teacher": "SD",
         "assignedTeachers": [
-          "MN"
+          "SD"
         ]
       },
       {
         "day": "Tue",
-        "period": 2,
-        "subject": "Accounts/HIST",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Tue",
-        "period": 3,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ]
-      },
-      {
-        "day": "Tue",
-        "period": 4,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ]
-      },
-      {
-        "day": "Tue",
-        "period": 5,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ]
-      },
-      {
-        "day": "Tue",
-        "period": 6,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ]
-      },
-      {
-        "day": "Tue",
-        "period": 7,
-        "subject": "BSt/Pol_Sc",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Tue",
-        "period": 8,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ]
-      },
-      {
-        "day": "Wed",
-        "period": 1,
-        "subject": "Accounts/HIST",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Wed",
         "period": 2,
         "subject": "English",
         "teacher": "MN",
@@ -9424,313 +8621,277 @@
         ]
       },
       {
-        "day": "Wed",
+        "day": "Tue",
         "period": 3,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ]
-      },
-      {
-        "day": "Wed",
-        "period": 4,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ]
-      },
-      {
-        "day": "Wed",
-        "period": 5,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ]
-      },
-      {
-        "day": "Wed",
-        "period": 6,
-        "subject": "BSt/Pol_Sc",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Wed",
-        "period": 7,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ]
-      },
-      {
-        "day": "Wed",
-        "period": 8,
-        "subject": "BSt/Pol_Sc",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Thu",
-        "period": 1,
-        "subject": "Library",
-        "teacher": "SP",
-        "assignedTeachers": [
-          "SP"
-        ]
-      },
-      {
-        "day": "Thu",
-        "period": 2,
-        "subject": "English",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ]
-      },
-      {
-        "day": "Thu",
-        "period": 3,
-        "subject": "Food_P/AI/Lib_Sc",
-        "teacher": "RN,AR,SP",
-        "assignedTeachers": [
-          "RN",
-          "AR",
-          "SP"
-        ]
-      },
-      {
-        "day": "Thu",
-        "period": 4,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ]
-      },
-      {
-        "day": "Thu",
-        "period": 5,
-        "subject": "BSt/Pol_Sc",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Thu",
-        "period": 6,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ]
-      },
-      {
-        "day": "Thu",
-        "period": 7,
-        "subject": "Accounts/HIST",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Thu",
-        "period": 8,
-        "subject": "Accounts/HIST",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Fri",
-        "period": 1,
-        "subject": "Accounts/HIST",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Fri",
-        "period": 2,
-        "subject": "Accounts/HIST",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Fri",
-        "period": 3,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ]
-      },
-      {
-        "day": "Fri",
-        "period": 4,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ]
-      },
-      {
-        "day": "Fri",
-        "period": 5,
-        "subject": "Games",
-        "teacher": "DV",
-        "assignedTeachers": [
-          "DV"
-        ]
-      },
-      {
-        "day": "Fri",
-        "period": 6,
-        "subject": "BSt/Pol_Sc",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Fri",
-        "period": 7,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ]
-      },
-      {
-        "day": "Fri",
-        "period": 8,
-        "subject": "English",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ]
-      },
-      {
-        "day": "Sat",
-        "period": 1,
-        "subject": "BSt/Pol_Sc",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Sat",
-        "period": 2,
-        "subject": "English",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ]
-      },
-      {
-        "day": "Sat",
-        "period": 3,
-        "subject": "Bio/Eco/Phy_Edu",
-        "teacher": "SB,SA,DV",
-        "assignedTeachers": [
-          "SB",
-          "SA",
-          "DV"
-        ]
-      },
-      {
-        "day": "Sat",
-        "period": 4,
-        "subject": "English",
-        "teacher": "MN",
-        "assignedTeachers": [
-          "MN"
-        ]
-      },
-      {
-        "day": "Sat",
-        "period": 5,
-        "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
-        "assignedTeachers": [
-          "AG",
-          "MG",
-          "MS"
-        ]
-      },
-      {
-        "day": "Sat",
-        "period": 6,
-        "subject": "Accounts/HIST",
-        "teacher": "SA,SS",
-        "assignedTeachers": [
-          "SA",
-          "SS"
-        ]
-      },
-      {
-        "day": "Sat",
-        "period": 7,
         "subject": "VE",
         "teacher": "RN",
         "assignedTeachers": [
           "RN"
+        ],
+        "clashes": [
+          {
+            "teacher": "RN",
+            "classId": "11b"
+          }
         ]
       },
       {
-        "day": "Sat",
+        "day": "Tue",
+        "period": 4,
+        "subject": "Library",
+        "teacher": "SP",
+        "assignedTeachers": [
+          "SP"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Tue",
+        "period": 5,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 6,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 7,
+        "subject": "Chemistry",
+        "teacher": "P",
+        "assignedTeachers": [
+          "P"
+        ]
+      },
+      {
+        "day": "Tue",
         "period": 8,
         "subject": "Maths/Music/Hindi",
-        "teacher": "AG,MG,MS",
+        "teacher": "DP,MG,MS",
         "assignedTeachers": [
-          "AG",
+          "DP",
           "MG",
           "MS"
         ]
       },
       {
-        "day": "Mon",
+        "day": "Wed",
+        "period": 1,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Wed",
+        "period": 2,
+        "subject": "Physics",
+        "teacher": "SD",
+        "assignedTeachers": [
+          "SD"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 3,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 4,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 5,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ],
+        "clashes": [
+          {
+            "teacher": "RN",
+            "classId": "10a"
+          },
+          {
+            "teacher": "AR",
+            "classId": "8b"
+          },
+          {
+            "teacher": "SP",
+            "classId": "2a"
+          }
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 6,
+        "subject": "Games",
+        "teacher": "DV",
+        "assignedTeachers": [
+          "DV"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Wed",
+        "period": 7,
+        "subject": "Maths/Music/Hindi",
+        "teacher": "DP,MG,MS",
+        "assignedTeachers": [
+          "DP",
+          "MG",
+          "MS"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 8,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ],
+        "clashes": [
+          {
+            "teacher": "SB",
+            "classId": "6a"
+          },
+          {
+            "teacher": "SA",
+            "classId": "11b"
+          },
+          {
+            "teacher": "DV",
+            "classId": "10a"
+          }
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 1,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 2,
+        "subject": "Physics",
+        "teacher": "SD",
+        "assignedTeachers": [
+          "SD"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 3,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 4,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 5,
+        "subject": "Chemistry",
+        "teacher": "P",
+        "assignedTeachers": [
+          "P"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Thu",
+        "period": 7,
+        "subject": "Chemistry",
+        "teacher": "P",
+        "assignedTeachers": [
+          "P"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 8,
+        "subject": "Physics",
+        "teacher": "SD",
+        "assignedTeachers": [
+          {
+            "teacher": "SD",
+            "clash": false,
+            "clashWith": null
+          }
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Fri",
+        "period": 1,
+        "subject": "Chemistry",
+        "teacher": "P",
+        "assignedTeachers": [
+          "P"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 2,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Fri",
         "period": 3,
         "subject": "Food_P/AI/Lib_Sc",
         "teacher": "RN,AR,SP",
@@ -9743,10 +8904,820 @@
           {
             "teacher": "AR",
             "classId": "8b"
+          }
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 4,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 6,
+        "subject": "Physics",
+        "teacher": "SD",
+        "assignedTeachers": [
+          "SD"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 7,
+        "subject": "Chemistry",
+        "teacher": "P",
+        "assignedTeachers": [
+          "P"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Fri",
+        "period": 8,
+        "subject": "Physics",
+        "teacher": "SD",
+        "assignedTeachers": [
+          {
+            "teacher": "SD",
+            "clash": false,
+            "clashWith": null
+          }
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Sat",
+        "period": 1,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 2,
+        "subject": "Physics",
+        "teacher": "SD",
+        "assignedTeachers": [
+          "SD"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 3,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 4,
+        "subject": "Chemistry",
+        "teacher": "P",
+        "assignedTeachers": [
+          "P"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 5,
+        "subject": "Maths/Music/Hindi",
+        "teacher": "DP,MG,MS",
+        "assignedTeachers": [
+          {
+            "teacher": "DP",
+            "clash": true,
+            "clashWith": "11b P5"
+          },
+          {
+            "teacher": "MG",
+            "clash": true,
+            "clashWith": "11b P5"
+          },
+          {
+            "teacher": "MS",
+            "clash": true,
+            "clashWith": "11b P5"
+          }
+        ],
+        "clashes": [
+          {
+            "teacher": "DP",
+            "classId": "11b"
+          },
+          {
+            "teacher": "MG",
+            "classId": "11b"
+          },
+          {
+            "teacher": "MS",
+            "classId": "11b"
+          }
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 6,
+        "subject": "Games",
+        "teacher": "DV",
+        "assignedTeachers": [
+          "DV"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 7,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 8,
+        "subject": "Maths/Music/Hindi",
+        "teacher": "DP,MG,MS",
+        "assignedTeachers": [
+          "DP",
+          "MG",
+          "MS"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 6,
+        "subject": "Maths/Music/Hindi",
+        "teacher": "DP,MG,MS",
+        "assignedTeachers": [
+          {
+            "teacher": "DP",
+            "clash": false,
+            "clashWith": null
+          },
+          {
+            "teacher": "MG",
+            "clash": true,
+            "clashWith": "11b P6"
+          },
+          {
+            "teacher": "MS",
+            "clash": true,
+            "clashWith": "11b P6"
+          }
+        ],
+        "clashes": [
+          {
+            "teacher": "MG",
+            "classId": "11b"
+          },
+          {
+            "teacher": "MS",
+            "classId": "11b"
+          }
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 5,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          {
+            "teacher": "SB",
+            "clash": true,
+            "clashWith": "11b P5"
+          },
+          {
+            "teacher": "SA",
+            "clash": true,
+            "clashWith": "11b P5"
+          },
+          {
+            "teacher": "DV",
+            "clash": true,
+            "clashWith": "11b P5"
+          }
+        ],
+        "clashes": [
+          {
+            "teacher": "SB",
+            "classId": "11b"
+          },
+          {
+            "teacher": "SA",
+            "classId": "11b"
+          },
+          {
+            "teacher": "DV",
+            "classId": "11b"
+          }
+        ]
+      }
+    ],
+    "11b": [
+      {
+        "day": "Mon",
+        "period": 1,
+        "subject": "BSt/Pol_Sc",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Mon",
+        "period": 2,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Mon",
+        "period": 4,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ]
+      },
+      {
+        "day": "Mon",
+        "period": 5,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ]
+      },
+      {
+        "day": "Mon",
+        "period": 6,
+        "subject": "Maths/Music/Hindi",
+        "teacher": "DP,MG,MS",
+        "assignedTeachers": [
+          "DP",
+          "MG",
+          "MS"
+        ],
+        "clashes": [
+          {
+            "teacher": "DP",
+            "classId": "10a"
+          },
+          {
+            "teacher": "MG",
+            "classId": "4b"
+          },
+          {
+            "teacher": "MS",
+            "classId": "6b"
+          }
+        ]
+      },
+      {
+        "day": "Mon",
+        "period": 7,
+        "subject": "Maths/Music/Hindi",
+        "teacher": "DP,MG,MS",
+        "assignedTeachers": [
+          "DP",
+          "MG",
+          "MS"
+        ]
+      },
+      {
+        "day": "Mon",
+        "period": 8,
+        "subject": "Accounts/HIST",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Tue",
+        "period": 1,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 2,
+        "subject": "Accounts/HIST",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 3,
+        "subject": "Games",
+        "teacher": "DV",
+        "assignedTeachers": [
+          "DV"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Tue",
+        "period": 4,
+        "subject": "VE",
+        "teacher": "RN",
+        "assignedTeachers": [
+          "RN"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Tue",
+        "period": 5,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 6,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 7,
+        "subject": "BSt/Pol_Sc",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ]
+      },
+      {
+        "day": "Tue",
+        "period": 8,
+        "subject": "Maths/Music/Hindi",
+        "teacher": "DP,MG,MS",
+        "assignedTeachers": [
+          "DP",
+          "MG",
+          "MS"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 1,
+        "subject": "Accounts/HIST",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 2,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 3,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 4,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 5,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ],
+        "clashes": [
+          {
+            "teacher": "RN",
+            "classId": "10a"
+          },
+          {
+            "teacher": "AR",
+            "classId": "8b"
+          },
+          {
+            "teacher": "SP",
+            "classId": "2a"
+          }
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 6,
+        "subject": "BSt/Pol_Sc",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 7,
+        "subject": "Maths/Music/Hindi",
+        "teacher": "DP,MG,MS",
+        "assignedTeachers": [
+          "DP",
+          "MG",
+          "MS"
+        ]
+      },
+      {
+        "day": "Wed",
+        "period": 8,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ],
+        "clashes": [
+          {
+            "teacher": "SB",
+            "classId": "6a"
+          },
+          {
+            "teacher": "DV",
+            "classId": "10a"
+          }
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 1,
+        "subject": "Library",
+        "teacher": "SP",
+        "assignedTeachers": [
+          "SP"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 2,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 3,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 4,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 5,
+        "subject": "BSt/Pol_Sc",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 6,
+        "subject": "Maths/Music/Hindi",
+        "teacher": "DP,MG,MS",
+        "assignedTeachers": [
+          "DP",
+          "MG",
+          "MS"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 7,
+        "subject": "Accounts/HIST",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ]
+      },
+      {
+        "day": "Thu",
+        "period": 8,
+        "subject": "Accounts/HIST",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 1,
+        "subject": "BSt/Pol_Sc",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ],
+        "clashes": []
+      },
+      {
+        "day": "Fri",
+        "period": 2,
+        "subject": "Accounts/HIST",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 3,
+        "subject": "Food_P/AI/Lib_Sc",
+        "teacher": "RN,AR,SP",
+        "assignedTeachers": [
+          "RN",
+          "AR",
+          "SP"
+        ],
+        "clashes": [
+          {
+            "teacher": "RN",
+            "classId": "11a"
+          },
+          {
+            "teacher": "AR",
+            "classId": "8b"
           },
           {
             "teacher": "SP",
             "classId": "11a"
+          }
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 4,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 5,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ],
+        "clashes": [
+          {
+            "teacher": "SB",
+            "classId": "6a"
+          },
+          {
+            "teacher": "SA",
+            "classId": "11a"
+          },
+          {
+            "teacher": "DV",
+            "classId": "11a"
+          }
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 6,
+        "subject": "BSt/Pol_Sc",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 7,
+        "subject": "Accounts/HIST",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ],
+        "clashes": [
+          {
+            "teacher": "SA",
+            "classId": "11a"
+          },
+          {
+            "teacher": "SS",
+            "classId": "10a"
+          }
+        ]
+      },
+      {
+        "day": "Fri",
+        "period": 8,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 1,
+        "subject": "Games",
+        "teacher": "DV",
+        "assignedTeachers": [
+          "DV"
+        ],
+        "clashes": [
+          {
+            "teacher": "DV",
+            "classId": "9b"
+          }
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 2,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 3,
+        "subject": "Bio/Eco/Phy_Edu",
+        "teacher": "SB,SA,DV",
+        "assignedTeachers": [
+          "SB",
+          "SA",
+          "DV"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 4,
+        "subject": "English",
+        "teacher": "MN",
+        "assignedTeachers": [
+          "MN"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 5,
+        "subject": "Maths/Music/Hindi",
+        "teacher": "DP,MG,MS",
+        "assignedTeachers": [
+          "DP",
+          "MG",
+          "MS"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 6,
+        "subject": "Accounts/HIST",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 7,
+        "subject": "BSt/Pol_Sc",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ],
+        "clashes": [
+          {
+            "teacher": "SA",
+            "classId": "8a"
+          },
+          {
+            "teacher": "SS",
+            "classId": "9b"
+          }
+        ]
+      },
+      {
+        "day": "Sat",
+        "period": 8,
+        "subject": "Maths/Music/Hindi",
+        "teacher": "DP,MG,MS",
+        "assignedTeachers": [
+          "DP",
+          "MG",
+          "MS"
+        ]
+      },
+      {
+        "day": "Mon",
+        "period": 3,
+        "subject": "BSt/Pol_Sc",
+        "teacher": "SA,SS",
+        "assignedTeachers": [
+          "SA",
+          "SS"
+        ],
+        "clashes": [
+          {
+            "teacher": "SA",
+            "classId": "8b"
           }
         ]
       }
@@ -9808,16 +9779,16 @@
       "5A": "NG",
       "5B": "NG",
       "6A": "NG",
-      "6B": "NG",
+      "6B": "DP",
       "7A": "SD",
       "7B": "SD",
       "8A": "NG",
-      "8B": "AG",
-      "9A": "AG",
-      "9B": "AG",
-      "10A": "AG",
-      "11A": "AG",
-      "11B": "AG"
+      "8B": "DP",
+      "9A": "DP",
+      "9B": "NG",
+      "10A": "DP",
+      "11A": "DP",
+      "11B": "DP"
     },
     "EVS": {
       "1A": "NM",
@@ -9894,22 +9865,22 @@
       "3B": "NT",
       "4A": "RD",
       "4B": "KB",
-      "5A": "KB",
-      "5B": "AN",
+      "5A": "SW",
+      "5B": "SW",
       "6A": "SL",
       "6B": "SL",
       "7A": "SL",
       "7B": "SP",
       "8A": "SL",
-      "8B": "GA",
-      "9A": "GA",
+      "8B": "AR",
+      "9A": "AR",
       "9B": "SP",
       "10A": "RN",
       "11A": "RN",
       "11B": "RN"
     },
     "Computer": {
-      "1A": "RADHIKA",
+      "1A": "NM",
       "1B": "TP",
       "2A": "NP",
       "2B": "NP",
@@ -9924,10 +9895,10 @@
       "7A": "GA",
       "7B": "GA",
       "8A": "GA",
-      "8B": "GA",
+      "8B": "AR",
       "9A": "GA",
       "9B": "GA",
-      "10A": "GA"
+      "10A": "AR"
     },
     "STEM_Junior": {
       "1A": "NP",
@@ -9961,7 +9932,7 @@
       "11A": "MG",
       "11B": "MG"
     },
-    "C": {
+    "A/C": {
       "1A": "MP",
       "1B": "MP",
       "2A": "MP",
@@ -10059,10 +10030,10 @@
       "11B": "SP"
     },
     "CCA": {
-      "1A": "MP",
-      "1B": "MP",
-      "2A": "MP",
-      "2B": "MP"
+      "1A": "MP,SL,SZ,MG",
+      "1B": "MP,SL,SZ,MG",
+      "2A": "MP,SL,SZ,MG",
+      "2B": "MP,SL,SZ,MG"
     },
     "Science": {
       "3A": "VR",
@@ -10096,33 +10067,25 @@
       "6B": "PR"
     },
     "STEM": {
-      "6A": "GA, AB",
-      "6B": "GA, SB",
-      "7A": "GA",
-      "7B": "GA, AB",
-      "8A": "GA, NG",
-      "8B": "GA, AB",
-      "9A": "GA, SD",
-      "9B": "GA, SD"
+      "6A": "AR, AB",
+      "6B": "AR, SB",
+      "7A": "AR, GA",
+      "7B": "AR, AB",
+      "8A": "AR, NG",
+      "8B": "AR, AB",
+      "9A": "AR, SD",
+      "9B": "AR, SD"
     },
     "Skill": {
       "6A": "GA, SA, HSC",
       "6B": "GA, SA, HSC",
-      "7A": "GA, SA, TEST",
+      "7A": "GA, SA, HSC",
       "7B": "GA, SA, HSC",
       "8A": "GA, SA, HSC",
-      "8B": "GA, SA, HSC",
-      "9A": "GA, DV, HSC",
-      "9B": "GA, DV, HSC",
-      "10A": "DV, GA, HSC"
-    },
-    "S": {
-      "6A": "MS",
-      "6B": "MS",
-      "7A": "MS",
-      "7B": "SH",
-      "8A": "SH",
-      "8B": "SH"
+      "8B": "AR, SA, HSC",
+      "9A": "DV, HSC",
+      "9B": "AR, DV, HSC",
+      "10A": "DV, AR, HSC"
     },
     "Biology": {
       "8A": "SB",
@@ -10137,7 +10100,10 @@
       "9A": "SD",
       "9B": "SD",
       "10A": "SD",
-      "11A": "SD"
+      "11A": "SD",
+      "6A": "",
+      "6B": "",
+      "7A": ""
     },
     "Chemistry": {
       "8A": "AB",
@@ -10199,120 +10165,59 @@
     "Pol_Sc": {
       "11B": "SS"
     },
-    "Art and Craft": {
-      "1A": "MP",
-      "1B": "MP",
-      "2A": "MP",
-      "2B": "MP",
-      "3A": "MP",
-      "3B": "MP",
-      "4A": "MP",
-      "4B": "MP",
-      "5A": "MP",
-      "5B": "MP",
-      "6A": "MP",
-      "6B": "MP",
-      "7A": "MP",
-      "7B": "MP",
-      "8A": "MP",
-      "8B": "NT"
-    },
-    "French and Sanskrit": {
-      "6A": "SW",
-      "6B": "SW",
-      "7A": "SW",
-      "7B": "SW",
-      "8A": "SW",
-      "8B": "SW"
-    },
-    "A": {
-      "1A": "MP",
-      "1B": "MP",
-      "2A": "MP",
-      "2B": "MP",
-      "3A": "MP",
-      "3B": "MP",
-      "4A": "MP",
-      "4B": "MP",
-      "5A": "MP",
-      "5B": "MP",
-      "6A": "MP",
-      "6B": "MP",
-      "7A": "MP",
-      "7B": "MP",
-      "8A": "MP",
-      "8B": "NT"
-    },
-    "F": {
-      "6A": "SW",
-      "6B": "SW",
-      "7A": "SW",
-      "7B": "SW",
-      "8A": "SW",
-      "8B": "SW"
-    },
-    "A/C": {
-      "1A": "MP",
-      "1B": "MP",
-      "2A": "MP",
-      "2B": "MP",
-      "3A": "MP",
-      "3B": "MP",
-      "4A": "MP",
-      "4B": "MP",
-      "5A": "MP",
-      "5B": "MP",
-      "6A": "MP",
-      "6B": "MP",
-      "7A": "MP",
-      "7B": "MP",
-      "8A": "MP",
-      "8B": "NT"
-    },
-    "F/S": {
-      "6A": "SW, MS",
-      "6B": "SW, MS",
-      "7A": "SW, MS",
-      "7B": "SW, SH",
-      "8A": "SW, SH",
-      "8B": "SW, SH"
-    },
     "Maths_DK": {
       "3B": ""
     },
-    "Maths_VR": {
-      "3B": "AG",
-      "3A": ""
-    },
     "Computer/HSC": {
       "9A": "",
-      "9B": "",
-      "10A": ""
-    },
-    "English_lang": {
-      "9B": ""
+      "9B": "GA,HSC",
+      "10A": "AR",
+      "10a": ""
     },
     "Bio/Eco/Phy_Edu": {
-      "11A": "",
-      "11B": ""
+      "11A": "SB,SA,DV",
+      "11B": "SB,SA, DV"
     },
     "Food_P/AI/Lib_Sc": {
-      "11A": "",
-      "11B": ""
+      "11A": "RN,AR,SP",
+      "11B": "RN,AR,SP"
     },
     "Maths/Music/Hindi": {
-      "11A": "",
-      "11B": ""
+      "11A": "DP,MG,MS",
+      "11B": "DP,MG,MS"
     },
     "Accounts/HIST": {
-      "11B": ""
+      "11B": "SA, SS"
     },
     "BSt/Pol_Sc": {
-      "11B": ""
+      "11B": "SA,SS"
     },
     "Sanskrit": {
       "9A": "SH",
-      "9B": "MS"
+      "9B": "MS",
+      "6A": "MS",
+      "6B": "MS",
+      "7B": "SH",
+      "8A": "MS",
+      "8B": "MS",
+      "7A": "SH",
+      "7a": ""
+    },
+    "French": {
+      "6A": "SW",
+      "7A": "SW",
+      "7B": "SW",
+      "8A": "SW",
+      "6B": "SW",
+      "8B": "SW"
+    },
+    "Maths_VR": {
+      "3B": ""
+    },
+    "computer_application": {
+      "9A": "GA",
+      "9B": "",
+      "10A": ""
     }
   },
   "loadMaster": [
@@ -11091,24 +10996,6 @@
       "class_id": "3b"
     },
     {
-      "subject": "Maths_DK",
-      "class_val": "3",
-      "section": "B",
-      "total_load": 1,
-      "used_load": 1,
-      "remaining_load": 0,
-      "class_id": "3b"
-    },
-    {
-      "subject": "Maths_VR",
-      "class_val": "3",
-      "section": "B",
-      "total_load": 6,
-      "used_load": 6,
-      "remaining_load": 0,
-      "class_id": "3b"
-    },
-    {
       "subject": "English_Lit",
       "class_val": "3",
       "section": "B",
@@ -12009,15 +11896,6 @@
       "class_id": "6a"
     },
     {
-      "subject": "F/S",
-      "class_val": "6",
-      "section": "A",
-      "total_load": 2,
-      "used_load": 2,
-      "remaining_load": 0,
-      "class_id": "6a"
-    },
-    {
       "subject": "Science",
       "class_val": "6",
       "section": "B",
@@ -12171,15 +12049,6 @@
       "class_id": "6b"
     },
     {
-      "subject": "F/S",
-      "class_val": "6",
-      "section": "B",
-      "total_load": 2,
-      "used_load": 2,
-      "remaining_load": 0,
-      "class_id": "6b"
-    },
-    {
       "subject": "Science",
       "class_val": "7",
       "section": "A",
@@ -12325,15 +12194,6 @@
     },
     {
       "subject": "Skill",
-      "class_val": "7",
-      "section": "A",
-      "total_load": 2,
-      "used_load": 2,
-      "remaining_load": 0,
-      "class_id": "7a"
-    },
-    {
-      "subject": "F/S",
       "class_val": "7",
       "section": "A",
       "total_load": 2,
@@ -12495,15 +12355,6 @@
       "class_id": "7b"
     },
     {
-      "subject": "F/S",
-      "class_val": "7",
-      "section": "B",
-      "total_load": 2,
-      "used_load": 2,
-      "remaining_load": 0,
-      "class_id": "7b"
-    },
-    {
       "subject": "Biology",
       "class_val": "8",
       "section": "A",
@@ -12667,15 +12518,6 @@
     },
     {
       "subject": "Skill",
-      "class_val": "8",
-      "section": "A",
-      "total_load": 2,
-      "used_load": 2,
-      "remaining_load": 0,
-      "class_id": "8a"
-    },
-    {
-      "subject": "F/S",
       "class_val": "8",
       "section": "A",
       "total_load": 2,
@@ -12855,15 +12697,6 @@
       "class_id": "8b"
     },
     {
-      "subject": "F/S",
-      "class_val": "8",
-      "section": "B",
-      "total_load": 2,
-      "used_load": 2,
-      "remaining_load": 0,
-      "class_id": "8b"
-    },
-    {
       "subject": "Biology",
       "class_val": "9",
       "section": "A",
@@ -12954,7 +12787,7 @@
       "class_id": "9a"
     },
     {
-      "subject": "Computer/HSC",
+      "subject": "computer_application",
       "class_val": "9",
       "section": "A",
       "total_load": 5,
@@ -12966,7 +12799,7 @@
       "subject": "Games",
       "class_val": "9",
       "section": "A",
-      "total_load": 2,
+      "total_load": 1,
       "used_load": 2,
       "remaining_load": 0,
       "class_id": "9a"
@@ -12993,7 +12826,7 @@
       "subject": "Dance",
       "class_val": "9",
       "section": "A",
-      "total_load": 1,
+      "total_load": 0,
       "used_load": 1,
       "remaining_load": 0,
       "class_id": "9a"
@@ -13053,15 +12886,6 @@
       "class_id": "9b"
     },
     {
-      "subject": "English_lang",
-      "class_val": "9",
-      "section": "B",
-      "total_load": 4,
-      "used_load": 4,
-      "remaining_load": 0,
-      "class_id": "9b"
-    },
-    {
       "subject": "Hindi_Lit",
       "class_val": "9",
       "section": "B",
@@ -13098,7 +12922,7 @@
       "class_id": "9b"
     },
     {
-      "subject": "Computer/HSC",
+      "subject": "computer_application",
       "class_val": "9",
       "section": "B",
       "total_load": 5,
@@ -13110,7 +12934,7 @@
       "subject": "Games",
       "class_val": "9",
       "section": "B",
-      "total_load": 2,
+      "total_load": 1,
       "used_load": 2,
       "remaining_load": 0,
       "class_id": "9b"
@@ -13137,7 +12961,7 @@
       "subject": "Dance",
       "class_val": "9",
       "section": "B",
-      "total_load": 1,
+      "total_load": 0,
       "used_load": 1,
       "remaining_load": 0,
       "class_id": "9b"
@@ -13251,7 +13075,7 @@
       "class_id": "10a"
     },
     {
-      "subject": "Computer/HSC",
+      "subject": "computer_application",
       "class_val": "10",
       "section": "A",
       "total_load": 5,
@@ -13470,6 +13294,104 @@
       "section": "B",
       "subject": "Sanskrit",
       "total_load": 2
+    },
+    {
+      "class_id": "6a",
+      "class_val": "6",
+      "section": "A",
+      "subject": "Sanskrit",
+      "total_load": 1
+    },
+    {
+      "class_id": "6a",
+      "class_val": "6",
+      "section": "A",
+      "subject": "French",
+      "total_load": 1
+    },
+    {
+      "class_id": "6b",
+      "class_val": "6",
+      "section": "B",
+      "subject": "Sanskrit",
+      "total_load": 1
+    },
+    {
+      "class_id": "7a",
+      "class_val": "7",
+      "section": "A",
+      "subject": "French",
+      "total_load": 1
+    },
+    {
+      "class_id": "7b",
+      "class_val": "7",
+      "section": "B",
+      "subject": "French",
+      "total_load": 1
+    },
+    {
+      "class_id": "8a",
+      "class_val": "8",
+      "section": "A",
+      "subject": "French",
+      "total_load": 1
+    },
+    {
+      "class_id": "7b",
+      "class_val": "7",
+      "section": "B",
+      "subject": "Sanskrit",
+      "total_load": 1
+    },
+    {
+      "class_id": "8a",
+      "class_val": "8",
+      "section": "A",
+      "subject": "Sanskrit",
+      "total_load": 1
+    },
+    {
+      "class_id": "8b",
+      "class_val": "8",
+      "section": "B",
+      "subject": "Sanskrit",
+      "total_load": 1
+    },
+    {
+      "class_id": "6b",
+      "class_val": "6",
+      "section": "B",
+      "subject": "French",
+      "total_load": 1
+    },
+    {
+      "class_id": "8b",
+      "class_val": "8",
+      "section": "B",
+      "subject": "French",
+      "total_load": 1
+    },
+    {
+      "class_id": "9b",
+      "class_val": "9",
+      "section": "B",
+      "subject": "Computer/HSC",
+      "total_load": 5
+    },
+    {
+      "class_id": "10a",
+      "class_val": "10",
+      "section": "A",
+      "subject": "Computer/HSC",
+      "total_load": 5
+    },
+    {
+      "class_id": "7a",
+      "class_val": "7",
+      "section": "A",
+      "subject": "Sanskrit",
+      "total_load": 1
     }
   ],
   "masterClasses": [
@@ -13556,6 +13478,9 @@
       ]
     }
   ],
-  "substitutions": {},
+  "substitutions": {
+    "2026-06-20": [],
+    "2026-06-24": []
+  },
   "absentTeachers": {}
 }

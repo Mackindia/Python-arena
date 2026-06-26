@@ -20,7 +20,7 @@ export const autoAssignTeacher = (subject, classId, day, period, teacherSubjectM
   const clashes = [];
 
   potentialTeachers.forEach(t => {
-    const availability = isTeacherAvailable(t, day, period, masterTimetable);
+    const availability = isTeacherAvailable(t, day, period, masterTimetable, classId);
     const hasClash = !availability.isFree && availability.clashClass !== classId;
     
     assignedTeachers.push({

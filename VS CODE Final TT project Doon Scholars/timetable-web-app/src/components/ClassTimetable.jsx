@@ -15,6 +15,106 @@ const ClassTimetable = () => {
   const [notification, setNotification] = useState(null);
   const [clashReport, setClashReport] = useState(null);
   const [resolveLog, setResolveLog] = useState(null);
+  const [showLoadBalance, setShowLoadBalance] = useState(false);
+
+  // Calculate load balance for selected class
+  const getLoadBalance = (classId) => {
+    if (!classId || !timetables[classId]) return [];
+    
+    const normalizedClassId = classId.replace(/\s+/g, '').toUpperCase();
+    
+    // Get deleted subjects from localStorage
+    const savedDeletedSubjects = localStorage.getItem('deletedSubjects');
+    const deletedSubjects = savedDeletedSubjects ? JSON.parse(savedDeletedSubjects) : [];
+    
+    // Get expected load from loadMaster for this class (excluding deleted subjects)
+    const expectedLoad = {};
+    loadMaster.forEach(item => {
+      if (item.class_id.replace(/\s+/g, '').toUpperCase() === normalizedClassId && !deletedSubjects.includes(item.subject)) {
+        expectedLoad[item.subject] = item.total_load;
+      }
+    });
+    
+    // Count actual periods in timetable for each subject (excluding deleted subjects)
+    const actualLoad = {};
+    timetables[classId].forEach(slot => {
+      if (slot.subject && !deletedSubjects.includes(slot.subject)) {
+        actualLoad[slot.subject] = (actualLoad[slot.subject] || 0) + 1;
+      }
+    });
+    
+    // Combine and calculate balance
+    const allSubjects = new Set([...Object.keys(expectedLoad), ...Object.keys(actualLoad)]);
+    const balance = [];
+    
+    allSubjects.forEach(subject => {
+      const expected = expectedLoad[subject] || 0;
+      const actual = actualLoad[subject] || 0;
+      const diff = actual - expected;
+      let status = 'balanced';
+      
+      if (diff > 0) status = 'overloaded';
+      else if (diff < 0) status = 'underloaded';
+      
+      balance.push({
+        subject,
+        expected,
+        actual,
+        diff,
+        status
+      });
+    });
+    
+    // Sort: overloaded first, then underloaded, then balanced
+    return balance.sort((a, b) => {
+      if (a.status === 'overloaded' && b.status !== 'overloaded') return -1;
+      if (a.status !== 'overloaded' && b.status === 'overloaded') return 1;
+      if (a.status === 'underloaded' && b.status === 'balanced') return -1;
+      if (a.status === 'balanced' && b.status === 'underloaded') return 1;
+      return a.subject.localeCompare(b.subject);
+    });
+  };
+
+  const loadBalance = getLoadBalance(selectedClass);
+  const overloadedCount = loadBalance.filter(b => b.status === 'overloaded').length;
+  const underloadedCount = loadBalance.filter(b => b.status === 'underloaded').length;
+  const balancedCount = loadBalance.filter(b => b.status === 'balanced').length;
+
+  // Check if a subject has a valid mapping for a class
+  // Returns: { subjectExists: boolean, teacherAssigned: boolean, status: string }
+  const getMappingStatus = (classId, subject) => {
+    if (!subject) return { subjectExists: false, teacherAssigned: false, status: 'empty' };
+    
+    const normalizedClassId = classId.replace(/\s+/g, '').toUpperCase();
+    
+    // 1. Check if subject exists in loadMaster for this class
+    const subjectInLoadMaster = loadMaster.some(
+      item => item.class_id.replace(/\s+/g, '').toUpperCase() === normalizedClassId && item.subject === subject
+    );
+    
+    // 2. Check if subject exists in teacherSubjectMap for this class
+    const subjectInMap = teacherSubjectMap && teacherSubjectMap[subject] && 
+      teacherSubjectMap[subject][normalizedClassId] !== undefined;
+    
+    const subjectExists = subjectInLoadMaster || subjectInMap;
+    
+    // 3. Check if teacher is mapped
+    let teacherAssigned = false;
+    if (subjectExists && teacherSubjectMap && teacherSubjectMap[subject]) {
+      const mappedTeacher = teacherSubjectMap[subject][normalizedClassId];
+      teacherAssigned = mappedTeacher !== undefined && mappedTeacher !== null && mappedTeacher.trim() !== '';
+    }
+    
+    // 4. Determine status
+    let status = 'valid';
+    if (!subjectExists) {
+      status = 'no_subject';
+    } else if (!teacherAssigned) {
+      status = 'no_teacher';
+    }
+    
+    return { subjectExists, teacherAssigned, status };
+  };
 
   const getLogDetails = (msg) => {
     let type = 'info';
@@ -311,13 +411,37 @@ const ClassTimetable = () => {
             <div className="grid-cell day-header">{day}</div>
             {PERIODS.map(p => {
               const slot = timetables[targetClass]?.find(s => s.day === day && parseInt(s.period) === p);
-              const isCollision = slot?.teacher && checkTeacherCollision(slot.teacher, day, p, targetClass);
+              const mappingStatus = getMappingStatus(targetClass, slot?.subject);
+              const isCollision = slot?.teacher && mappingStatus.status === 'valid' && checkTeacherCollision(slot.teacher, day, p, targetClass);
+              
+              // Determine cell CSS class: missing mapping takes priority, then collision
+              let cellClassName = 'grid-cell';
+              if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
+                // Deleted subject or empty slot - show blue
+                cellClassName += ' missing-mapping';
+              } else if (mappingStatus.status === 'no_teacher') {
+                // Subject exists but no teacher - show blue
+                cellClassName += ' missing-mapping';
+              } else if (isCollision) {
+                // Only show red for actual clashes when mapping is valid
+                cellClassName += ' collision-warning';
+              }
+              
+              // Determine title tooltip
+              let cellTitle = '';
+              if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
+                cellTitle = 'No valid subject mapping exists - subject may be deleted';
+              } else if (mappingStatus.status === 'no_teacher') {
+                cellTitle = 'Subject exists but teacher is not assigned';
+              } else if (isCollision) {
+                cellTitle = `Clash Detected: ${slot.teacher} is also teaching Class ${isCollision.toUpperCase()} in Period ${p}`;
+              }
               
               return (
                 <div 
                   key={`${day}-p${p}`} 
-                  className={`grid-cell ${isCollision ? 'collision-warning' : ''}`}
-                  title={isCollision ? `Clash Detected: ${slot.teacher} is also teaching Class ${isCollision.toUpperCase()} in Period ${p}` : ''}
+                  className={cellClassName}
+                  title={cellTitle}
                 >
                   {editMode && targetClass === selectedClass ? (
                     <div className="edit-slot no-print">
@@ -346,22 +470,36 @@ const ClassTimetable = () => {
                     <>
                       {slot?.subject ? (
                         <>
-                          <div className="slot-subject font-bold">{slot.subject}</div>
-                          <div className="slot-teacher">
-                            {slot.assignedTeachers && slot.assignedTeachers.length > 0 
-                              ? slot.assignedTeachers.map((at, idx) => {
-                                  if (typeof at === 'string') return <span key={idx}>{at}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}</span>;
-                                  return (
-                                    <span key={idx} style={{ color: at.clash ? '#ef4444' : 'inherit' }} title={at.clashWith ? `Clash: ${at.clashWith}` : ''}>
-                                      {at.teacher}{at.clash ? ` ⚠ (${at.clashWith})` : ''}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}
-                                    </span>
-                                  );
-                                })
-                              : (slot.teacher ? slot.teacher : 'No Teacher')}
-                          </div>
+                          {mappingStatus.status === 'no_subject' ? (
+                            // Deleted subject - show message
+                            <div className="slot-subject font-bold" style={{ color: '#1e40af', fontSize: '0.75rem' }}>No Subject or Teacher Assigned</div>
+                          ) : mappingStatus.status === 'no_teacher' ? (
+                            // Subject exists but no teacher
+                            <>
+                              <div className="slot-subject font-bold">{slot.subject}</div>
+                              <div className="slot-teacher">No Teacher</div>
+                            </>
+                          ) : (
+                            // Valid mapping - show normally
+                            <>
+                              <div className="slot-subject font-bold">{slot.subject}</div>
+                              <div className="slot-teacher">
+                                {slot.assignedTeachers && slot.assignedTeachers.length > 0 
+                                  ? slot.assignedTeachers.map((at, idx) => {
+                                      if (typeof at === 'string') return <span key={idx}>{at}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}</span>;
+                                      return (
+                                        <span key={idx} style={{ color: at.clash ? '#ef4444' : 'inherit' }} title={at.clashWith ? `Clash: ${at.clashWith}` : ''}>
+                                          {at.teacher}{at.clash ? ` ⚠ (${at.clashWith})` : ''}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}
+                                        </span>
+                                      );
+                                    })
+                                  : (slot.teacher ? slot.teacher : 'No Teacher')}
+                              </div>
+                            </>
+                          )}
                         </>
                       ) : (
-                        <div className="slot-teacher" style={{opacity: 0.3}}>-</div>
+                        <div className="slot-subject" style={{ color: '#1e40af', fontSize: '0.75rem', opacity: 1 }}>No Subject or Teacher Assigned</div>
                       )}
                     </>
                   )}
@@ -468,8 +606,122 @@ const ClassTimetable = () => {
             )}
           </select>
         </div>
+        <div className="filter-group">
+          <button
+            className="btn"
+            onClick={() => setShowLoadBalance(!showLoadBalance)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              padding: '0.5rem 1rem',
+              borderRadius: '4px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              background: showLoadBalance ? '#059669' : '#f8fafc',
+              color: showLoadBalance ? 'white' : '#374151',
+              border: showLoadBalance ? 'none' : '1px solid #e5e7eb'
+            }}
+            disabled={!selectedClass}
+          >
+            📊 Load Balance
+            {selectedClass && loadBalance.length > 0 && (
+              <span style={{
+                background: overloadedCount > 0 ? '#ef4444' : underloadedCount > 0 ? '#f59e0b' : '#10b981',
+                color: 'white',
+                padding: '1px 6px',
+                borderRadius: '10px',
+                fontSize: '0.7rem',
+                marginLeft: '4px'
+              }}>
+                {overloadedCount > 0 ? `${overloadedCount} Over` : underloadedCount > 0 ? `${underloadedCount} Under` : '✓'}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
+      {/* Load Balance Panel */}
+      {showLoadBalance && selectedClass && (
+        <div className="no-print" style={{
+          marginBottom: '1rem',
+          padding: '1.25rem',
+          borderRadius: '0.75rem',
+          border: '1px solid #e2e8f0',
+          background: 'linear-gradient(to bottom, #ffffff, #f8fafc)',
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}>
+            <h3 style={{ margin: 0, color: '#1e293b', fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', background: '#f1f5f9', color: '#0f766e' }}>📊</span>
+              Load Balance Report — {selectedClass.toUpperCase()}
+            </h3>
+            <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.75rem' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', borderRadius: '4px', background: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }}></span>
+                Overloaded ({overloadedCount})
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', borderRadius: '4px', background: '#fffbeb', color: '#92400e', border: '1px solid #fde68a' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }}></span>
+                Underloaded ({underloadedCount})
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', borderRadius: '4px', background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
+                Balanced ({balancedCount})
+              </span>
+            </div>
+          </div>
+          
+          {loadBalance.length === 0 ? (
+            <div style={{ padding: '1rem', textAlign: 'center', color: '#6b7280', fontSize: '0.875rem' }}>
+              No load data available. Add subjects in Load Master first.
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
+              {loadBalance.map((item, idx) => (
+                <div 
+                  key={idx}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '0.5rem',
+                    border: `1px solid ${item.status === 'overloaded' ? '#fecaca' : item.status === 'underloaded' ? '#fde68a' : '#bbf7d0'}`,
+                    background: item.status === 'overloaded' ? '#fef2f2' : item.status === 'underloaded' ? '#fffbeb' : '#f0fdf4'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <span style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      background: item.status === 'overloaded' ? '#ef4444' : item.status === 'underloaded' ? '#f59e0b' : '#10b981',
+                      flexShrink: 0
+                    }}></span>
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.875rem' }}>{item.subject}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                        Expected: {item.expected} periods | Actual: {item.actual} periods
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{
+                    padding: '4px 10px',
+                    borderRadius: '12px',
+                    fontWeight: 700,
+                    fontSize: '0.8rem',
+                    background: item.status === 'overloaded' ? '#dc2626' : item.status === 'underloaded' ? '#d97706' : '#059669',
+                    color: 'white'
+                  }}>
+                    {item.status === 'overloaded' ? `+${item.diff}` : item.status === 'underloaded' ? `${item.diff}` : '✓'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <datalist id="class-teacher-list">
         {teachers.map(t => <option key={t} value={t} />)}

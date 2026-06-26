@@ -283,6 +283,21 @@ select:focus, input:focus {
   100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
+/* Missing Mapping State (Blue) */
+.missing-mapping {
+  border: 1px solid #3b82f6 !important;
+  background-color: #eff6ff !important;
+}
+
+.missing-mapping .slot-subject {
+  color: #1e40af;
+}
+
+.missing-mapping .slot-teacher {
+  color: #1e40af;
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
 /* Button */
 .btn {
   display: inline-flex;
@@ -363,6 +378,16 @@ select:focus, input:focus {
   
   .print-only-title {
     display: block !important;
+  }
+  
+  .day-timetable-section {
+    page-break-after: always;
+    break-after: page;
+  }
+  
+  .day-timetable-section:last-child {
+    page-break-after: auto;
+    break-after: auto;
   }
   
   .timetable-wrapper {

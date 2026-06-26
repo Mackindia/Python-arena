@@ -16,13 +16,15 @@ interface PythonProgram {
 function PythonEditorPageContent() {
   const searchParams = useSearchParams();
   const adminProgramId = searchParams.get("adminProgramId");
+  const templateTitle = searchParams.get("title");
+  const templateCode = searchParams.get("code");
 
   const { isLoaded, isSignedIn } = useUser();
   const [programs, setPrograms] = useState<PythonProgram[]>([]);
   const [activeProgram, setActiveProgram] = useState<PythonProgram | null>(null);
   
-  const [title, setTitle] = useState("Untitled Python Project");
-  const [pythonCode, setPythonCode] = useState("print('Hello, Python Arena!')");
+  const [title, setTitle] = useState(templateTitle || "Untitled Python Project");
+  const [pythonCode, setPythonCode] = useState(templateCode || "print('Hello, Python Arena!')");
   const [output, setOutput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [isPyodideLoading, setIsPyodideLoading] = useState(true);
@@ -58,11 +60,16 @@ function PythonEditorPageContent() {
     if (isLoaded && isSignedIn) {
       if (adminProgramId) {
         fetchAdminProgram(adminProgramId);
+      } else if (templateTitle && templateCode) {
+        setTitle(templateTitle);
+        setPythonCode(templateCode);
+        setOutput("");
+        setSaveStatus("saved");
       } else {
         fetchPrograms();
       }
     }
-  }, [isLoaded, isSignedIn, adminProgramId]);
+  }, [isLoaded, isSignedIn, adminProgramId, templateTitle, templateCode]);
 
   const fetchAdminProgram = async (id: string) => {
     try {

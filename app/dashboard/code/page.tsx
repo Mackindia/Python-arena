@@ -19,15 +19,19 @@ interface Program {
 function CodeEditorPageContent() {
   const searchParams = useSearchParams();
   const adminProgramId = searchParams.get("adminProgramId");
+  const templateTitle = searchParams.get("title");
+  const templateHtml = searchParams.get("htmlCode");
+  const templateCss = searchParams.get("cssCode");
+  const templateJs = searchParams.get("jsCode");
 
   const { isLoaded, isSignedIn } = useUser();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [activeProgram, setActiveProgram] = useState<Program | null>(null);
   
-  const [title, setTitle] = useState("Untitled Project");
-  const [htmlCode, setHtmlCode] = useState("<h1>Hello World!</h1>\n<p>Start typing your HTML here...</p>");
-  const [cssCode, setCssCode] = useState("h1 {\n  color: #0ea5e9;\n}");
-  const [jsCode, setJsCode] = useState("");
+  const [title, setTitle] = useState(templateTitle || "Untitled Project");
+  const [htmlCode, setHtmlCode] = useState(templateHtml || "<h1>Hello World!</h1>\n<p>Start typing your HTML here...</p>");
+  const [cssCode, setCssCode] = useState(templateCss || "h1 {\n  color: #0ea5e9;\n}");
+  const [jsCode, setJsCode] = useState(templateJs || "");
   
   const [activeTab, setActiveTab] = useState<"html" | "css" | "js" | "media">("html");
 
@@ -59,11 +63,30 @@ function CodeEditorPageContent() {
     if (isLoaded && isSignedIn) {
       if (adminProgramId) {
         fetchAdminProgram(adminProgramId);
+      } else if (templateTitle && templateHtml) {
+        setTitle(templateTitle);
+        setHtmlCode(templateHtml);
+        setCssCode(templateCss || "");
+        setJsCode(templateJs || "");
       } else {
         fetchPrograms();
       }
     }
-  }, [isLoaded, isSignedIn, adminProgramId]);
+  }, [isLoaded, isSignedIn, adminProgramId, templateTitle, templateHtml, templateCss, templateJs]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("editorCode");
+    if (stored) {
+      try {
+        const data = JSON.parse(stored);
+        setTitle(data.title || "Untitled Project");
+        setHtmlCode(data.htmlCode || "");
+        setCssCode(data.cssCode || "");
+        setJsCode(data.jsCode || "");
+      } catch {}
+      localStorage.removeItem("editorCode");
+    }
+  }, []);
 
   const fetchAdminProgram = async (id: string) => {
     try {
@@ -153,6 +176,21 @@ function CodeEditorPageContent() {
       <body>
         ${htmlCode}
         <script>${jsCode}</script>
+        <script>
+          // Block all link navigation in preview mode
+          document.addEventListener('click', function(e) {
+            var link = e.target.closest('a');
+            if (link) {
+              e.preventDefault();
+              e.stopPropagation();
+              var msg = document.createElement('div');
+              msg.textContent = 'Links are disabled in preview. Use "Open in Browser" to test navigation.';
+              msg.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1e293b;color:#f1f5f9;padding:12px 24px;border-radius:8px;font-size:14px;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-family:Arial,sans-serif;';
+              document.body.appendChild(msg);
+              setTimeout(function(){ msg.remove(); }, 3000);
+            }
+          }, true);
+        </script>
       </body>
     </html>
   `;
@@ -287,14 +325,25 @@ function CodeEditorPageContent() {
 
           {/* Live Preview */}
           <div className="flex w-1/2 flex-col bg-white">
-            <div className="border-b border-slate-200 bg-slate-100 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Live Preview
+            <div className="flex items-center justify-between border-b border-slate-200 bg-slate-100 px-4 py-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Live Preview
+              </span>
+              <button
+                onClick={() => {
+                  const iframe = document.querySelector('iframe[title="preview"]') as HTMLIFrameElement;
+                  if (iframe) iframe.srcDoc = combinedOutput;
+                }}
+                className="rounded bg-slate-200 px-3 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-300"
+              >
+                Reset Preview
+              </button>
             </div>
             <iframe
               title="preview"
               srcDoc={combinedOutput}
               className="h-full w-full flex-1 border-none bg-white"
-              sandbox="allow-scripts"
+              sandbox="allow-scripts allow-same-origin"
             />
           </div>
 

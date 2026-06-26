@@ -6,6 +6,7 @@ import { autoAssignTeacher } from '../services/allocationEngine';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
+const ALL_DAYS_VALUE = 'ALL';
 
 const Mastersheet = () => {
   const { timetables, classes, checkTeacherCollision, updateSlot, teachers, loadMaster, teacherSubjectMap, getAllowedSubjectsForClass, importBackup } = useTimetable();
@@ -14,6 +15,42 @@ const Mastersheet = () => {
   const [adminOverride, setAdminOverride] = useState(false);
   const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
+
+  // Check if a subject has a valid mapping for a class
+  // Returns: { subjectExists: boolean, teacherAssigned: boolean, status: string }
+  const getMappingStatus = (classId, subject) => {
+    if (!subject) return { subjectExists: false, teacherAssigned: false, status: 'empty' };
+    
+    const normalizedClassId = classId.replace(/\s+/g, '').toUpperCase();
+    
+    // 1. Check if subject exists in loadMaster for this class
+    const subjectInLoadMaster = loadMaster.some(
+      item => item.class_id.replace(/\s+/g, '').toUpperCase() === normalizedClassId && item.subject === subject
+    );
+    
+    // 2. Check if subject exists in teacherSubjectMap for this class
+    const subjectInMap = teacherSubjectMap && teacherSubjectMap[subject] && 
+      teacherSubjectMap[subject][normalizedClassId] !== undefined;
+    
+    const subjectExists = subjectInLoadMaster || subjectInMap;
+    
+    // 3. Check if teacher is mapped
+    let teacherAssigned = false;
+    if (subjectExists && teacherSubjectMap && teacherSubjectMap[subject]) {
+      const mappedTeacher = teacherSubjectMap[subject][normalizedClassId];
+      teacherAssigned = mappedTeacher !== undefined && mappedTeacher !== null && mappedTeacher.trim() !== '';
+    }
+    
+    // 4. Determine status
+    let status = 'valid';
+    if (!subjectExists) {
+      status = 'no_subject';
+    } else if (!teacherAssigned) {
+      status = 'no_teacher';
+    }
+    
+    return { subjectExists, teacherAssigned, status };
+  };
 
   // Sort classes logically (1a, 1b, 2a... 10a, 11a, 11b)
   const sortedClasses = [...classes].sort((a, b) => {
@@ -98,6 +135,9 @@ const Mastersheet = () => {
     }
   };
 
+  const isFullWeek = selectedDay === ALL_DAYS_VALUE;
+  const daysToShow = isFullWeek ? DAYS : [selectedDay];
+
   return (
     <div>
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -107,9 +147,9 @@ const Mastersheet = () => {
             className="btn btn-primary"
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem', background: '#3b82f6', border: 'none' }}
             onClick={() => window.print()}
-            title="Download this day's Mastersheet as a Landscape PDF"
+            title={isFullWeek ? "Print full week Mastersheet (Mon-Sat)" : "Print this day's Mastersheet"}
           >
-            🖨️ Print to PDF
+            🖨️ Print {isFullWeek ? 'Full Week' : 'Today'}
           </button>
           <button 
             className="btn btn-primary" 
@@ -200,7 +240,7 @@ const Mastersheet = () => {
       </div>
 
       <h1 className="print-only-title" style={{ display: 'none', textAlign: 'center', marginBottom: '20px', fontSize: '24px' }}>
-        Doon Scholars - Master Timetable ({selectedDay})
+        Doon Scholars - Master Timetable ({isFullWeek ? 'Full Week (Mon-Sat)' : selectedDay})
       </h1>
 
       {notification && (
@@ -228,6 +268,7 @@ const Mastersheet = () => {
             onChange={(e) => setSelectedDay(e.target.value)}
             style={{ width: '150px' }}
           >
+            <option value={ALL_DAYS_VALUE}>📅 Full Week</option>
             {DAYS.map(day => (
               <option key={day} value={day}>{day}</option>
             ))}
@@ -241,80 +282,121 @@ const Mastersheet = () => {
       </datalist>
 
       <div className="card printable-area" style={{ overflowX: 'auto' }}>
-        <div className="master-grid" style={{ gridTemplateColumns: `80px repeat(${PERIODS.length}, minmax(${editMode ? '140px' : '1fr'}, 1fr))` }}>
-          {/* Header Row */}
-          <div className="grid-cell grid-header">Class</div>
-          {PERIODS.map(p => (
-            <div key={`p${p}`} className="grid-cell grid-header">Period {p}</div>
-          ))}
+        {daysToShow.map(day => (
+          <div key={day} className="day-timetable-section" style={isFullWeek ? { marginBottom: '2rem', pageBreakAfter: 'always' } : {}}>
+            {isFullWeek && (
+              <h2 style={{ textAlign: 'center', fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b', padding: '8px', background: '#f1f5f9', borderRadius: '4px' }}>
+                {day === 'Mon' ? 'Monday' : day === 'Tue' ? 'Tuesday' : day === 'Wed' ? 'Wednesday' : day === 'Thu' ? 'Thursday' : day === 'Fri' ? 'Friday' : 'Saturday'}
+              </h2>
+            )}
+            <div className="master-grid" style={{ gridTemplateColumns: `80px repeat(${PERIODS.length}, minmax(${editMode ? '140px' : '1fr'}, 1fr))` }}>
+              {/* Header Row */}
+              <div className="grid-cell grid-header">Class</div>
+              {PERIODS.map(p => (
+                <div key={`p${p}`} className="grid-cell grid-header">Period {p}</div>
+              ))}
 
-          {/* Data Rows */}
-          {sortedClasses.map(cls => (
-            <React.Fragment key={cls}>
-              <div className="grid-cell day-header">{cls.toUpperCase()}</div>
-              {PERIODS.map(p => {
-                const slot = timetables[cls]?.find(s => s.day === selectedDay && parseInt(s.period) === p);
-                const collisionClass = slot?.teacher ? checkTeacherCollision(slot.teacher, selectedDay, p, cls) : false;
-                
-                return (
-                  <div 
-                    key={`${cls}-p${p}`} 
-                    className={`grid-cell ${collisionClass ? 'collision-warning' : ''}`}
-                    title={collisionClass ? `Clash Detected: ${slot.teacher} is also teaching Class ${collisionClass.toUpperCase()} in Period ${p}` : ''}
-                    style={{ padding: editMode ? '4px' : '0.5rem' }}
-                  >
-                    {editMode ? (
-                      <div className="edit-slot" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <select 
-                          value={slot?.subject || ''} 
-                          onChange={(e) => handleSlotUpdate(cls, selectedDay, p, 'subject', e.target.value, slot?.subject, slot?.teacher)}
-                          style={{ fontSize: '0.8rem', padding: '2px', width: '100%', background: '#fff', border: '1px solid #ccc', borderRadius: '2px' }}
-                        >
-                          <option value="">- Sub -</option>
-                          {getAllowedSubjectsForClass(cls).map(sub => (
-                            <option key={sub} value={sub}>{sub}</option>
-                          ))}
-                        </select>
-                        {adminOverride && (
-                          <input 
-                            type="text"
-                            list="teacher-list"
-                            value={slot?.teacher || ''} 
-                            onChange={(e) => handleSlotUpdate(cls, selectedDay, p, 'teacher', e.target.value, slot?.subject, slot?.teacher)}
-                            style={{ fontSize: '0.8rem', padding: '2px', width: '100%' }}
-                            placeholder="- Tr Override -"
-                          />
+              {/* Data Rows */}
+              {sortedClasses.map(cls => (
+                <React.Fragment key={cls}>
+                  <div className="grid-cell day-header">{cls.toUpperCase()}</div>
+                  {PERIODS.map(p => {
+                    const slot = timetables[cls]?.find(s => s.day === day && parseInt(s.period) === p);
+                    const mappingStatus = getMappingStatus(cls, slot?.subject);
+                    const collisionClass = slot?.teacher && mappingStatus.status === 'valid' ? checkTeacherCollision(slot.teacher, day, p, cls) : false;
+                    
+                    // Determine cell CSS class: missing mapping takes priority, then collision
+                    let cellClassName = 'grid-cell';
+                    if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
+                      cellClassName += ' missing-mapping';
+                    } else if (mappingStatus.status === 'no_teacher') {
+                      cellClassName += ' missing-mapping';
+                    } else if (collisionClass) {
+                      cellClassName += ' collision-warning';
+                    }
+                    
+                    // Determine title tooltip
+                    let cellTitle = '';
+                    if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
+                      cellTitle = 'No valid subject mapping exists - subject may be deleted';
+                    } else if (mappingStatus.status === 'no_teacher') {
+                      cellTitle = 'Subject exists but teacher is not assigned';
+                    } else if (collisionClass) {
+                      cellTitle = `Clash Detected: ${slot.teacher} is also teaching Class ${collisionClass.toUpperCase()} in Period ${p}`;
+                    }
+                    
+                    return (
+                      <div 
+                        key={`${cls}-${day}-p${p}`} 
+                        className={cellClassName}
+                        title={cellTitle}
+                        style={{ padding: editMode ? '4px' : '0.5rem' }}
+                      >
+                        {editMode ? (
+                          <div className="edit-slot" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <select 
+                              value={slot?.subject || ''} 
+                              onChange={(e) => handleSlotUpdate(cls, day, p, 'subject', e.target.value, slot?.subject, slot?.teacher)}
+                              style={{ fontSize: '0.8rem', padding: '2px', width: '100%', background: '#fff', border: '1px solid #ccc', borderRadius: '2px' }}
+                            >
+                              <option value="">- Sub -</option>
+                              {getAllowedSubjectsForClass(cls).map(sub => (
+                                <option key={sub} value={sub}>{sub}</option>
+                              ))}
+                            </select>
+                            {adminOverride && (
+                              <input 
+                                type="text"
+                                list="teacher-list"
+                                value={slot?.teacher || ''} 
+                                onChange={(e) => handleSlotUpdate(cls, day, p, 'teacher', e.target.value, slot?.subject, slot?.teacher)}
+                                style={{ fontSize: '0.8rem', padding: '2px', width: '100%' }}
+                                placeholder="- Tr Override -"
+                              />
+                            )}
+                          </div>
+                        ) : (
+                          <>
+                            {slot?.subject ? (
+                              <>
+                                {mappingStatus.status === 'no_subject' ? (
+                                  <div className="slot-subject" style={{ color: '#1e40af', fontSize: '0.75rem' }}>No Subject or Teacher Assigned</div>
+                                ) : mappingStatus.status === 'no_teacher' ? (
+                                  <>
+                                    <div className="slot-subject">{slot.subject}</div>
+                                    <div className="slot-teacher">No Teacher</div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="slot-subject">{slot.subject}</div>
+                                    <div className="slot-teacher">
+                                      {slot.assignedTeachers && slot.assignedTeachers.length > 0 
+                                        ? slot.assignedTeachers.map((at, idx) => {
+                                            if (typeof at === 'string') return <span key={idx}>{at}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}</span>;
+                                            return (
+                                              <span key={idx} style={{ color: at.clash ? '#ef4444' : 'inherit' }} title={at.clashWith ? `Clash: ${at.clashWith}` : ''}>
+                                                {at.teacher}{at.clash ? ` ⚠ (${at.clashWith})` : ''}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}
+                                              </span>
+                                            );
+                                          })
+                                        : (slot.teacher ? slot.teacher : 'No Teacher')}
+                                    </div>
+                                  </>
+                                )}
+                              </>
+                            ) : (
+                              <div className="slot-subject" style={{ color: '#1e40af', fontSize: '0.75rem' }}>No Subject or Teacher Assigned</div>
+                            )}
+                          </>
                         )}
                       </div>
-                    ) : (
-                      <>
-                        {slot?.subject ? (
-                          <>
-                            <div className="slot-subject">{slot.subject}</div>
-                            <div className="slot-teacher">
-                              {slot.assignedTeachers && slot.assignedTeachers.length > 0 
-                                ? slot.assignedTeachers.map((at, idx) => {
-                                    if (typeof at === 'string') return <span key={idx}>{at}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}</span>;
-                                    return (
-                                      <span key={idx} style={{ color: at.clash ? '#ef4444' : 'inherit' }} title={at.clashWith ? `Clash: ${at.clashWith}` : ''}>
-                                        {at.teacher}{at.clash ? ` ⚠ (${at.clashWith})` : ''}{idx < slot.assignedTeachers.length - 1 ? ', ' : ''}
-                                      </span>
-                                    );
-                                  })
-                                : (slot.teacher ? slot.teacher : 'No Teacher')}
-                            </div>
-                          </>
-                        ) : (
-                          <div className="slot-teacher" style={{opacity: 0.3}}>-</div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </React.Fragment>
-          ))}
-        </div>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
