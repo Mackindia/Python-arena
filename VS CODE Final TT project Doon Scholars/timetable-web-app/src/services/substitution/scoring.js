@@ -1,10 +1,14 @@
 export const calculateTeacherScore = (teacher, subjectToSubstitute, period, dayName, teacherUsage, currentSubs) => {
+  const { normalizeTeacherId, normalizePeriod } = require('./normalization');
+  const normalizedTeacher = normalizeTeacherId(teacher);
+  const normalizedPeriod = normalizePeriod(period);
+  
   let score = 0;
   
   let baseLoad = 0;
-  const usage = teacherUsage[teacher]?.[dayName];
+  const usage = teacherUsage[normalizedTeacher]?.[dayName];
   if (usage) baseLoad = Object.values(usage).reduce((sum, count) => sum + count, 0);
-  const extraLoad = currentSubs.filter(s => s.substituteTeacher === teacher).length;
+  const extraLoad = currentSubs.filter(s => normalizeTeacherId(s.substituteTeacher) === normalizedTeacher).length;
   const currentLoad = baseLoad + extraLoad;
   
   // Scoring formula (Best score wins)

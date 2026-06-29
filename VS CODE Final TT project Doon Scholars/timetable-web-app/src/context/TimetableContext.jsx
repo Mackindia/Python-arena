@@ -109,13 +109,41 @@ export const TimetableProvider = ({ children }) => {
     if (savedAbsentTeachers) setAbsentTeachers(savedAbsentTeachers);
     
     
+    // ──────────────────────────────────────────────────────────────────
+    // FIX: Build teachers list from ACTUAL timetable data on initial load.
+    // Previously used initialTeachers (static JSON) which never updates —
+    // causing stale/removed teacher initials to persist in the UI.
+    // Now: Scan timetable slots + localStorage custom teachers - deleted
+    // ──────────────────────────────────────────────────────────────────
     const customTeachers = safeJSONParse('addedTeachers', []);
     const deletedTeachersList = safeJSONParse('deletedTeachers', []);
 
-    const validInitial = initialTeachers.filter(t => !deletedTeachersList.includes(t));
-    const validCustom = customTeachers.filter(t => !deletedTeachersList.includes(t));
+    // Step 1: Scan timetables to find teachers actually assigned to slots
+    const timetableTeachers = new Set();
+    Object.values(currentTT).forEach(schedule => {
+      schedule.forEach(slot => {
+        if (slot.teacher) {
+          slot.teacher.split(',').forEach(t => {
+            const cleanT = t.trim().toUpperCase();
+            if (cleanT && cleanT.toLowerCase() !== 'nan' && cleanT !== '0' && !deletedTeachersList.includes(cleanT)) {
+              timetableTeachers.add(cleanT);
+            }
+          });
+        }
+      });
+    });
 
-    setTeachers([...new Set([...validInitial, ...validCustom])].sort());
+    // Step 2: Build final list = timetable teachers + custom teachers - deleted
+    const initialTeacherSet = new Set();
+    timetableTeachers.forEach(t => initialTeacherSet.add(t));
+    customTeachers.forEach(t => {
+      const normalized = t.trim().toUpperCase();
+      if (!deletedTeachersList.includes(normalized)) {
+        initialTeacherSet.add(normalized);
+      }
+    });
+
+    setTeachers(Array.from(initialTeacherSet).sort());
     
     const savedMasterClasses = safeJSONParse('masterClasses', null);
     if (savedMasterClasses) {
@@ -252,30 +280,54 @@ export const TimetableProvider = ({ children }) => {
     if (Object.keys(timetables).length > 0) {
       localStorage.setItem('timetables', JSON.stringify(timetables));
       
-      // Dynamically update teachers list based on assigned timetables
+      // ──────────────────────────────────────────────────────────────────
+      // FIX: Build teachers list from ACTUAL timetable data (ground truth)
+      // Previously: UNION of initialTeachers + addedTeachers + timetable scan
+      //   → Stale teachers persisted after rename/swap (old initials never removed)
+      // Now: Teachers = timetable scan + addedTeachers - deletedTeachers
+      //   → Only teachers that actually exist in timetables or were explicitly added
+      // ──────────────────────────────────────────────────────────────────
       const savedAddedTeachers = localStorage.getItem('addedTeachers');
       const customTeachers = savedAddedTeachers ? JSON.parse(savedAddedTeachers) : [];
 
       const savedDeletedTeachers = localStorage.getItem('deletedTeachers');
       const deletedTeachers = savedDeletedTeachers ? JSON.parse(savedDeletedTeachers) : [];
       
-      const validInitial = initialTeachers.filter(t => !deletedTeachers.includes(t));
-      const validCustom = customTeachers.filter(t => !deletedTeachers.includes(t));
-
-      const dynamicTeachers = new Set([...validInitial, ...validCustom]);
-      
+      // Step 1: Scan ALL timetable slots to find teachers actually in use
+      const timetableTeachers = new Set();
       Object.values(timetables).forEach(schedule => {
         schedule.forEach(slot => {
           if (slot.teacher) {
             slot.teacher.split(',').forEach(t => {
-              const cleanT = t.trim();
+              const cleanT = t.trim().toUpperCase();
               if (cleanT && cleanT.toLowerCase() !== 'nan' && cleanT !== '0' && !deletedTeachers.includes(cleanT)) {
-                dynamicTeachers.add(cleanT);
+                timetableTeachers.add(cleanT);
               }
             });
           }
         });
       });
+
+      // Step 2: Build final list = timetable teachers + custom teachers - deleted
+      const dynamicTeachers = new Set();
+
+      // Add all teachers found in timetables (these are the real, active teachers)
+      timetableTeachers.forEach(t => dynamicTeachers.add(t));
+
+      // Add custom teachers (explicitly added by user, even if not yet in timetables)
+      customTeachers.forEach(t => {
+        const normalized = t.trim().toUpperCase();
+        if (!deletedTeachers.includes(normalized)) {
+          dynamicTeachers.add(normalized);
+        }
+      });
+
+      // NOTE: We intentionally do NOT include initialTeachers blindly.
+      // initialTeachers is a static JSON that never updates. If a teacher was
+      // renamed/swapped, their old initials linger there. The timetable scan
+      // is the single source of truth — only teachers actually assigned to
+      // slots appear in the list.
+
       setTeachers(Array.from(dynamicTeachers).sort());
     }
   }, [timetables]);

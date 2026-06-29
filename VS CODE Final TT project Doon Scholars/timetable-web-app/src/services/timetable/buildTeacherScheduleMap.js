@@ -7,6 +7,7 @@ export const buildTeacherScheduleMap = (timetables) => {
     schedule.forEach(slot => {
       if (!slot.teacher) return;
 
+      // Normalize all teacher names to uppercase for consistent matching
       const currentTeachers = slot.teacher.split(',').map(t => t.trim().toUpperCase()).filter(Boolean);
       
       currentTeachers.forEach(tStr => {
