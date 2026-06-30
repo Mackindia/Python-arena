@@ -365,6 +365,24 @@ const SubstitutionManager = () => {
     unmarkTeacherAbsent
   } = useTimetable();
 
+  // ──────────────────────────────────────────────────────────────────
+  // FIX: Derive teacher list from ACTUAL timetable data (teacherScheduleMap),
+  // NOT from context's `teachers` state. The context's `teachers` may include
+  // stale entries from `addedTeachers` in localStorage that are NOT synced
+  // across clients — causing sadmin to see old teacher initials while
+  // super admin sees correct ones.
+  // teacherScheduleMap is built from timetables (synced data) and is the
+  // single source of truth for which teachers actually exist.
+  // ──────────────────────────────────────────────────────────────────
+  const timetableTeachers = useMemo(() => {
+    const map = buildTeacherScheduleMap(timetables);
+    return Object.keys(map).sort();
+  }, [timetables]);
+
+  // Use timetable-derived teachers for the checkbox list (absent teacher selection)
+  // Fall back to context teachers if timetable scan is empty
+  const displayTeachers = timetableTeachers.length > 0 ? timetableTeachers : teachers;
+
   const getTeacherFullName = (shortName) => {
     const normalized = normalizeTeacherId(shortName);
     if (!teacherMapping || !Array.isArray(teacherMapping)) return normalized;
@@ -432,7 +450,7 @@ const SubstitutionManager = () => {
           <Users size={20} color="#ef4444" /> STEP 2 — Select Absent Teachers
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '0.5rem' }}>
-          {teachers.map(t => {
+          {displayTeachers.map(t => {
             const normalizedT = normalizeTeacherId(t);
             return (
               <label key={normalizedT} style={{ 
@@ -457,7 +475,7 @@ const SubstitutionManager = () => {
 
       <SubstitutionEngineUI 
         timetables={timetables}
-        teachers={teachers}
+        teachers={displayTeachers}
         dailyAbsent={dailyAbsent}
         selectedDate={selectedDate}
         selectedDayName={selectedDayName}

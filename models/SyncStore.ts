@@ -10,6 +10,8 @@ const SyncStoreSchema = new mongoose.Schema({
   masterClasses: { type: mongoose.Schema.Types.Mixed, default: null },
   substitutions: { type: mongoose.Schema.Types.Mixed, default: null },
   absentTeachers: { type: mongoose.Schema.Types.Mixed, default: null },
+  addedTeachers: { type: mongoose.Schema.Types.Mixed, default: null },
+  deletedTeachers: { type: mongoose.Schema.Types.Mixed, default: null },
 });
 
 export default mongoose.models.SyncStore || mongoose.model("SyncStore", SyncStoreSchema);

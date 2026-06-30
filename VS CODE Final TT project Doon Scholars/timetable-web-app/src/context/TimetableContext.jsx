@@ -213,6 +213,12 @@ export const TimetableProvider = ({ children }) => {
       setAbsentTeachers(payload.absentTeachers);
       localStorage.setItem('absentTeachers', JSON.stringify(payload.absentTeachers));
     }
+    if (Array.isArray(payload.addedTeachers)) {
+      localStorage.setItem('addedTeachers', JSON.stringify(payload.addedTeachers));
+    }
+    if (Array.isArray(payload.deletedTeachers)) {
+      localStorage.setItem('deletedTeachers', JSON.stringify(payload.deletedTeachers));
+    }
 
     setTimeout(() => {
       isRemoteUpdate.current = false;
@@ -274,6 +280,22 @@ export const TimetableProvider = ({ children }) => {
       setTimeout(() => setSyncStatus('idle'), 2000);
     }, 800);
   }, [substitutions, absentTeachers]);
+
+  // Sync addedTeachers and deletedTeachers so all clients stay consistent
+  useEffect(() => {
+    if (!syncReady.current) return;
+    if (isRemoteUpdate.current) return;
+
+    const added = JSON.parse(localStorage.getItem('addedTeachers') || '[]');
+    const deleted = JSON.parse(localStorage.getItem('deletedTeachers') || '[]');
+
+    clearTimeout(syncPushTimers.current['teacher_lists']);
+    syncPushTimers.current['teacher_lists'] = setTimeout(() => {
+      syncService.push({ addedTeachers: added, deletedTeachers: deleted });
+      setSyncStatus('synced');
+      setTimeout(() => setSyncStatus('idle'), 2000);
+    }, 800);
+  }, [teachers]);
 
   // Save to local storage whenever state changes
   useEffect(() => {
