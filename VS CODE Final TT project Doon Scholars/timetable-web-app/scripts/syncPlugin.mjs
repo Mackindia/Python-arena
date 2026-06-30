@@ -11,6 +11,7 @@ let syncStore = {
   updatedAt: Date.now(),
   updatedBy: null,
   timetables: null,
+  teachers: null,
   teacherSubjectMap: null,
   loadMaster: null,
   masterClasses: null,

@@ -5,6 +5,7 @@ const SyncStoreSchema = new mongoose.Schema({
   updatedAt: { type: Number, default: Date.now },
   updatedBy: { type: String, default: null },
   timetables: { type: mongoose.Schema.Types.Mixed, default: null },
+  teachers: { type: [String], default: null },
   teacherSubjectMap: { type: mongoose.Schema.Types.Mixed, default: null },
   loadMaster: { type: mongoose.Schema.Types.Mixed, default: null },
   masterClasses: { type: mongoose.Schema.Types.Mixed, default: null },

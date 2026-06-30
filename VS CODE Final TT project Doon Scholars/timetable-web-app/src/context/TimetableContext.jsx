@@ -60,6 +60,7 @@ export const TimetableProvider = ({ children }) => {
   const [substitutions, setSubstitutions] = useState({});
   const [absentTeachers, setAbsentTeachers] = useState({});
   const [teacherMapping, setTeacherMapping] = useState(initialTeacherMapping);
+  const [teachersSynced, setTeachersSynced] = useState(false);
   const [teacherSubjectMap, setTeacherSubjectMap] = useState(() => {
     const item = localStorage.getItem('teacherSubjectMap');
     if (!item || item === "undefined" || item === "null" || item === "[object Object]") {
@@ -112,10 +113,37 @@ export const TimetableProvider = ({ children }) => {
     const customTeachers = safeJSONParse('addedTeachers', []);
     const deletedTeachersList = safeJSONParse('deletedTeachers', []);
 
-    const validInitial = initialTeachers.filter(t => !deletedTeachersList.includes(t));
-    const validCustom = customTeachers.filter(t => !deletedTeachersList.includes(t));
+    // Check for synced teachers from server (takes priority over localStorage derivation)
+    const syncedTeachersList = safeJSONParse('syncedTeachers', null);
 
-    setTeachers([...new Set([...validInitial, ...validCustom])].sort());
+    // Build teachers list from ACTUAL timetable data (ground truth)
+    const timetableTeachers = new Set();
+    Object.values(currentTT).forEach(schedule => {
+      schedule.forEach(slot => {
+        if (slot.teacher) {
+          slot.teacher.split(',').forEach(t => {
+            const cleanT = t.trim().toUpperCase();
+            if (cleanT && cleanT.toLowerCase() !== 'nan' && cleanT !== '0' && !deletedTeachersList.includes(cleanT)) {
+              timetableTeachers.add(cleanT);
+            }
+          });
+        }
+      });
+    });
+
+    const initialTeacherSet = new Set();
+    timetableTeachers.forEach(t => initialTeacherSet.add(t));
+    customTeachers.forEach(t => {
+      const normalized = t.trim().toUpperCase();
+      if (!deletedTeachersList.includes(normalized)) {
+        initialTeacherSet.add(normalized);
+      }
+    });
+
+    // Prefer synced teachers from server if available (fixes stale teacher lists)
+    const derivedTeachers = Array.from(initialTeacherSet).sort();
+    setTeachers(syncedTeachersList && syncedTeachersList.length > 0 ? syncedTeachersList : derivedTeachers);
+    setTeachersSynced(!!syncedTeachersList && syncedTeachersList.length > 0);
     
     const savedMasterClasses = safeJSONParse('masterClasses', null);
     if (savedMasterClasses) {
@@ -154,6 +182,11 @@ export const TimetableProvider = ({ children }) => {
     if (payload.timetables && typeof payload.timetables === 'object') {
       setTimetables(payload.timetables);
       localStorage.setItem('timetables', JSON.stringify(payload.timetables));
+    }
+    if (Array.isArray(payload.teachers) && payload.teachers.length > 0) {
+      setTeachers(payload.teachers);
+      localStorage.setItem('syncedTeachers', JSON.stringify(payload.teachers));
+      setTeachersSynced(true);
     }
     if (payload.teacherSubjectMap && typeof payload.teacherSubjectMap === 'object') {
       setTeacherSubjectMap(payload.teacherSubjectMap);
@@ -224,6 +257,13 @@ export const TimetableProvider = ({ children }) => {
   }, [teacherSubjectMap, debouncedPushField]);
 
   useEffect(() => {
+    if (!syncReady.current || teachers.length === 0) return;
+    if (isRemoteUpdate.current) return;
+    if (teachersSynced) return; // Don't re-push if we just received from server
+    debouncedPushField('teachers', teachers);
+  }, [teachers, debouncedPushField, teachersSynced]);
+
+  useEffect(() => {
     if (!syncReady.current || loadMaster.length === 0) return;
     if (isRemoteUpdate.current) return;
     debouncedPushField('loadMaster', loadMaster);
@@ -252,31 +292,45 @@ export const TimetableProvider = ({ children }) => {
     if (Object.keys(timetables).length > 0) {
       localStorage.setItem('timetables', JSON.stringify(timetables));
       
-      // Dynamically update teachers list based on assigned timetables
+      // FIX: Build teachers list from ACTUAL timetable data (ground truth)
       const savedAddedTeachers = localStorage.getItem('addedTeachers');
       const customTeachers = savedAddedTeachers ? JSON.parse(savedAddedTeachers) : [];
 
       const savedDeletedTeachers = localStorage.getItem('deletedTeachers');
       const deletedTeachers = savedDeletedTeachers ? JSON.parse(savedDeletedTeachers) : [];
       
-      const validInitial = initialTeachers.filter(t => !deletedTeachers.includes(t));
-      const validCustom = customTeachers.filter(t => !deletedTeachers.includes(t));
-
-      const dynamicTeachers = new Set([...validInitial, ...validCustom]);
-      
+      // Step 1: Scan ALL timetable slots to find teachers actually in use
+      const timetableTeachers = new Set();
       Object.values(timetables).forEach(schedule => {
         schedule.forEach(slot => {
           if (slot.teacher) {
             slot.teacher.split(',').forEach(t => {
-              const cleanT = t.trim();
+              const cleanT = t.trim().toUpperCase();
               if (cleanT && cleanT.toLowerCase() !== 'nan' && cleanT !== '0' && !deletedTeachers.includes(cleanT)) {
-                dynamicTeachers.add(cleanT);
+                timetableTeachers.add(cleanT);
               }
             });
           }
         });
       });
-      setTeachers(Array.from(dynamicTeachers).sort());
+
+      // Step 2: Build final list = timetable teachers + custom teachers - deleted
+      const dynamicTeachers = new Set();
+      timetableTeachers.forEach(t => dynamicTeachers.add(t));
+      customTeachers.forEach(t => {
+        const normalized = t.trim().toUpperCase();
+        if (!deletedTeachers.includes(normalized)) {
+          dynamicTeachers.add(normalized);
+        }
+      });
+
+      const newTeachersList = Array.from(dynamicTeachers).sort();
+      setTeachers(newTeachersList);
+
+      // Push derived teachers to sync server so other browsers get them
+      if (!isRemoteUpdate.current && syncReady.current) {
+        localStorage.setItem('syncedTeachers', JSON.stringify(newTeachersList));
+      }
     }
   }, [timetables]);
 
@@ -909,7 +963,7 @@ export const TimetableProvider = ({ children }) => {
       };
 
       const payload = {};
-      const syncKeys = ['timetables', 'teacherSubjectMap', 'loadMaster', 'masterClasses', 'substitutions', 'absentTeachers'];
+      const syncKeys = ['timetables', 'teachers', 'teacherSubjectMap', 'loadMaster', 'masterClasses', 'substitutions', 'absentTeachers'];
       syncKeys.forEach(key => {
         if (backupData[key] !== undefined) {
           payload[key] = parseVal(backupData[key]);
@@ -944,6 +998,10 @@ export const TimetableProvider = ({ children }) => {
         });
 
         if (payload.timetables) setTimetables(payload.timetables);
+        if (payload.teachers) {
+          setTeachers(payload.teachers);
+          localStorage.setItem('syncedTeachers', JSON.stringify(payload.teachers));
+        }
         if (payload.teacherSubjectMap) setTeacherSubjectMap(payload.teacherSubjectMap);
         if (payload.loadMaster) setLoadMaster(payload.loadMaster);
         if (payload.masterClasses) setMasterClasses(payload.masterClasses);
@@ -966,6 +1024,7 @@ export const TimetableProvider = ({ children }) => {
     try {
       const payload = {};
       if (Object.keys(timetables).length > 0) payload.timetables = timetables;
+      if (teachers.length > 0) payload.teachers = teachers;
       if (teacherSubjectMap && Object.keys(teacherSubjectMap).length > 0) payload.teacherSubjectMap = teacherSubjectMap;
       if (loadMaster.length > 0) payload.loadMaster = loadMaster;
       if (masterClasses.length > 0) payload.masterClasses = masterClasses;
@@ -1004,7 +1063,7 @@ export const TimetableProvider = ({ children }) => {
       alert('Force sync failed: ' + err.message);
       return false;
     }
-  }, [timetables, teacherSubjectMap, loadMaster, masterClasses, substitutions, absentTeachers]);
+  }, [timetables, teachers, teacherSubjectMap, loadMaster, masterClasses, substitutions, absentTeachers]);
 
   return (
     <TimetableContext.Provider value={{
@@ -1044,7 +1103,8 @@ export const TimetableProvider = ({ children }) => {
       deleteTeacher,
       importBackup,
       forcePushAllToServer,
-      syncStatus
+      syncStatus,
+      teachersSynced
     }}>
       {children}
     </TimetableContext.Provider>

@@ -26,6 +26,22 @@ async function main() {
   const timetables = JSON.parse(fs.readFileSync(path.join(ttDir, "src/data/timetables.json"), "utf-8"));
   const loadMaster = JSON.parse(fs.readFileSync(path.join(ttDir, "src/data/load_master.json"), "utf-8"));
 
+  // Derive teachers from timetables
+  const teachersSet = new Set();
+  Object.values(timetables).forEach(schedule => {
+    schedule.forEach(slot => {
+      if (slot.teacher) {
+        slot.teacher.split(',').forEach(t => {
+          const cleanT = t.trim().toUpperCase();
+          if (cleanT && cleanT.toLowerCase() !== 'nan' && cleanT !== '0') {
+            teachersSet.add(cleanT);
+          }
+        });
+      }
+    });
+  });
+  const teachers = Array.from(teachersSet).sort();
+
   // Derive masterClasses
   const derived = {};
   Object.keys(timetables).forEach(classId => {
@@ -44,7 +60,7 @@ async function main() {
     sections: Array.from(derived[k]),
   }));
 
-  console.log(`Loaded: ${Object.keys(timetables).length} classes, ${loadMaster.length} load master entries, ${masterClasses.length} master classes`);
+  console.log(`Loaded: ${Object.keys(timetables).length} classes, ${teachers.length} teachers, ${loadMaster.length} load master entries, ${masterClasses.length} master classes`);
   console.log("Connecting to MongoDB...");
   await mongoose.connect(MONGODB_URI);
   console.log("Connected.");
@@ -68,6 +84,7 @@ async function main() {
         updatedAt: Date.now(),
         updatedBy: "seed-script",
         timetables,
+        teachers,
         loadMaster,
         masterClasses,
       },
@@ -76,6 +93,7 @@ async function main() {
   );
 
   console.log(`\nMongoDB SyncStore seeded successfully! Version: ${result.version}`);
+  console.log(`  teachers: ${teachers.length} teachers synced`);
   await mongoose.disconnect();
 }
 

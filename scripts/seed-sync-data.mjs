@@ -12,11 +12,28 @@ const ttDir = path.join(__dirname, '..', 'VS CODE Final TT project Doon Scholars
 const timetables = JSON.parse(fs.readFileSync(path.join(ttDir, 'src/data/timetables.json'), 'utf-8'));
 const loadMaster = JSON.parse(fs.readFileSync(path.join(ttDir, 'src/data/load_master.json'), 'utf-8'));
 
+// Derive teachers from timetables
+const teachersSet = new Set();
+Object.values(timetables).forEach(schedule => {
+  schedule.forEach(slot => {
+    if (slot.teacher) {
+      slot.teacher.split(',').forEach(t => {
+        const cleanT = t.trim().toUpperCase();
+        if (cleanT && cleanT.toLowerCase() !== 'nan' && cleanT !== '0') {
+          teachersSet.add(cleanT);
+        }
+      });
+    }
+  });
+});
+const teachers = Array.from(teachersSet).sort();
+
 const syncData = {
   version: 100,
   updatedAt: Date.now(),
   updatedBy: 'seed-script',
   timetables,
+  teachers,
   teacherSubjectMap: null,
   loadMaster,
   masterClasses: null,
@@ -44,5 +61,5 @@ syncData.masterClasses = Object.keys(derived).map(k => ({
 
 const outPath = path.join(ttDir, 'sync-data.json');
 fs.writeFileSync(outPath, JSON.stringify(syncData, null, 2), 'utf-8');
-console.log(`Seeded sync-data.json with ${Object.keys(timetables).length} classes, ${loadMaster.length} load master entries, ${syncData.masterClasses.length} master classes.`);
+console.log(`Seeded sync-data.json with ${Object.keys(timetables).length} classes, ${teachers.length} teachers, ${loadMaster.length} load master entries, ${syncData.masterClasses.length} master classes.`);
 console.log(`Version set to ${syncData.version}.`);

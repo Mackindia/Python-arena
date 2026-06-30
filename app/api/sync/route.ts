@@ -15,6 +15,7 @@ export async function GET(req: Request) {
         updatedAt: Date.now(),
         updatedBy: null,
         timetables: null,
+        teachers: null,
         teacherSubjectMap: null,
         loadMaster: null,
         masterClasses: null,
@@ -33,6 +34,7 @@ export async function GET(req: Request) {
       updatedAt: syncStore.updatedAt,
       updatedBy: syncStore.updatedBy,
       timetables: syncStore.timetables,
+      teachers: syncStore.teachers,
       teacherSubjectMap: syncStore.teacherSubjectMap,
       loadMaster: syncStore.loadMaster,
       masterClasses: syncStore.masterClasses,
@@ -61,6 +63,7 @@ export async function POST(req: Request) {
         updatedAt: Date.now(),
         updatedBy: null,
         timetables: {},
+        teachers: [],
         teacherSubjectMap: {},
         loadMaster: [],
         masterClasses: [],
@@ -76,6 +79,7 @@ export async function POST(req: Request) {
     };
 
     if (payload.timetables !== undefined) updatedFields.timetables = payload.timetables;
+    if (payload.teachers !== undefined) updatedFields.teachers = payload.teachers;
     if (payload.teacherSubjectMap !== undefined) updatedFields.teacherSubjectMap = payload.teacherSubjectMap;
     if (payload.loadMaster !== undefined) updatedFields.loadMaster = payload.loadMaster;
     if (payload.masterClasses !== undefined) updatedFields.masterClasses = payload.masterClasses;
