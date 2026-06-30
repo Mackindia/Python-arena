@@ -28,7 +28,7 @@ export default function HomeDocumentEditor() {
           </div>
 
           {/* Hover gradient */}
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500/5 to-cyan-500/5 opacity-0 transition-opacity group-hover:opacity-100"></div>
+          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500/5 to-cyan-500/5 opacity-0 transition-opacity group-hover:opacity-100"></div>
         </div>
       </div>
     </section>
