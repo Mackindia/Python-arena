@@ -9,7 +9,7 @@ export default function EducationalAIQuestionBankPage() {
   const [subject, setSubject] = useState("");
   const [topic, setTopic] = useState("");
   const [bookId, setBookId] = useState("");
-  const [count, setCount] = useState(100);
+  const [count, setCount] = useState(30);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [payload, setPayload] = useState<any>(null);

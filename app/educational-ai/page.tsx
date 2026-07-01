@@ -29,6 +29,26 @@ export default function EducationalAIPage() {
       desc: "Generate and organize broad assessment pools by type.",
     },
     {
+      href: "/educational-ai/exam-intelligence",
+      title: "Exam Intelligence",
+      desc: "Solve papers, generate exams, analyze patterns, cross-paper comparison, and find most important questions.",
+    },
+    {
+      href: "/educational-ai/question-paper",
+      title: "Solve Question Paper",
+      desc: "Upload a question paper (PDF/image) and get solved answers with mark-wise breakdown.",
+    },
+    {
+      href: "/educational-ai/paper-generator",
+      title: "Paper Generator",
+      desc: "Generate new question papers matching any pattern — sections, marks, and topics.",
+    },
+    {
+      href: "/educational-ai/most-important",
+      title: "Most Important Questions",
+      desc: "Find the most repeated and highest-weightage questions across all saved papers.",
+    },
+    {
       href: "/educational-ai/worksheet",
       title: "Worksheet",
       desc: "Produce printable classroom worksheets in one click.",
