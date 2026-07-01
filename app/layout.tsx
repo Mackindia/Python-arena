@@ -6,6 +6,7 @@ import HashEducationalAIRedirect from "@/src/components/educational-ai/HashEduca
 import Navbar from "@/src/components/navbar/Navbar";
 import NoticeBoard from "@/src/components/dashboard/NoticeBoard";
 import Footer from "@/src/components/footer/Footer";
+import ChatWidget from "@/src/components/chat/ChatWidget";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,7 +21,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Python Arena",
-  description: "Learn Python and AI from Class 8 to Class 11",
+  description: "Learn Python and AI with guided programs, interactive lessons, and projects.",
 };
 
 export default function RootLayout({
@@ -72,6 +73,7 @@ export default function RootLayout({
           <NoticeBoard />
           <main className="flex-1">{children}</main>
           <Footer />
+          <ChatWidget />
         </ClerkProvider>
       </body>
     </html>

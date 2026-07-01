@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, X, ExternalLink, LayoutGrid, Box, ShieldAlert } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import MegaDropdown from "@/src/components/dropdown/MegaDropdown";
+import AdminChatBubble from "@/src/components/chat/AdminChatBubble";
 import { learnMenu as fallbackLearnMenu, primaryNavLinks } from "@/src/data/navigation";
 import type { LearnCategory } from "@/src/data/navigation";
 
@@ -504,6 +505,7 @@ export default function Navbar() {
           ) : null}
         </AnimatePresence>
       </div>
+      {isAdmin && <AdminChatBubble />}
     </header>
   );
 }

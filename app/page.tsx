@@ -2,7 +2,6 @@
 import HeroSection from "@/src/components/hero/HeroSection";
 import ProgramsSection from "@/src/sections/ProgramsSection";
 import FeaturesSection from "@/src/sections/FeaturesSection";
-import TestimonialsSection from "@/src/sections/TestimonialsSection";
 
 import HomeDocumentEditor from "@/src/components/editor/HomeDocumentEditor";
 
@@ -13,7 +12,6 @@ export default function Home() {
       <HomeDocumentEditor />
       <ProgramsSection />
       <FeaturesSection />
-      <TestimonialsSection />
     </div>
   );
 }
