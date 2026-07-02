@@ -52,7 +52,7 @@ async function getNotesData(subjectSlug: string, classSlug: string): Promise<Not
       slug: String(lesson.slug || ""),
       description: String(lesson.description || ""),
       preview: String((lesson.content || "").slice(0, 180)),
-      createdAt: lesson.createdAt ? new Date(lesson.createdAt as string | number | Date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "",
+      createdAt: (lesson as any).createdAt ? new Date((lesson as any).createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "",
     })),
   };
 }
