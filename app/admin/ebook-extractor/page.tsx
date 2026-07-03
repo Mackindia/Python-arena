@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import EnginePageLayout from "@/src/components/admin/EnginePageLayout";
-import { Download, Eye, FileText, Loader2, X } from "lucide-react";
+import { Download, Eye, FileText, Loader2, X, ExternalLink, Images } from "lucide-react";
 import { jsPDF } from "jspdf";
 
 const CLASS_CONFIG = {
@@ -75,6 +75,10 @@ export default function EbookExtractorPage() {
   const [pdfFilename, setPdfFilename] = useState("Touchpad_AI_Extracted");
   const [status, setStatus] = useState<{ message: string; type: "success" | "error" | null }>({ message: "", type: null });
 
+  const [rangePreviewPages, setRangePreviewPages] = useState<number[]>([]);
+  const [rangePreviewLoading, setRangePreviewLoading] = useState(false);
+  const [rangePreviewVisible, setRangePreviewVisible] = useState(false);
+
   const selectedPages = parsePageRange(pageRange);
 
   const getProxyUrl = useCallback((classNum: string, page: number) => {
@@ -89,8 +93,83 @@ export default function EbookExtractorPage() {
     }
     setPreviewUrl(getProxyUrl(selectedClass, page));
     setPreviewPage(page);
+    setRangePreviewVisible(false);
     setStatus({ message: "", type: null });
   }, [singlePage, selectedClass, getProxyUrl]);
+
+  const handlePreviewRange = useCallback(() => {
+    if (selectedPages.length === 0) {
+      setStatus({ message: "Enter a page range first", type: "error" });
+      return;
+    }
+
+    setRangePreviewLoading(true);
+    setRangePreviewVisible(true);
+    setPreviewUrl(null);
+    setPreviewPage(null);
+    setRangePreviewPages(selectedPages);
+    setStatus({ message: `Loading preview for ${selectedPages.length} pages...`, type: "success" });
+
+    setTimeout(() => {
+      setRangePreviewLoading(false);
+      setStatus({ message: `Showing ${selectedPages.length} pages from ${selectedPages[0]} to ${selectedPages[selectedPages.length - 1]}`, type: "success" });
+    }, 500);
+  }, [selectedPages]);
+
+  const handleOpenRangeInNewTab = useCallback(() => {
+    if (selectedPages.length === 0) {
+      setStatus({ message: "Enter a page range first", type: "error" });
+      return;
+    }
+
+    const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Ebook Pages ${selectedPages[0]}-${selectedPages[selectedPages.length - 1]}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: system-ui, sans-serif; padding: 20px; }
+    h1 { text-align: center; margin-bottom: 20px; color: #22d3ee; font-size: 1.5rem; }
+    .info { text-align: center; margin-bottom: 20px; color: #94a3b8; font-size: 0.875rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; max-width: 1400px; margin: 0 auto; }
+    .card { background: #1e293b; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+    .card img { width: 100%; height: auto; display: block; cursor: pointer; transition: transform 0.2s; }
+    .card img:hover { transform: scale(1.02); }
+    .card .label { padding: 8px 12px; text-align: center; font-size: 0.75rem; color: #94a3b8; }
+    .loading { text-align: center; padding: 40px; color: #64748b; }
+  </style>
+</head>
+<body>
+  <h1>Touchpad AI Ebook - Pages ${selectedPages[0]} to ${selectedPages[selectedPages.length - 1]}</h1>
+  <p class="info">${selectedPages.length} pages | Click any image to open full size</p>
+  <div class="grid" id="grid">
+    <div class="loading">Loading pages...</div>
+  </div>
+  <script>
+    const pages = ${JSON.stringify(selectedPages)};
+    const classNum = "${selectedClass}";
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+    let loaded = 0;
+    pages.forEach((page, idx) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      const url = "/api/admin/ebook-extractor?class=" + classNum + "&page=" + page;
+      card.innerHTML = '<img src="' + url + '" alt="Page ' + page + '" loading="lazy" onclick="window.open(\'' + url + '\', \'_blank\')" /><div class="label">Page ' + page + '</div>';
+      grid.appendChild(card);
+      const img = card.querySelector("img");
+      img.onerror = () => { card.style.opacity = "0.3"; };
+      img.onload = () => { loaded++; };
+    });
+  </script>
+</body>
+</html>`;
+
+    const blob = new Blob([htmlContent], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+    setStatus({ message: `Opened ${selectedPages.length} pages in new tab`, type: "success" });
+  }, [selectedPages, selectedClass]);
 
   const handleQuickUnit = (unit: typeof UNITS_10[0]) => {
     setPageRange(`${unit.start}-${unit.end}`);
@@ -207,6 +286,8 @@ export default function EbookExtractorPage() {
         category="AI Generators"
         quickActions={[
           { label: "Preview Page", onClick: handlePreview, icon: Eye },
+          { label: "Preview Range", onClick: handlePreviewRange, icon: Images, disabled: selectedPages.length === 0 },
+          { label: "Open in New Tab", onClick: handleOpenRangeInNewTab, icon: ExternalLink, disabled: selectedPages.length === 0 },
           { label: "Download JPG", onClick: handleDownloadSingle, icon: Download, disabled: isProcessing },
           { label: "Generate PDF", onClick: handleGeneratePDF, icon: FileText, disabled: isProcessing || selectedPages.length === 0 },
         ]}
@@ -357,29 +438,94 @@ export default function EbookExtractorPage() {
             </div>
           </div>
 
-          {/* Preview */}
-          <div className="rounded-3xl border border-white/10 bg-slate-900/40 p-5 sm:p-6 backdrop-blur-md">
-            <h3 className="text-lg font-semibold text-white mb-4">Page Preview</h3>
-            {previewUrl ? (
+          {/* Single Page Preview */}
+          {previewUrl && (
+            <div className="rounded-3xl border border-white/10 bg-slate-900/40 p-5 sm:p-6 backdrop-blur-md">
+              <h3 className="text-lg font-semibold text-white mb-4">Page Preview</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-400">Page {previewPage}</span>
-                  <button onClick={() => { setPreviewUrl(null); setPreviewPage(null); }} className="text-xs text-slate-400 hover:text-white flex items-center gap-1">
-                    <X className="h-3 w-3" /> Clear
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => window.open(previewUrl, "_blank")}
+                      className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 border border-cyan-400/20 rounded-lg px-2 py-1"
+                    >
+                      <ExternalLink className="h-3 w-3" /> Open in New Tab
+                    </button>
+                    <button onClick={() => { setPreviewUrl(null); setPreviewPage(null); }} className="text-xs text-slate-400 hover:text-white flex items-center gap-1">
+                      <X className="h-3 w-3" /> Clear
+                    </button>
+                  </div>
                 </div>
                 <div className="flex justify-center bg-black/20 rounded-xl p-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={previewUrl} alt={`Page ${previewPage}`} className="max-h-[600px] rounded-lg shadow-2xl" />
                 </div>
               </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-16 text-slate-500">
-                <Eye className="h-12 w-12 mb-4 opacity-30" />
-                <p className="text-sm">Enter a page number and click Preview</p>
+            </div>
+          )}
+
+          {/* Range Preview Grid */}
+          {rangePreviewVisible && rangePreviewPages.length > 0 && (
+            <div className="rounded-3xl border border-white/10 bg-slate-900/40 p-5 sm:p-6 backdrop-blur-md">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Range Preview</h3>
+                  <p className="text-xs text-slate-400">{rangePreviewPages.length} pages - {rangePreviewPages[0]} to {rangePreviewPages[rangePreviewPages.length - 1]}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleOpenRangeInNewTab}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-300 hover:bg-cyan-400/20 transition-colors"
+                  >
+                    <ExternalLink className="h-3 w-3" /> Open All in New Tab
+                  </button>
+                  <button
+                    onClick={() => { setRangePreviewVisible(false); setRangePreviewPages([]); }}
+                    className="text-xs text-slate-400 hover:text-white flex items-center gap-1"
+                  >
+                    <X className="h-3 w-3" /> Close
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
+
+              {rangePreviewLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[600px] overflow-y-auto pr-2">
+                  {rangePreviewPages.map((page) => {
+                    const url = getProxyUrl(selectedClass, page);
+                    return (
+                      <div
+                        key={page}
+                        className="group relative rounded-xl border border-white/10 bg-black/30 overflow-hidden cursor-pointer hover:border-cyan-400/30 transition-colors"
+                        onClick={() => window.open(url, "_blank")}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={url}
+                          alt={`Page ${page}`}
+                          loading="lazy"
+                          className="w-full h-auto object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.opacity = "0.2";
+                          }}
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                          <p className="text-[10px] text-center text-slate-300">Page {page}</p>
+                        </div>
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                          <ExternalLink className="h-5 w-5 text-white" />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Generate PDF Button */}
           {selectedPages.length > 0 && (
