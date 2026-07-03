@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import ClerkUserSync from "@/src/components/auth/ClerkUserSync";
 import HashEducationalAIRedirect from "@/src/components/educational-ai/HashEducationalAIRedirect";
+import ChatWidget from "@/src/components/chat/ChatWidget";
 import Navbar from "@/src/components/navbar/Navbar";
 import NoticeBoard from "@/src/components/dashboard/NoticeBoard";
 import Footer from "@/src/components/footer/Footer";
@@ -71,6 +72,7 @@ export default function RootLayout({
           <Navbar />
           <NoticeBoard />
           <main className="flex-1">{children}</main>
+          <ChatWidget />
           <Footer />
         </ClerkProvider>
       </body>

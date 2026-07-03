@@ -92,6 +92,7 @@ export default async function AdminPage() {
   const quickActions = [
     { label: "Upload Lesson", href: "/admin/upload", meta: "Upload PDFs, thumbnails, and lesson assets" },
     { label: "Manage Lessons", href: "/admin/lessons", meta: "Create, update, and publish lesson content" },
+    { label: "Practice Question Paper", href: "/admin/practice-question-papers", meta: "Manage class-wise question papers and printable PDFs" },
     { label: "Manage Subjects", href: "/admin/courses", meta: "Organize subject and class curriculum structure" },
     { label: "Program Manager", href: "/admin/programs", meta: "Browse, edit, and delete student programs" },
     { label: "Students", href: "/admin/users", meta: "Review learner profiles and engagement" },
