@@ -8,6 +8,8 @@ import { jsPDF } from "jspdf";
 const CLASS_CONFIG = {
   "9": { name: "Class 9 - AI (Code 417)", totalPages: 450 },
   "10": { name: "Class 10 - AI (Code 417)", totalPages: 518 },
+  "11": { name: "Class 11 - AI (Code 841)", totalPages: 480 },
+  "12": { name: "Class 12 - AI (Code 842)", totalPages: 500 },
 };
 
 const UNITS_10 = [
@@ -20,6 +22,24 @@ const UNITS_10 = [
   { id: "unit6.1", name: "Unit 6.1", topic: "NLP Theory", start: 365, end: 396 },
   { id: "unit6.2", name: "Unit 6.2", topic: "NLP Practical", start: 397, end: 412 },
   { id: "unit7", name: "Unit 7", topic: "Advance Python", start: 413, end: 481 },
+];
+
+const UNITS_11 = [
+  { id: "unit1", name: "Unit 1", topic: "Introduction to AI", start: 1, end: 60 },
+  { id: "unit2", name: "Unit 2", topic: "AI Project Cycle", start: 61, end: 120 },
+  { id: "unit3", name: "Unit 3", topic: "Data & Statistics", start: 121, end: 200 },
+  { id: "unit4", name: "Unit 4", topic: "Exploratory Data Analysis", start: 201, end: 280 },
+  { id: "unit5", name: "Unit 5", topic: "Data Modeling", start: 281, end: 360 },
+  { id: "unit6", name: "Unit 6", topic: "AI Applications", start: 361, end: 450 },
+];
+
+const UNITS_12 = [
+  { id: "unit1", name: "Unit 1", topic: "Advanced AI Concepts", start: 1, end: 70 },
+  { id: "unit2", name: "Unit 2", topic: "Neural Networks", start: 71, end: 150 },
+  { id: "unit3", name: "Unit 3", topic: "Deep Learning", start: 151, end: 240 },
+  { id: "unit4", name: "Unit 4", topic: "Natural Language Processing", start: 241, end: 330 },
+  { id: "unit5", name: "Unit 5", topic: "Computer Vision", start: 331, end: 420 },
+  { id: "unit6", name: "Unit 6", topic: "AI Ethics & Society", start: 421, end: 480 },
 ];
 
 function parsePageRange(range: string): number[] {
@@ -237,6 +257,40 @@ export default function EbookExtractorPage() {
                 <label className="block text-xs font-medium text-slate-400 mb-2">Quick Select Unit</label>
                 <div className="flex flex-wrap gap-2">
                   {UNITS_10.map((unit) => (
+                    <button
+                      key={unit.id}
+                      onClick={() => handleQuickUnit(unit)}
+                      className="rounded-lg border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-300 hover:bg-cyan-400/20 transition-colors"
+                    >
+                      {unit.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {selectedClass === "11" && (
+              <div className="mt-4">
+                <label className="block text-xs font-medium text-slate-400 mb-2">Quick Select Unit</label>
+                <div className="flex flex-wrap gap-2">
+                  {UNITS_11.map((unit) => (
+                    <button
+                      key={unit.id}
+                      onClick={() => handleQuickUnit(unit)}
+                      className="rounded-lg border border-cyan-400/20 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-300 hover:bg-cyan-400/20 transition-colors"
+                    >
+                      {unit.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {selectedClass === "12" && (
+              <div className="mt-4">
+                <label className="block text-xs font-medium text-slate-400 mb-2">Quick Select Unit</label>
+                <div className="flex flex-wrap gap-2">
+                  {UNITS_12.map((unit) => (
                     <button
                       key={unit.id}
                       onClick={() => handleQuickUnit(unit)}

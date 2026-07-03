@@ -37,7 +37,6 @@ export default function ChatWidget() {
 
   useEffect(() => {
     setMounted(true);
-    console.log("[ChatWidget] Component mounted successfully");
   }, []);
 
   // Fetch threads
