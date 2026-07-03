@@ -67,6 +67,14 @@ export const ENGINES_LIST: Engine[] = [
     category: "AI Generators",
     iconName: "Download"
   },
+  {
+    id: "practice-question-papers",
+    title: "Practice Question Paper",
+    description: "Create subjects, upload question papers and important PDFs, then publish them for students.",
+    href: "/admin/practice-question-papers",
+    category: "AI Generators",
+    iconName: "FileText"
+  },
   // Academic Tools
   {
     id: "manage-lessons",
