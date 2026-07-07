@@ -19,8 +19,6 @@ type Thread = {
   updatedAt: string;
 };
 
-const STAFF_ROLES = new Set(["super_admin", "admin", "teacher"]);
-
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -32,32 +30,13 @@ export default function ChatWidget() {
   const [error, setError] = useState("");
   const [view, setView] = useState<"list" | "chat" | "new">("list");
   const [adminOnline, setAdminOnline] = useState(false);
-  const [currentRole, setCurrentRole] = useState<string | null>(null);
-  const [roleChecked, setRoleChecked] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    async function loadRole() {
-      try {
-        const res = await fetch("/api/auth/me");
-        if (!res.ok) {
-          setCurrentRole(null);
-          setRoleChecked(true);
-          return;
-        }
-
-        const data = await res.json();
-        setCurrentRole(data?.user?.role || null);
-      } catch {
-        setCurrentRole(null);
-      } finally {
-        setRoleChecked(true);
-      }
-    }
-
-    loadRole();
+    setMounted(true);
   }, []);
 
   // Fetch threads
@@ -181,16 +160,9 @@ export default function ChatWidget() {
     return (
       thread.unreadByUser &&
       thread.messages.length > 0 &&
-      ["super_admin", "admin"].includes(thread.messages[thread.messages.length - 1].senderRole)
+      (thread.messages[thread.messages.length - 1].senderRole === "super_admin" ||
+       thread.messages[thread.messages.length - 1].senderRole === "admin")
     );
-  }
-
-  if (!roleChecked) {
-    return null;
-  }
-
-  if (currentRole !== "student" && currentRole !== "super_admin" && currentRole !== "admin") {
-    return null;
   }
 
   return (
@@ -382,7 +354,7 @@ export default function ChatWidget() {
               <div className="flex h-full flex-col">
                 <div className="flex-1 space-y-3 overflow-y-auto p-4">
                   {activeThread.messages.map((msg, i) => {
-                    const isUser = !STAFF_ROLES.has(msg.senderRole);
+                    const isUser = msg.senderRole !== "super_admin" && msg.senderRole !== "admin";
                     return (
                       <div
                         key={i}

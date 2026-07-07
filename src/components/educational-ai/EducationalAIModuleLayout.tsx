@@ -8,6 +8,10 @@ const links = [
   { href: "/educational-ai/notes", label: "Generate Notes" },
   { href: "/educational-ai/mcq", label: "Generate MCQs" },
   { href: "/educational-ai/question-bank", label: "Question Bank" },
+  { href: "/educational-ai/exam-intelligence", label: "Exam Intelligence" },
+  { href: "/educational-ai/question-paper", label: "Solve Paper" },
+  { href: "/educational-ai/paper-generator", label: "Paper Generator" },
+  { href: "/educational-ai/most-important", label: "Most Important" },
   { href: "/educational-ai/worksheet", label: "Worksheet" },
   { href: "/educational-ai/lesson-plan", label: "Lesson Plan" },
   { href: "/educational-ai/bloom", label: "Bloom's Taxonomy" },
@@ -30,7 +34,7 @@ export default function EducationalAIModuleLayout({ children }: { children: Reac
           </p>
         </header>
 
-        <nav className="grid gap-2 rounded-2xl border border-white/10 bg-white/5 p-3 sm:grid-cols-2 lg:grid-cols-5">
+        <nav className="grid gap-2 rounded-2xl border border-white/10 bg-white/5 p-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
           {links.map((item) => {
             const active = pathname === item.href;
             return (

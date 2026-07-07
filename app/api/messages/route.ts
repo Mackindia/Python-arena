@@ -4,15 +4,10 @@ import Message from "@/src/models/Message";
 import { auth } from "@clerk/nextjs/server";
 import { cookies } from "next/headers";
 
-const STAFF_ROLES = ["super_admin", "admin"];
-const USER_ROLES = ["student"];
+const ADMIN_ROLES = ["super_admin", "admin"];
 
 function isAdmin(role: string) {
-  return STAFF_ROLES.includes(role);
-}
-
-function canUseMessages(role: string) {
-  return STAFF_ROLES.includes(role) || USER_ROLES.includes(role);
+  return ADMIN_ROLES.includes(role);
 }
 
 async function getAuthUser() {
@@ -60,10 +55,6 @@ export async function POST(req: Request) {
     const authUser = await getAuthUser();
     if (!authUser) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    if (!canUseMessages(authUser.role)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     const body = await req.json();
@@ -134,10 +125,6 @@ export async function GET(req: Request) {
     const authUser = await getAuthUser();
     if (!authUser) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    if (!canUseMessages(authUser.role)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     await connectDB();

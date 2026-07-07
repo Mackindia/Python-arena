@@ -24,6 +24,7 @@ type LessonData = {
   content: string;
   subjectName: string;
   className: string;
+  createdAt: string;
   previous: { slug: string; title: string } | null;
   next: { slug: string; title: string } | null;
 };
@@ -43,7 +44,7 @@ async function getLessonData(subjectSlug: string, classSlug: string, lessonSlug:
     published: true,
     content: { $exists: true, $ne: "" },
   })
-    .select("_id title slug description content")
+    .select("_id title slug description content createdAt")
     .sort({ createdAt: 1 })
     .lean();
 
@@ -64,6 +65,7 @@ async function getLessonData(subjectSlug: string, classSlug: string, lessonSlug:
     content: String(current.content || ""),
     subjectName: String(subject.name || ""),
     className: String(classDoc.name || ""),
+    createdAt: (current as any).createdAt ? new Date((current as any).createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "",
     previous: previous ? { slug: String(previous.slug || ""), title: String(previous.title || "") } : null,
     next: next ? { slug: String(next.slug || ""), title: String(next.title || "") } : null,
   };
@@ -107,6 +109,9 @@ export default async function LessonPage({ params }: { params: Promise<Params> }
         <section className="mt-6 rounded-2xl border border-cyan-400/20 bg-slate-950 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.45)]">
           <h1 className="text-2xl font-bold sm:text-3xl">{data.title}</h1>
           {data.description ? <p className="mt-2 text-sm text-slate-300">{data.description}</p> : null}
+          {data.createdAt && (
+            <p className="mt-2 text-xs text-slate-500">Published on {data.createdAt}</p>
+          )}
 
           <article className="prose prose-invert mt-6 max-w-none prose-headings:text-white prose-p:text-slate-200 prose-li:text-slate-200">
             <ReactMarkdown

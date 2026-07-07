@@ -320,7 +320,7 @@ const TeacherSubjectMapping = () => {
             wingClasses.push(classId);
             wingMappings++;
             if (teacher && teacher.trim()) {
-              wingMappings++;
+              wingMappings++; // Count actual teacher assignments
             }
           }
         });

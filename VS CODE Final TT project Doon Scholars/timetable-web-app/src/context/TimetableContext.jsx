@@ -110,13 +110,16 @@ export const TimetableProvider = ({ children }) => {
     if (savedAbsentTeachers) setAbsentTeachers(savedAbsentTeachers);
     
     
+    // ──────────────────────────────────────────────────────────────────
+    // FIX: Build teachers list from ACTUAL timetable data on initial load.
+    // Previously used initialTeachers (static JSON) which never updates —
+    // causing stale/removed teacher initials to persist in the UI.
+    // Now: Scan timetable slots + localStorage custom teachers - deleted
+    // ──────────────────────────────────────────────────────────────────
     const customTeachers = safeJSONParse('addedTeachers', []);
     const deletedTeachersList = safeJSONParse('deletedTeachers', []);
 
-    // Check for synced teachers from server (takes priority over localStorage derivation)
-    const syncedTeachersList = safeJSONParse('syncedTeachers', null);
-
-    // Build teachers list from ACTUAL timetable data (ground truth)
+    // Step 1: Scan timetables to find teachers actually assigned to slots
     const timetableTeachers = new Set();
     Object.values(currentTT).forEach(schedule => {
       schedule.forEach(slot => {
@@ -131,6 +134,7 @@ export const TimetableProvider = ({ children }) => {
       });
     });
 
+    // Step 2: Build final list = timetable teachers + custom teachers - deleted
     const initialTeacherSet = new Set();
     timetableTeachers.forEach(t => initialTeacherSet.add(t));
     customTeachers.forEach(t => {
@@ -140,10 +144,7 @@ export const TimetableProvider = ({ children }) => {
       }
     });
 
-    // Prefer synced teachers from server if available (fixes stale teacher lists)
-    const derivedTeachers = Array.from(initialTeacherSet).sort();
-    setTeachers(syncedTeachersList && syncedTeachersList.length > 0 ? syncedTeachersList : derivedTeachers);
-    setTeachersSynced(!!syncedTeachersList && syncedTeachersList.length > 0);
+    setTeachers(Array.from(initialTeacherSet).sort());
     
     const savedMasterClasses = safeJSONParse('masterClasses', null);
     if (savedMasterClasses) {
@@ -218,6 +219,12 @@ export const TimetableProvider = ({ children }) => {
       setAbsentTeachers(payload.absentTeachers);
       localStorage.setItem('absentTeachers', JSON.stringify(payload.absentTeachers));
     }
+    if (Array.isArray(payload.addedTeachers)) {
+      localStorage.setItem('addedTeachers', JSON.stringify(payload.addedTeachers));
+    }
+    if (Array.isArray(payload.deletedTeachers)) {
+      localStorage.setItem('deletedTeachers', JSON.stringify(payload.deletedTeachers));
+    }
 
     setTimeout(() => {
       isRemoteUpdate.current = false;
@@ -287,12 +294,34 @@ export const TimetableProvider = ({ children }) => {
     }, 800);
   }, [substitutions, absentTeachers]);
 
+  // Sync addedTeachers and deletedTeachers so all clients stay consistent
+  useEffect(() => {
+    if (!syncReady.current) return;
+    if (isRemoteUpdate.current) return;
+
+    const added = JSON.parse(localStorage.getItem('addedTeachers') || '[]');
+    const deleted = JSON.parse(localStorage.getItem('deletedTeachers') || '[]');
+
+    clearTimeout(syncPushTimers.current['teacher_lists']);
+    syncPushTimers.current['teacher_lists'] = setTimeout(() => {
+      syncService.push({ addedTeachers: added, deletedTeachers: deleted });
+      setSyncStatus('synced');
+      setTimeout(() => setSyncStatus('idle'), 2000);
+    }, 800);
+  }, [teachers]);
+
   // Save to local storage whenever state changes
   useEffect(() => {
     if (Object.keys(timetables).length > 0) {
       localStorage.setItem('timetables', JSON.stringify(timetables));
       
+      // ──────────────────────────────────────────────────────────────────
       // FIX: Build teachers list from ACTUAL timetable data (ground truth)
+      // Previously: UNION of initialTeachers + addedTeachers + timetable scan
+      //   → Stale teachers persisted after rename/swap (old initials never removed)
+      // Now: Teachers = timetable scan + addedTeachers - deletedTeachers
+      //   → Only teachers that actually exist in timetables or were explicitly added
+      // ──────────────────────────────────────────────────────────────────
       const savedAddedTeachers = localStorage.getItem('addedTeachers');
       const customTeachers = savedAddedTeachers ? JSON.parse(savedAddedTeachers) : [];
 
@@ -316,7 +345,11 @@ export const TimetableProvider = ({ children }) => {
 
       // Step 2: Build final list = timetable teachers + custom teachers - deleted
       const dynamicTeachers = new Set();
+
+      // Add all teachers found in timetables (these are the real, active teachers)
       timetableTeachers.forEach(t => dynamicTeachers.add(t));
+
+      // Add custom teachers (explicitly added by user, even if not yet in timetables)
       customTeachers.forEach(t => {
         const normalized = t.trim().toUpperCase();
         if (!deletedTeachers.includes(normalized)) {
@@ -324,13 +357,13 @@ export const TimetableProvider = ({ children }) => {
         }
       });
 
-      const newTeachersList = Array.from(dynamicTeachers).sort();
-      setTeachers(newTeachersList);
+      // NOTE: We intentionally do NOT include initialTeachers blindly.
+      // initialTeachers is a static JSON that never updates. If a teacher was
+      // renamed/swapped, their old initials linger there. The timetable scan
+      // is the single source of truth — only teachers actually assigned to
+      // slots appear in the list.
 
-      // Push derived teachers to sync server so other browsers get them
-      if (!isRemoteUpdate.current && syncReady.current) {
-        localStorage.setItem('syncedTeachers', JSON.stringify(newTeachersList));
-      }
+      setTeachers(Array.from(dynamicTeachers).sort());
     }
   }, [timetables]);
 

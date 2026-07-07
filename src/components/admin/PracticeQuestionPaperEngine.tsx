@@ -405,7 +405,7 @@ export default function PracticeQuestionPaperEngine() {
   }
 
   async function deleteResource(item: PracticeResource) {
-    if (!window.confirm(`Delete \"${item.title}\"?`)) return;
+    if (!window.confirm(`Delete "${item.title}"?`)) return;
 
     try {
       setError("");

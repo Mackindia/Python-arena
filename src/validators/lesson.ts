@@ -83,7 +83,7 @@ export type LessonCreateInput = z.infer<typeof LessonCreateSchema>;
 
 // ─── Lesson upload (admin multipart form) ─────────────────────────────────────
 
-const ALLOWED_FOLDERS = ["lms/pdfs", "lms/thumbnails", "lms/content", "python-arena"] as const;
+const ALLOWED_FOLDERS = ["lms/pdfs", "lms/thumbnails", "lms/content", "python-arena", "private/pdfs", "practice/resources"] as const;
 
 export const UploadFormSchema = z.object({
   kind: z.enum(["pdf", "image"], {

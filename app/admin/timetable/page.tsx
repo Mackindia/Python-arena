@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft, Download, ExternalLink, RefreshCw, ShieldCheck, TriangleAlert } from "lucide-react";
+import { ArrowLeft, Download, ExternalLink, RefreshCw, ShieldCheck, TriangleAlert, Lock, Unlock } from "lucide-react";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 type PreviewEntry = {
   class: string;
@@ -148,6 +148,45 @@ export default function AdminTimetablePage({ defaultVerificationMode = false }: 
   const [selectedClassKey, setSelectedClassKey] = useState<string>("");
   const searchParams = useSearchParams();
   const verificationMode = defaultVerificationMode || searchParams.get("view") === "verification";
+
+  const [isTimetableLocked, setIsTimetableLocked] = useState<boolean>(false);
+  const [lockLoading, setLockLoading] = useState<boolean>(false);
+
+  const loadLockStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/timetable/lock", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setIsTimetableLocked(Boolean(data.isLocked));
+      }
+    } catch {
+      // Silently ignore lock status load errors
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadLockStatus();
+  }, [loadLockStatus]);
+
+  const toggleTimetableLock = async () => {
+    try {
+      setLockLoading(true);
+      const newLocked = !isTimetableLocked;
+      const res = await fetch("/api/admin/timetable/lock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isLocked: newLocked }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setIsTimetableLocked(Boolean(data.isLocked));
+      }
+    } catch {
+      // Silently ignore
+    } finally {
+      setLockLoading(false);
+    }
+  };
 
   useEffect(() => {
     setTimetableUrl(`/timetable/index.html?v=${new Date().getTime()}`);
@@ -332,6 +371,26 @@ export default function AdminTimetablePage({ defaultVerificationMode = false }: 
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleTimetableLock}
+              disabled={lockLoading}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition ${
+                isTimetableLocked
+                  ? "border border-amber-400/20 bg-amber-500/10 text-amber-100 hover:bg-amber-500/20"
+                  : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+              } disabled:opacity-50`}
+              title={isTimetableLocked ? "Timetable is locked. Click to unlock." : "Timetable is unlocked. Click to lock."}
+            >
+              {lockLoading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : isTimetableLocked ? (
+                <Lock className="h-4 w-4" />
+              ) : (
+                <Unlock className="h-4 w-4" />
+              )}
+              {isTimetableLocked ? "Locked" : "Unlocked"}
+            </button>
             <Link
               href={timetableUrl}
               className="flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20"

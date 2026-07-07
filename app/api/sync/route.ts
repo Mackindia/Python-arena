@@ -21,6 +21,8 @@ export async function GET(req: Request) {
         masterClasses: null,
         substitutions: null,
         absentTeachers: null,
+        addedTeachers: null,
+        deletedTeachers: null,
       });
     }
 
@@ -40,6 +42,8 @@ export async function GET(req: Request) {
       masterClasses: syncStore.masterClasses,
       substitutions: syncStore.substitutions,
       absentTeachers: syncStore.absentTeachers,
+      addedTeachers: syncStore.addedTeachers,
+      deletedTeachers: syncStore.deletedTeachers,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -69,6 +73,8 @@ export async function POST(req: Request) {
         masterClasses: [],
         substitutions: {},
         absentTeachers: {},
+        addedTeachers: [],
+        deletedTeachers: [],
       });
     }
 
@@ -85,6 +91,8 @@ export async function POST(req: Request) {
     if (payload.masterClasses !== undefined) updatedFields.masterClasses = payload.masterClasses;
     if (payload.substitutions !== undefined) updatedFields.substitutions = payload.substitutions;
     if (payload.absentTeachers !== undefined) updatedFields.absentTeachers = payload.absentTeachers;
+    if (payload.addedTeachers !== undefined) updatedFields.addedTeachers = payload.addedTeachers;
+    if (payload.deletedTeachers !== undefined) updatedFields.deletedTeachers = payload.deletedTeachers;
 
     const result = await SyncStore.findOneAndUpdate(
       {},

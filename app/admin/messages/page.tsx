@@ -33,8 +33,6 @@ type Thread = {
   updatedAt: string;
 };
 
-const STAFF_ROLES = new Set(["super_admin", "admin", "teacher"]);
-
 export default function AdminMessagesPage() {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeThread, setActiveThread] = useState<Thread | null>(null);
@@ -44,48 +42,8 @@ export default function AdminMessagesPage() {
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
   const [userOnline, setUserOnline] = useState(false);
-  const [currentRole, setCurrentRole] = useState<string | null>(null);
-  const [roleChecked, setRoleChecked] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    async function loadRole() {
-      try {
-        const res = await fetch("/api/auth/me");
-        if (!res.ok) {
-          setCurrentRole(null);
-          return;
-        }
-
-        const data = await res.json();
-        setCurrentRole(data?.user?.role || null);
-      } catch {
-        setCurrentRole(null);
-      } finally {
-        setRoleChecked(true);
-      }
-    }
-
-    loadRole();
-  }, []);
-
-  if (!roleChecked) {
-    return <div className="flex min-h-[320px] items-center justify-center text-slate-400">Loading messages...</div>;
-  }
-
-  if (currentRole !== "super_admin" && currentRole !== "admin") {
-    return (
-      <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-slate-300 backdrop-blur-xl">
-        <div>
-          <p className="text-lg font-semibold text-white">Access restricted</p>
-          <p className="mt-2 text-sm text-slate-400">
-            Only super admin can read or reply to student messages.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   const fetchThreads = useCallback(async () => {
     try {
@@ -203,7 +161,7 @@ export default function AdminMessagesPage() {
   const openCount = threads.filter((t) => t.unreadByAdmin).length;
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl">
+    <div className="mx-auto flex max-w-6xl overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl" style={{ height: "min(600px, 80vh)" }}>
       {/* Thread List */}
       <div
         className={`flex w-80 flex-col border-r border-white/10 bg-black/20 ${
@@ -375,17 +333,17 @@ export default function AdminMessagesPage() {
             {/* Messages - scrollable, takes remaining space */}
             <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
               {activeThread.messages.map((msg, i) => {
-                const isUserMessage = !STAFF_ROLES.has(msg.senderRole);
+                const isAdmin = msg.senderRole === "super_admin" || msg.senderRole === "admin";
                 return (
                   <div
                     key={i}
-                    className={`flex ${isUserMessage ? "justify-end" : "justify-start"}`}
+                    className={`flex ${isAdmin ? "justify-end" : "justify-start"}`}
                   >
                     <div
                       className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
-                        isUserMessage
+                        isAdmin
                           ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white"
-                          : "bg-white text-slate-900 border border-slate-200"
+                          : "bg-white/10 text-slate-200 border border-white/10"
                       }`}
                     >
                       <p className="text-xs font-medium opacity-70 mb-1">
@@ -394,7 +352,7 @@ export default function AdminMessagesPage() {
                       <p className="text-sm leading-relaxed">{msg.text}</p>
                       <p
                         className={`mt-1 text-[10px] ${
-                          isUserMessage ? "text-white/50" : "text-slate-500"
+                          isAdmin ? "text-white/50" : "text-slate-500"
                         }`}
                       >
                         {formatTime(msg.createdAt)}

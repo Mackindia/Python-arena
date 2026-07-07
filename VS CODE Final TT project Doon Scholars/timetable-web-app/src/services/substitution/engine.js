@@ -24,14 +24,26 @@ export const generateAllSubstitutions = (
       normalizeTeacherId(t)
     )
 
+  // ──────────────────────────────────────────────────────────────────────
+  // FIX: Build assignedMap from teacherScheduleMap (timetable truth),
+  // NOT from the teachers array. The teachers array may be stale or
+  // missing entries. teacherScheduleMap is built from actual timetable
+  // data and is the single source of truth for which teachers exist.
+  // ──────────────────────────────────────────────────────────────────────
   const assignedMap = {}
 
+  Object.keys(teacherScheduleMap || {}).forEach(tId => {
+    const normalized = normalizeTeacherId(tId)
+    assignedMap[normalized] = []
+  })
+
+  // Also add any teachers from the teachers array that aren't in schedule map
+  // (they may have been added but not yet assigned to a slot)
   teachers.forEach(t => {
-
-    const tId =
-      normalizeTeacherId(t)
-
-    assignedMap[tId] = []
+    const tId = normalizeTeacherId(t)
+    if (!assignedMap[tId]) {
+      assignedMap[tId] = []
+    }
   })
 
   Object.entries(
@@ -62,13 +74,25 @@ export const generateAllSubstitutions = (
 
       const availableTeachers =
 
-        teachers
-
-          .map(t => ({
-            raw: t,
-            id:
-              normalizeTeacherId(t)
-          }))
+        // ──────────────────────────────────────────────────────────────
+        // FIX: Build candidate list from teacherScheduleMap keys
+        // (actual timetable teachers) merged with teachers array.
+        // This ensures newly renamed teachers are eligible even if
+        // the teachers array hasn't fully synced yet.
+        // ──────────────────────────────────────────────────────────────
+        [...new Set([
+          ...Object.keys(teacherScheduleMap || {}).map(k => normalizeTeacherId(k)),
+          ...teachers.map(t => normalizeTeacherId(t))
+        ])]
+          .map(tId => {
+            // Find the raw name from teachers array or teacherScheduleMap
+            const rawFromTeachers = teachers.find(t => normalizeTeacherId(t) === tId)
+            const rawFromMap = Object.keys(teacherScheduleMap || {}).find(k => normalizeTeacherId(k) === tId)
+            return {
+              raw: rawFromTeachers || rawFromMap || tId,
+              id: tId
+            }
+          })
 
           // remove absent teachers
           .filter(t =>
@@ -107,9 +131,7 @@ export const generateAllSubstitutions = (
           // prevent duplicate substitute
           .filter(t => {
 
-            return !assignedMap[
-              t.id
-            ].includes(
+            return !(assignedMap[t.id] || []).includes(
               normalizedPeriod
             )
           })
@@ -133,9 +155,7 @@ export const generateAllSubstitutions = (
                 ).length
 
             const extraLoad =
-              assignedMap[
-                t.id
-              ].length
+              (assignedMap[t.id] || []).length
 
             return extraLoad < 3 && (baseLoad + extraLoad) < 8;
           })
@@ -169,14 +189,10 @@ export const generateAllSubstitutions = (
                 ).length
 
             const extraLoadA =
-              assignedMap[
-                a.id
-              ].length
+              (assignedMap[a.id] || []).length
 
             const extraLoadB =
-              assignedMap[
-                b.id
-              ].length
+              (assignedMap[b.id] || []).length
 
             // Sort by extraLoad first (distribute arrangements evenly)
             if (extraLoadA !== extraLoadB) {
@@ -230,6 +246,10 @@ export const generateAllSubstitutions = (
         })
 
         return
+      }
+
+      if (!assignedMap[assignedTeacher.id]) {
+        assignedMap[assignedTeacher.id] = []
       }
 
       assignedMap[

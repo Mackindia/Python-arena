@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const data = await getSubjectData(subject);
 
   return {
-    title: `${data?.subjectName || "Subject"} Practice Question Papers | Python Arena`,
+    title: `${data?.subjectName || "Subject"} Practice Question Papers`,
     description: "Browse class-wise practice question papers and downloadable resources.",
     alternates: { canonical: `/practice/${subject}` },
   };

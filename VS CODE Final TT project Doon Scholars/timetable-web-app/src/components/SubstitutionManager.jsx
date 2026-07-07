@@ -102,8 +102,8 @@ const SubstitutionEngineUI = ({
     const normalizedPeriod = normalizePeriod(period);
 
     return teachers
-      // remove absent teachers
-      .filter(t => !dailyAbsent.map(normalizeTeacherId).includes(normalizeTeacherId(t)))
+      // remove absent teachers (normalize for consistent comparison)
+      .filter(t => !dailyAbsent.includes(normalizeTeacherId(t)))
       // teacher free
       .filter(t => {
         const tId = normalizeTeacherId(t);
@@ -365,10 +365,32 @@ const SubstitutionManager = () => {
     unmarkTeacherAbsent
   } = useTimetable();
 
+  // ──────────────────────────────────────────────────────────────────
+  // FIX: Derive teacher list from ACTUAL timetable data (teacherScheduleMap),
+  // NOT from context's `teachers` state. The context's `teachers` may include
+  // stale entries from `addedTeachers` in localStorage that are NOT synced
+  // across clients — causing sadmin to see old teacher initials while
+  // super admin sees correct ones.
+  // teacherScheduleMap is built from timetables (synced data) and is the
+  // single source of truth for which teachers actually exist.
+  // ──────────────────────────────────────────────────────────────────
+  const timetableTeachers = useMemo(() => {
+    const map = buildTeacherScheduleMap(timetables);
+    return Object.keys(map).sort();
+  }, [timetables]);
+
+  // Use timetable-derived teachers for the checkbox list (absent teacher selection)
+  // Fall back to context teachers if timetable scan is empty
+  const displayTeachers = timetableTeachers.length > 0 ? timetableTeachers : teachers;
+
   const getTeacherFullName = (shortName) => {
-    if (!teacherMapping || !Array.isArray(teacherMapping)) return shortName;
-    const match = teacherMapping.find(t => Object.values(t).includes(shortName) || t.Teacher === shortName || t.ID === shortName);
-    return match ? (match['Teacher Name'] || match.Name || match.Teacher || shortName) : shortName;
+    const normalized = normalizeTeacherId(shortName);
+    if (!teacherMapping || !Array.isArray(teacherMapping)) return normalized;
+    const match = teacherMapping.find(t => {
+      const teacherVal = t.Teacher || t.ID || '';
+      return normalizeTeacherId(teacherVal) === normalized;
+    });
+    return match ? (match['Teacher Name'] || match.Name || match.Teacher || normalized) : normalized;
   };
 
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -385,13 +407,18 @@ const SubstitutionManager = () => {
   }, [selectedDate]);
 
   const dailySubstitutions = useMemo(() => substitutions[selectedDate] || [], [substitutions, selectedDate]);
-  const dailyAbsent = useMemo(() => absentTeachers[selectedDate] || [], [absentTeachers, selectedDate]);
+  const dailyAbsent = useMemo(() => {
+    const raw = absentTeachers[selectedDate] || [];
+    // Normalize all absent teacher names to uppercase for consistent matching
+    return raw.map(t => normalizeTeacherId(t));
+  }, [absentTeachers, selectedDate]);
 
   const handleToggleAbsent = (teacherName) => {
-    if (dailyAbsent.includes(teacherName)) {
-      unmarkTeacherAbsent(selectedDate, teacherName);
+    const normalized = normalizeTeacherId(teacherName);
+    if (dailyAbsent.includes(normalized)) {
+      unmarkTeacherAbsent(selectedDate, normalized);
     } else {
-      markTeacherAbsent(selectedDate, teacherName);
+      markTeacherAbsent(selectedDate, normalized);
     }
   };
 
@@ -423,29 +450,32 @@ const SubstitutionManager = () => {
           <Users size={20} color="#ef4444" /> STEP 2 — Select Absent Teachers
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '0.5rem' }}>
-          {teachers.map(t => (
-            <label key={t} style={{ 
-              display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', 
-              backgroundColor: dailyAbsent.includes(t) ? '#fee2e2' : '#f8fafc', 
-              border: `1px solid ${dailyAbsent.includes(t) ? '#fca5a5' : '#e2e8f0'}`,
-              borderRadius: '4px', cursor: 'pointer'
-            }}>
-              <input 
-                type="checkbox" 
-                checked={dailyAbsent.includes(t)}
-                onChange={() => handleToggleAbsent(t)}
-              />
-              <span style={{ fontWeight: dailyAbsent.includes(t) ? 'bold' : 'normal', color: dailyAbsent.includes(t) ? '#b91c1c' : 'inherit' }}>
-                {t} {getTeacherFullName(t) !== t ? `- ${getTeacherFullName(t)}` : ''}
-              </span>
-            </label>
-          ))}
+          {displayTeachers.map(t => {
+            const normalizedT = normalizeTeacherId(t);
+            return (
+              <label key={normalizedT} style={{ 
+                display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', 
+                backgroundColor: dailyAbsent.includes(normalizedT) ? '#fee2e2' : '#f8fafc', 
+                border: `1px solid ${dailyAbsent.includes(normalizedT) ? '#fca5a5' : '#e2e8f0'}`,
+                borderRadius: '4px', cursor: 'pointer'
+              }}>
+                <input 
+                  type="checkbox" 
+                  checked={dailyAbsent.includes(normalizedT)}
+                  onChange={() => handleToggleAbsent(t)}
+                />
+                <span style={{ fontWeight: dailyAbsent.includes(normalizedT) ? 'bold' : 'normal', color: dailyAbsent.includes(normalizedT) ? '#b91c1c' : 'inherit' }}>
+                  {normalizedT} {getTeacherFullName(normalizedT) !== normalizedT ? `- ${getTeacherFullName(normalizedT)}` : ''}
+                </span>
+              </label>
+            );
+          })}
         </div>
       </div>
 
       <SubstitutionEngineUI 
         timetables={timetables}
-        teachers={teachers}
+        teachers={displayTeachers}
         dailyAbsent={dailyAbsent}
         selectedDate={selectedDate}
         selectedDayName={selectedDayName}

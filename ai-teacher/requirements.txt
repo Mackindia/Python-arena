@@ -13,3 +13,8 @@ pypdf
 faiss-cpu
 pydantic
 python-multipart
+Pillow
+pytesseract
+pdf2image
+python-docx
+reportlab

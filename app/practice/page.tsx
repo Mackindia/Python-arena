@@ -8,7 +8,7 @@ import PracticeResourceModel from "@/models/practice/PracticeResource";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Practice Question Paper | Python Arena",
+  title: "Practice Question Paper",
   description: "Browse class-wise practice question papers and downloadable PDF resources.",
   alternates: { canonical: "/practice" },
 };

@@ -17,7 +17,9 @@ import {
   Grid,
   Code,
   History,
-  Settings
+  Settings,
+  MessageSquare,
+  Download
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -56,6 +58,22 @@ export const ENGINES_LIST: Engine[] = [
     href: "/admin/upload",
     category: "AI Generators",
     iconName: "UploadCloud"
+  },
+  {
+    id: "ebook-extractor",
+    title: "Ebook Page Extractor",
+    description: "Extract specific pages from Touchpad AI ebooks (Class 9-12), preview content, and generate topic-wise PDFs for sharing.",
+    href: "/admin/ebook-extractor",
+    category: "AI Generators",
+    iconName: "Download"
+  },
+  {
+    id: "practice-question-papers",
+    title: "Practice Question Paper",
+    description: "Create subjects, upload question papers and important PDFs, then publish them for students.",
+    href: "/admin/practice-question-papers",
+    category: "AI Generators",
+    iconName: "FileText"
   },
   // Academic Tools
   {
@@ -150,6 +168,15 @@ export const ENGINES_LIST: Engine[] = [
     category: "Communication",
     iconName: "Megaphone"
   },
+  {
+    id: "user-messages",
+    title: "User Messages",
+    description: "View and reply to messages from students and users. Only admins have access.",
+    href: "/admin/messages",
+    category: "Communication",
+    iconName: "MessageSquare",
+    roleRestriction: ["super_admin", "admin"]
+  },
   // Automation
   {
     id: "timetable-system",
@@ -223,5 +250,7 @@ export const iconMap: Record<string, LucideIcon> = {
   Grid,
   Code,
   History,
-  Settings
+  Settings,
+  MessageSquare,
+  Download
 };

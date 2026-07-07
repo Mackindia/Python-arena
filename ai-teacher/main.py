@@ -13,11 +13,13 @@ from app.retrieval.reranker import DEFAULT_RERANKER_MODEL
 from app.generators.case_study_generator import generate_case_studies
 from app.generators.question_bank_generator import generate_question_bank
 from app.educational_ai.api.routes import router as educational_router
+from app.educational_ai.question_paper.routes import router as exam_router
 
 
 app = FastAPI(title="AI Teacher Assistant", version="1.0")
 
 app.include_router(educational_router)
+app.include_router(exam_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,6 +27,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+async def _prewarm_models():
+    """Load reranker and embedding models at startup to avoid cold-start delays."""
+    import threading
+
+    def _warm():
+        try:
+            from app.retrieval.reranker import _get_cross_encoder, DEFAULT_RERANKER_MODEL
+            _get_cross_encoder(DEFAULT_RERANKER_MODEL)
+            print("[startup] Reranker model loaded ✓")
+        except Exception as e:
+            print(f"[startup] Reranker pre-warm failed: {e}")
+        try:
+            from app.retrieval.indexer import get_embeddings_model
+            get_embeddings_model()
+            print("[startup] Embedding model loaded ✓")
+        except Exception as e:
+            print(f"[startup] Embedding pre-warm failed: {e}")
+
+    threading.Thread(target=_warm, daemon=True).start()
 
 # ─── Request schemas ──────────────────────────────────────────────────────────
 class QuestionRequest(BaseModel):

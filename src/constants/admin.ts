@@ -15,5 +15,6 @@ export const adminSidebarLinks: AdminNavItem[] = [
   { label: "Learn Navigation", href: "/admin/navigation", icon: GraduationCap },
   { label: "Students", href: "/admin/users", icon: Users },
   { label: "AI Engines", href: "/admin/engines", icon: Sparkles },
+  { label: "Practice Question Paper", href: "/admin/practice-question-papers", icon: FileText },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];

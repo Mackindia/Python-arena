@@ -20,6 +20,7 @@ type NotesData = {
     slug: string;
     description: string;
     preview: string;
+    createdAt: string;
   }>;
 };
 
@@ -38,7 +39,7 @@ async function getNotesData(subjectSlug: string, classSlug: string): Promise<Not
     published: true,
     content: { $exists: true, $ne: "" },
   })
-    .select("_id title slug description content")
+    .select("_id title slug description content createdAt")
     .sort({ createdAt: -1 })
     .lean();
 
@@ -51,6 +52,7 @@ async function getNotesData(subjectSlug: string, classSlug: string): Promise<Not
       slug: String(lesson.slug || ""),
       description: String(lesson.description || ""),
       preview: String((lesson.content || "").slice(0, 180)),
+      createdAt: (lesson as any).createdAt ? new Date((lesson as any).createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "",
     })),
   };
 }
@@ -98,7 +100,12 @@ export default async function NotesPage({ params }: { params: Promise<Params> })
                 ) : (
                   <p className="mt-2 line-clamp-3 text-sm text-slate-400">{lesson.preview}</p>
                 )}
-                <p className="mt-3 text-xs text-cyan-300">Open lesson</p>
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="text-xs text-cyan-300">Open lesson</p>
+                  {lesson.createdAt && (
+                    <p className="text-xs text-slate-500">{lesson.createdAt}</p>
+                  )}
+                </div>
               </Link>
             ))
           ) : (

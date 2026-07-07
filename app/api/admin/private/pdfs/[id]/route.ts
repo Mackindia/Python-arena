@@ -31,17 +31,14 @@ export async function DELETE(
       );
     }
 
-    // Delete from Cloudinary
     if (pdf.url) {
       try {
         await deleteCloudinaryAssetByUrl(pdf.url, ["raw"]);
       } catch (cloudError) {
         console.error("Cloudinary deletion error:", cloudError);
-        // Continue even if Cloudinary deletion fails
       }
     }
 
-    // Delete from MongoDB
     await PrivatePdf.findByIdAndDelete(id);
 
     return NextResponse.json({ success: true });
