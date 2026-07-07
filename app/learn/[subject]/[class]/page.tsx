@@ -29,6 +29,7 @@ type NoteItem = {
   slug: string;
   description: string;
   preview: string;
+  createdAt?: string;
 };
 
 type PdfItem = {
@@ -70,7 +71,7 @@ async function getClassContent(subjectSlug: string, classSlug: string) {
     published: true,
     content: { $exists: true, $ne: "" },
   })
-    .select("_id title slug description content")
+    .select("_id title slug description content createdAt")
     .sort({ createdAt: -1 })
     .lean();
 
@@ -80,6 +81,7 @@ async function getClassContent(subjectSlug: string, classSlug: string) {
     slug: String(l.slug || ""),
     description: String(l.description || ""),
     preview: String(l.content || "").slice(0, 120).trim(),
+    createdAt: (l as any).createdAt ? new Date((l as any).createdAt).toISOString() : undefined,
   }));
 
   // ── PDFs: lessons with pdfUrl ──
@@ -90,7 +92,7 @@ async function getClassContent(subjectSlug: string, classSlug: string) {
     pdfUrl: { $exists: true, $ne: "" },
   })
     .select("title slug description pdfUrl thumbnailUrl thumbnail createdAt")
-    .sort({ createdAt: 1 })
+    .sort({ createdAt: -1 })
     .lean();
 
   const pdfs: PdfItem[] = pdfRaw.map((l) => {
@@ -314,6 +316,11 @@ export default async function ClassPage({ params }: { params: Promise<Params> })
                       {note.preview}…
                     </p>
                   ) : null}
+                  {note.createdAt && (
+                    <p className="mt-2 text-[11px] text-slate-500">
+                      {new Date(note.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    </p>
+                  )}
                 </Link>
               ))}
             </div>

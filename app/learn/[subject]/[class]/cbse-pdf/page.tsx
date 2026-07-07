@@ -56,7 +56,7 @@ async function fetchAllPdfContent(
       pdfUrl: { $exists: true, $ne: "" },
     })
       .select("title slug description pdfUrl thumbnailUrl thumbnail createdAt")
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .lean();
 
     const lmsItems: PdfItem[] = lmsLessons.map((l) => {
