@@ -7,7 +7,6 @@ import ChatWidget from "@/src/components/chat/ChatWidget";
 import Navbar from "@/src/components/navbar/Navbar";
 import NoticeBoard from "@/src/components/dashboard/NoticeBoard";
 import Footer from "@/src/components/footer/Footer";
-import ChatWidget from "@/src/components/chat/ChatWidget";
 import "./globals.css";
 
 const geistSans = Geist({
