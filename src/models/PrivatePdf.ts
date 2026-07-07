@@ -1,4 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
+
+export interface IPrivatePdf extends Document {
+  title: string;
+  fileName: string;
+  url: string;
+  publicId: string;
+  size: number;
+  ownerId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const PrivatePdfSchema = new mongoose.Schema(
   {
@@ -33,4 +44,4 @@ const PrivatePdfSchema = new mongoose.Schema(
 );
 
 export default mongoose.models.PrivatePdf ||
-  mongoose.model("PrivatePdf", PrivatePdfSchema);
+  mongoose.model<IPrivatePdf>("PrivatePdf", PrivatePdfSchema);

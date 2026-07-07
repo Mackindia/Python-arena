@@ -4,6 +4,8 @@ export interface IPrivateNote extends Document {
   ownerId: string;
   title: string;
   content: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const PrivateNoteSchema: Schema = new Schema(

@@ -451,6 +451,7 @@ export default function PrivateNotesClient({ standalone = false }: PrivateNotesC
                     {new Date(note.updatedAt).toLocaleDateString("en-IN", {
                       day: "numeric",
                       month: "short",
+                      year: "numeric",
                     })}
                   </p>
                 </li>
