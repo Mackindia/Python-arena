@@ -6,9 +6,10 @@ type CbsePdfCardProps = {
   description?: string;
   thumbnailUrl?: string;
   pdfUrl: string;
+  createdAt?: string;
 };
 
-export default function CbsePdfCard({ title, description, thumbnailUrl, pdfUrl }: CbsePdfCardProps) {
+export default function CbsePdfCard({ title, description, thumbnailUrl, pdfUrl, createdAt }: CbsePdfCardProps) {
   const hasValidPdfUrl = isValidHttpUrl(pdfUrl);
 
   const viewerUrl = hasValidPdfUrl
@@ -62,6 +63,11 @@ export default function CbsePdfCard({ title, description, thumbnailUrl, pdfUrl }
         <h3 className="text-sm font-semibold leading-snug text-white">{title}</h3>
         {description && (
           <p className="line-clamp-2 text-xs leading-relaxed text-slate-400">{description}</p>
+        )}
+        {createdAt && (
+          <p className="text-[11px] text-slate-500">
+            {new Date(createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+          </p>
         )}
         <div className="mt-auto flex flex-col gap-2">
           {hasValidPdfUrl ? (

@@ -20,6 +20,7 @@ type PdfItem = {
   pdfUrl: string;
   thumbnailUrl: string;
   source: "lms" | "course";
+  createdAt?: string;
 };
 
 function formatLabel(value: string) {
@@ -54,7 +55,7 @@ async function fetchAllPdfContent(
       published: true,
       pdfUrl: { $exists: true, $ne: "" },
     })
-      .select("title slug description pdfUrl thumbnailUrl thumbnail")
+      .select("title slug description pdfUrl thumbnailUrl thumbnail createdAt")
       .sort({ createdAt: 1 })
       .lean();
 
@@ -66,6 +67,7 @@ async function fetchAllPdfContent(
         pdfUrl?: string;
         thumbnailUrl?: string;
         thumbnail?: string;
+        createdAt?: Date;
       };
       return {
         title: lesson.title || "",
@@ -74,6 +76,7 @@ async function fetchAllPdfContent(
         pdfUrl: lesson.pdfUrl ?? "",
         thumbnailUrl: (lesson.thumbnailUrl || lesson.thumbnail) ?? "",
         source: "lms" as const,
+        createdAt: lesson.createdAt ? new Date(lesson.createdAt).toISOString() : undefined,
       };
     });
 
@@ -207,6 +210,7 @@ export default async function CbsePdfPage({ params }: { params: Promise<Params> 
                   description={lesson.description}
                   thumbnailUrl={lesson.thumbnailUrl}
                   pdfUrl={lesson.pdfUrl}
+                  createdAt={lesson.createdAt}
                 />
               ))}
             </div>

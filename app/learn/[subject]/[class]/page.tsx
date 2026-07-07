@@ -37,6 +37,7 @@ type PdfItem = {
   description: string;
   pdfUrl: string;
   thumbnailUrl: string;
+  createdAt?: string;
 };
 
 type CourseItem = {
@@ -88,7 +89,7 @@ async function getClassContent(subjectSlug: string, classSlug: string) {
     published: true,
     pdfUrl: { $exists: true, $ne: "" },
   })
-    .select("title slug description pdfUrl thumbnailUrl thumbnail")
+    .select("title slug description pdfUrl thumbnailUrl thumbnail createdAt")
     .sort({ createdAt: 1 })
     .lean();
 
@@ -100,6 +101,7 @@ async function getClassContent(subjectSlug: string, classSlug: string) {
       pdfUrl?: string;
       thumbnailUrl?: string;
       thumbnail?: string;
+      createdAt?: Date;
     };
     return {
       title: lesson.title || "",
@@ -107,6 +109,7 @@ async function getClassContent(subjectSlug: string, classSlug: string) {
       description: lesson.description ?? "",
       pdfUrl: lesson.pdfUrl ?? "",
       thumbnailUrl: (lesson.thumbnailUrl || lesson.thumbnail) ?? "",
+      createdAt: lesson.createdAt ? new Date(lesson.createdAt).toISOString() : undefined,
     };
   });
 
@@ -237,6 +240,7 @@ export default async function ClassPage({ params }: { params: Promise<Params> })
                   description={pdf.description}
                   thumbnailUrl={pdf.thumbnailUrl}
                   pdfUrl={pdf.pdfUrl}
+                  createdAt={pdf.createdAt}
                 />
               ))}
             </div>
