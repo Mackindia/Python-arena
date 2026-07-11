@@ -72,7 +72,6 @@ export default function RootLayout({
           <Navbar />
           <NoticeBoard />
           <main className="flex-1">{children}</main>
-          <ChatWidget />
           <Footer />
           <ChatWidget />
         </ClerkProvider>
