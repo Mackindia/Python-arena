@@ -14,6 +14,7 @@ interface ServerConfig {
 const SERVERS: ServerConfig[] = [
   { id: "nextjs", name: "Next.js (Main App)", port: 3000, dir: "Current directory", color: "text-cyan-400" },
   { id: "ai-teacher", name: "Educational AI (FastAPI)", port: 8000, dir: "ai-teacher", color: "text-green-400" },
+  { id: "claude-proxy", name: "Claude Proxy (Node)", port: 8080, dir: "antigravity-claude-proxy-main", color: "text-orange-400" },
   { id: "timetable", name: "Timetable Engine", port: 5173, dir: "timetable-web-app", color: "text-amber-400" },
   { id: "ebook-proxy", name: "Ebook Proxy Server", port: 9090, dir: "External", color: "text-violet-400" },
 ];

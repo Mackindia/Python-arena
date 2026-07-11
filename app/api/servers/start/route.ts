@@ -19,6 +19,13 @@ const SERVERS: Record<string, { name: string; port: number; cmd: string; args: s
     args: ["-m", "uvicorn", "main:app", "--reload", "--port", "8000"],
     cwd: `${BASE}\\ai-teacher`,
   },
+  "claude-proxy": {
+    name: "Claude Proxy (Node)",
+    port: 8080,
+    cmd: "node",
+    args: ["src/index.js"],
+    cwd: "C:\\Users\\Doon Scholars\\Downloads\\antigravity-claude-proxy-main\\antigravity-claude-proxy-main",
+  },
   "timetable": {
     name: "Timetable Engine",
     port: 5173,
