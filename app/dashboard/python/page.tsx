@@ -31,6 +31,8 @@ function PythonEditorPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   
   const workerRef = useRef<Worker | null>(null);
+  const inputResolverRef = useRef<((value: string) => void) | null>(null);
+  const [pendingInput, setPendingInput] = useState<{ prompt: string; id: number } | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
   const [currentTime, setCurrentTime] = useState("");
@@ -101,11 +103,15 @@ function PythonEditorPageContent() {
     workerRef.current = worker;
 
     worker.onmessage = (e) => {
-      const { type, text, error } = e.data;
+      const { type, text, error, id } = e.data;
       if (type === "ready") {
         setIsPyodideLoading(false);
       } else if (type === "stdout" || type === "stderr") {
         setOutput((prev) => prev + text);
+      } else if (type === "input_request") {
+        const promptText = e.data.prompt || "";
+        setOutput((prev) => prev + promptText);
+        setPendingInput({ prompt: promptText, id: e.data.id });
       } else if (type === "done") {
         setIsRunning(false);
       } else if (type === "error") {
@@ -227,8 +233,17 @@ function PythonEditorPageContent() {
     }
     setIsRunning(true);
     setOutput("");
+    setPendingInput(null);
     
     workerRef.current.postMessage({ id: Date.now(), python: pythonCode });
+  };
+
+  const submitInput = (value: string) => {
+    if (pendingInput && workerRef.current) {
+      setOutput((prev) => prev + value + "\n");
+      workerRef.current.postMessage({ id: pendingInput.id, inputResponse: value });
+      setPendingInput(null);
+    }
   };
 
   const stopExecution = () => {
@@ -236,9 +251,9 @@ function PythonEditorPageContent() {
         workerRef.current.terminate();
     }
     setIsRunning(false);
+    setPendingInput(null);
     setOutput(prev => prev + "\n\n[Execution Terminated]");
     
-    // Restart the worker for the next run
     initWorker();
   };
 
@@ -369,7 +384,26 @@ function PythonEditorPageContent() {
               Terminal Output
             </div>
             <div className="flex-1 overflow-y-auto p-4 font-mono text-sm text-green-400 whitespace-pre-wrap">
-                {output || <span className="text-slate-600">No output yet. Click "Run Code" to execute.</span>}
+                {output}
+                {!output && !pendingInput && <span className="text-slate-600">No output yet. Click "Run Code" to execute.</span>}
+                {pendingInput && (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const input = e.currentTarget.elements.namedItem("userInput") as HTMLInputElement;
+                      submitInput(input.value);
+                      input.value = "";
+                    }}
+                    className="flex items-center mt-1"
+                  >
+                    <span className="text-white">&gt; </span>
+                    <input
+                      name="userInput"
+                      autoFocus
+                      className="flex-1 bg-transparent border-none outline-none text-white font-mono"
+                    />
+                  </form>
+                )}
             </div>
           </div>
 
