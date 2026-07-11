@@ -7,6 +7,7 @@ import ChatWidget from "@/src/components/chat/ChatWidget";
 import Navbar from "@/src/components/navbar/Navbar";
 import NoticeBoard from "@/src/components/dashboard/NoticeBoard";
 import Footer from "@/src/components/footer/Footer";
+import ServerConsole from "@/src/components/admin/ServerConsole";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -69,6 +70,7 @@ export default function RootLayout({
         <ClerkProvider>
           <ClerkUserSync />
           <HashEducationalAIRedirect />
+          <ServerConsole />
           <Navbar />
           <NoticeBoard />
           <main className="flex-1">{children}</main>
