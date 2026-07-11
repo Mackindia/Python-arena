@@ -38,9 +38,9 @@ const SERVERS = {
   "ebook-proxy": {
     name: "Ebook Proxy Server",
     port: 9090,
-    cmd: "python",
+    cmd: "C:\\Python314\\python.exe",
     args: ["C:\\Users\\Doon Scholars\\Downloads\\data\\ebook-extractor\\proxy_server.py"],
-    cwd: BASE,
+    cwd: "C:\\Users\\Doon Scholars\\Downloads\\data\\ebook-extractor",
   },
 };
 
@@ -98,12 +98,23 @@ function stopServer(id) {
   const proc = processes[id];
   if (!proc) return { error: "Not running" };
   try {
-    proc.kill("SIGTERM");
-    // Force kill after 3s if still alive
-    setTimeout(() => {
-      try { proc.kill("SIGKILL"); } catch {}
-    }, 3000);
+    // On Windows, SIGTERM doesn't kill the process tree.
+    // Use taskkill /F /T to force-kill the entire tree.
+    if (process.platform === "win32" && proc.pid) {
+      const { execSync } = require("child_process");
+      try {
+        execSync(`taskkill /F /T /PID ${proc.pid}`, { stdio: "ignore" });
+      } catch {
+        // Process might already be dead
+      }
+    } else {
+      proc.kill("SIGTERM");
+      setTimeout(() => {
+        try { proc.kill("SIGKILL"); } catch {}
+      }, 3000);
+    }
   } catch {}
+  processes[id] = null;
   console.log(`[Manager] Stopped ${SERVERS[id]?.name || id}`);
   return { ok: true, stopped: id };
 }

@@ -100,6 +100,8 @@ export default function ServerConsole() {
   const stopServer = async (id: string) => {
     if (!managerUp) return;
     setLoading(id);
+    // Optimistic update — immediately show as stopped
+    setStatuses((prev) => ({ ...prev, [id]: false }));
     try {
       await fetch(`${MANAGER_URL}/stop`, {
         method: "POST",
@@ -108,7 +110,9 @@ export default function ServerConsole() {
       });
       disconnectFromLogs(id);
       setLogs((prev) => ({ ...prev, [id]: [...(prev[id] || []), `[Server stopped]`] }));
-      setTimeout(checkManager, 500);
+      // Multiple polls to catch the state change
+      setTimeout(checkManager, 300);
+      setTimeout(checkManager, 1000);
     } catch {}
     setLoading(null);
   };
