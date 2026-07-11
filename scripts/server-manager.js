@@ -17,7 +17,7 @@ const SERVERS = {
   "ai-teacher": {
     name: "Educational AI (FastAPI)",
     port: 8000,
-    cmd: "python",
+    cmd: path.join(BASE, "ai-teacher", ".venv", "Scripts", "python.exe"),
     args: ["-m", "uvicorn", "main:app", "--reload", "--port", "8000"],
     cwd: path.join(BASE, "ai-teacher"),
   },
