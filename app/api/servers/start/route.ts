@@ -68,16 +68,6 @@ export async function POST(req: Request) {
 
     addServer(serverId, config.name, config.port, proc);
 
-    proc.stdout?.on("data", (data: Buffer) => {
-      console.log(`[${config.name}] ${data.toString().trim()}`);
-    });
-    proc.stderr?.on("data", (data: Buffer) => {
-      console.error(`[${config.name}] ${data.toString().trim()}`);
-    });
-    proc.on("exit", () => {
-      console.log(`[${config.name}] exited`);
-    });
-
     return NextResponse.json({
       ok: true,
       server: { id: serverId, name: config.name, port: config.port },
