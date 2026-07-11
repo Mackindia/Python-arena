@@ -3,8 +3,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Terminal, Play, Square, ChevronDown, ChevronRight, X, Server,
-  Loader2, Trash2, Maximize2, Minimize2,
+  Loader2, Trash2, Maximize2, Minimize2, AlertTriangle,
 } from "lucide-react";
+
+const MANAGER_URL = "http://localhost:7777";
 
 interface ServerConfig {
   id: string;
@@ -26,6 +28,7 @@ export default function ServerConsole() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isLocalhost, setIsLocalhost] = useState(false);
+  const [managerUp, setManagerUp] = useState(false);
   const [statuses, setStatuses] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState<string | null>(null);
   const [activeServer, setActiveServer] = useState<string | null>(null);
@@ -41,26 +44,30 @@ export default function ServerConsole() {
     );
   }, []);
 
-  const pollStatus = useCallback(async () => {
+  const checkManager = useCallback(async () => {
     try {
-      const res = await fetch("/api/servers/status");
-      const data = await res.json();
-      const map: Record<string, boolean> = {};
-      for (const s of data.servers) {
-        map[s.id] = s.running;
+      const res = await fetch(`${MANAGER_URL}/status`, { signal: AbortSignal.timeout(2000) });
+      if (res.ok) {
+        setManagerUp(true);
+        const data = await res.json();
+        const map: Record<string, boolean> = {};
+        for (const s of data.servers) map[s.id] = s.running;
+        setStatuses(map);
+      } else {
+        setManagerUp(false);
       }
-      setStatuses(map);
-    } catch {}
+    } catch {
+      setManagerUp(false);
+    }
   }, []);
 
   useEffect(() => {
     if (!isLocalhost) return;
-    pollStatus();
-    const interval = setInterval(pollStatus, 3000);
+    checkManager();
+    const interval = setInterval(checkManager, 3000);
     return () => clearInterval(interval);
-  }, [isLocalhost, pollStatus]);
+  }, [isLocalhost, checkManager]);
 
-  // Auto-scroll logs
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs, activeServer]);
@@ -68,51 +75,59 @@ export default function ServerConsole() {
   if (!isLocalhost) return null;
 
   const startServer = async (id: string) => {
+    if (!managerUp) return;
     setLoading(id);
     try {
-      await fetch("/api/servers/start", {
+      const res = await fetch(`${MANAGER_URL}/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ serverId: id }),
+        body: JSON.stringify({ id }),
       });
+      const data = await res.json();
+      if (data.error) {
+        setLogs((prev) => ({ ...prev, [id]: [...(prev[id] || []), `[Error: ${data.error}]`] }));
+      }
       setTimeout(() => {
-        pollStatus();
+        checkManager();
         connectToLogs(id);
       }, 500);
-    } catch {}
+    } catch (e: any) {
+      setLogs((prev) => ({ ...prev, [id]: [...(prev[id] || []), `[Error: ${e.message}]`] }));
+    }
     setLoading(null);
   };
 
   const stopServer = async (id: string) => {
+    if (!managerUp) return;
     setLoading(id);
     try {
-      await fetch("/api/servers/stop", {
+      await fetch(`${MANAGER_URL}/stop`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ serverId: id }),
+        body: JSON.stringify({ id }),
       });
       disconnectFromLogs(id);
-      setLogs((prev) => {
-        const next = { ...prev };
-        next[id] = [...(next[id] || []), `[Server stopped]`];
-        return next;
-      });
-      setTimeout(pollStatus, 500);
+      setLogs((prev) => ({ ...prev, [id]: [...(prev[id] || []), `[Server stopped]`] }));
+      setTimeout(checkManager, 500);
     } catch {}
     setLoading(null);
   };
 
   const connectToLogs = (id: string) => {
     if (eventSourcesRef.current[id]) return;
-    const es = new EventSource(`/api/servers/logs?id=${id}`);
+    const es = new EventSource(`${MANAGER_URL}/logs?id=${id}`);
     eventSourcesRef.current[id] = es;
     es.onmessage = (e) => {
       if (e.data === "__EXIT__") {
         es.close();
         delete eventSourcesRef.current[id];
-        pollStatus();
+        checkManager();
         return;
       }
+      try {
+        const parsed = JSON.parse(e.data);
+        if (parsed.error) return;
+      } catch {}
       setLogs((prev) => ({
         ...prev,
         [id]: [...(prev[id] || []), e.data],
@@ -174,13 +189,16 @@ export default function ServerConsole() {
           <span className="text-xs font-bold tracking-wide text-slate-200 uppercase">
             Server Console
           </span>
+          <span
+            className={`h-2 w-2 rounded-full ${managerUp ? "bg-green-400" : "bg-red-400"}`}
+            title={managerUp ? "Manager running" : "Manager offline"}
+          />
         </div>
         <div className="flex items-center gap-1">
           {activeServer && (
             <button
               onClick={() => setExpanded(!expanded)}
               className="rounded p-1 text-slate-400 hover:bg-slate-700 hover:text-white"
-              title={expanded ? "Shrink" : "Expand"}
             >
               {expanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
             </button>
@@ -202,6 +220,19 @@ export default function ServerConsole() {
 
       {!isMinimized && (
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          {/* Manager warning */}
+          {!managerUp && (
+            <div className="mx-2 mt-2 flex items-start gap-2 rounded-lg border border-amber-600/40 bg-amber-900/20 px-3 py-2">
+              <AlertTriangle size={14} className="mt-0.5 flex-shrink-0 text-amber-400" />
+              <div className="text-[11px] text-amber-200">
+                <p className="font-semibold">Server Manager is offline</p>
+                <p className="mt-0.5 text-amber-300/70">
+                  Run in terminal: <code className="rounded bg-black/30 px-1 font-mono">npm run servers</code>
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Server List */}
           <div className="flex-shrink-0 overflow-y-auto p-2">
             {SERVERS.map((server) => {
@@ -218,7 +249,6 @@ export default function ServerConsole() {
                       : "border-slate-700/50 bg-slate-800/50 hover:border-slate-600"
                   }`}
                 >
-                  {/* Server name + port */}
                   <div className="mb-1.5 flex items-center justify-between">
                     <button
                       onClick={() => viewServer(server.id)}
@@ -240,37 +270,27 @@ export default function ServerConsole() {
                     </span>
                   </div>
 
-                  {/* Directory */}
                   <div className="mb-1.5 text-[10px] text-slate-500">
                     📁 {server.dir}
                   </div>
 
-                  {/* Run / Stop buttons */}
                   <div className="flex items-center gap-2">
                     {isRunning ? (
                       <button
                         onClick={() => stopServer(server.id)}
-                        disabled={isLoading}
+                        disabled={isLoading || !managerUp}
                         className="flex flex-1 items-center justify-center gap-1.5 rounded-md bg-red-600/20 border border-red-600/40 px-3 py-1.5 text-[11px] font-semibold text-red-400 transition hover:bg-red-600/30 disabled:opacity-50"
                       >
-                        {isLoading ? (
-                          <Loader2 size={12} className="animate-spin" />
-                        ) : (
-                          <Square size={12} />
-                        )}
+                        {isLoading ? <Loader2 size={12} className="animate-spin" /> : <Square size={12} />}
                         Stop
                       </button>
                     ) : (
                       <button
                         onClick={() => startServer(server.id)}
-                        disabled={isLoading}
+                        disabled={isLoading || !managerUp}
                         className="flex flex-1 items-center justify-center gap-1.5 rounded-md bg-green-600/20 border border-green-600/40 px-3 py-1.5 text-[11px] font-semibold text-green-400 transition hover:bg-green-600/30 disabled:opacity-50"
                       >
-                        {isLoading ? (
-                          <Loader2 size={12} className="animate-spin" />
-                        ) : (
-                          <Play size={12} />
-                        )}
+                        {isLoading ? <Loader2 size={12} className="animate-spin" /> : <Play size={12} />}
                         Run
                       </button>
                     )}
@@ -291,7 +311,7 @@ export default function ServerConsole() {
             })}
           </div>
 
-          {/* Terminal Output Panel */}
+          {/* Terminal Output */}
           {activeServer && (
             <div className="flex min-h-0 flex-1 flex-col border-t border-slate-700">
               <div className="flex items-center justify-between border-b border-slate-700/50 bg-slate-900 px-3 py-1.5">
@@ -300,23 +320,13 @@ export default function ServerConsole() {
                   <span className="text-[11px] font-semibold text-slate-300">
                     {SERVERS.find((s) => s.id === activeServer)?.name}
                   </span>
-                  <span className="text-[10px] text-slate-500">
-                    — terminal output
-                  </span>
+                  <span className="text-[10px] text-slate-500">— terminal</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => clearLogs(activeServer)}
-                    className="rounded p-1 text-slate-500 hover:bg-slate-700 hover:text-white"
-                    title="Clear logs"
-                  >
+                  <button onClick={() => clearLogs(activeServer)} className="rounded p-1 text-slate-500 hover:bg-slate-700 hover:text-white" title="Clear">
                     <Trash2 size={12} />
                   </button>
-                  <button
-                    onClick={() => setActiveServer(null)}
-                    className="rounded p-1 text-slate-500 hover:bg-slate-700 hover:text-white"
-                    title="Close terminal"
-                  >
+                  <button onClick={() => setActiveServer(null)} className="rounded p-1 text-slate-500 hover:bg-slate-700 hover:text-white" title="Close">
                     <X size={12} />
                   </button>
                 </div>
@@ -333,9 +343,9 @@ export default function ServerConsole() {
                     <div
                       key={i}
                       className={
-                        line.startsWith("[Error") || line.includes("error")
+                        line.includes("[Error") || line.includes("error")
                           ? "text-red-400"
-                          : line.includes("exit")
+                          : line.includes("exit") || line.includes("stopped")
                           ? "text-yellow-400"
                           : "text-green-300"
                       }

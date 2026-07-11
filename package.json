@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed:learn-nav": "node scripts/seed-learn-navigation.mjs",
-    "sync:timetable": "node scripts/sync-timetable.mjs"
+    "sync:timetable": "node scripts/sync-timetable.mjs",
+    "servers": "node scripts/server-manager.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.3.3",
