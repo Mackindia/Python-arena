@@ -18,7 +18,7 @@ const SERVERS = {
     name: "Educational AI (FastAPI)",
     port: 8000,
     cmd: path.join(BASE, "ai-teacher", ".venv", "Scripts", "python.exe"),
-    args: ["-m", "uvicorn", "main:app", "--reload", "--port", "8000"],
+    args: ["-m", "uvicorn", "main:app", "--port", "8000"],
     cwd: path.join(BASE, "ai-teacher"),
   },
   "claude-proxy": {
@@ -57,7 +57,8 @@ function startServer(id) {
     return { error: `Directory not found: ${config.cwd}` };
   }
 
-  const proc = spawn(config.cmd, config.args, {
+  const cmdStr = `"${config.cmd}"`;
+  const proc = spawn(cmdStr, config.args, {
     cwd: config.cwd,
     shell: true,
     stdio: ["ignore", "pipe", "pipe"],
@@ -84,28 +85,72 @@ function startServer(id) {
   proc.on("exit", (code) => {
     pushLog(`[Process exited with code ${code}]`);
     proc._listeners.forEach((fn) => fn("__EXIT__"));
+    processes[id] = null;
+    console.log(`[Manager] ${config.name} exited (code ${code}) — cleared tracking`);
   });
   proc.on("error", (err) => {
     pushLog(`[Error: ${err.message}]`);
     proc._listeners.forEach((fn) => fn("__EXIT__"));
+    processes[id] = null;
+    console.log(`[Manager] ${config.name} error: ${err.message} — cleared tracking`);
   });
 
   console.log(`[Manager] Started ${config.name} (PID: ${proc.pid}) on port ${config.port}`);
   return { ok: true, id, name: config.name, port: config.port, pid: proc.pid };
 }
 
+function killByPort(port) {
+  try {
+    const { execSync } = require("child_process");
+    // Find PIDs listening on this port
+    const output = execSync(`netstat -ano | findstr ":${port}" | findstr "LISTENING"`, {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    const pids = new Set();
+    for (const line of output.split("\n")) {
+      const match = line.trim().match(/\s+(\d+)\s*$/);
+      if (match) pids.add(match[1]);
+    }
+    for (const pid of pids) {
+      try {
+        execSync(`taskkill /F /T /PID ${pid}`, { stdio: "ignore" });
+        console.log(`[Manager] Killed PID ${pid} on port ${port}`);
+      } catch {}
+    }
+    return pids.size;
+  } catch {
+    return 0;
+  }
+}
+
 function stopServer(id) {
   const proc = processes[id];
-  if (!proc) return { error: "Not running" };
+  const config = SERVERS[id];
+
+  if (!proc) {
+    // Process not tracked — try killing by port as fallback
+    if (config) {
+      const killed = killByPort(config.port);
+      if (killed > 0) {
+        processes[id] = null;
+        console.log(`[Manager] Stopped ${config.name} via port kill (${killed} processes)`);
+        return { ok: true, stopped: id };
+      }
+    }
+    return { error: "Not running" };
+  }
+
   try {
     // On Windows, SIGTERM doesn't kill the process tree.
-    // Use taskkill /F /T to force-kill the entire tree.
+    // Use taskkill /F /T to force-kill the entire tree, then fallback to port kill.
     if (process.platform === "win32" && proc.pid) {
       const { execSync } = require("child_process");
       try {
         execSync(`taskkill /F /T /PID ${proc.pid}`, { stdio: "ignore" });
       } catch {
-        // Process might already be dead
+        // Fallback: kill by port
+        if (config) killByPort(config.port);
       }
     } else {
       proc.kill("SIGTERM");

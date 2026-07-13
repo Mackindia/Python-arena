@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Terminal, Play, Square, ChevronDown, ChevronRight, X, Server,
-  Loader2, Trash2, Maximize2, Minimize2, AlertTriangle,
+  Loader2, Trash2, Maximize2, Minimize2, AlertTriangle, GripVertical,
 } from "lucide-react";
 
 const MANAGER_URL = "http://localhost:7777";
@@ -36,6 +36,10 @@ export default function ServerConsole() {
   const [expanded, setExpanded] = useState(false);
   const logEndRef = useRef<HTMLDivElement>(null);
   const eventSourcesRef = useRef<Record<string, EventSource>>({});
+  const [claudeModel, setClaudeModel] = useState("gemini-3-flash");
+  const [position, setPosition] = useState({ x: 8, y: 8 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     setIsLocalhost(
@@ -71,6 +75,23 @@ export default function ServerConsole() {
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs, activeServer]);
+
+  useEffect(() => {
+    if (!isDragging) return;
+    const onMove = (e: MouseEvent) => {
+      setPosition({
+        x: Math.max(0, Math.min(window.innerWidth - 100, e.clientX - dragOffset.current.x)),
+        y: Math.max(0, Math.min(window.innerHeight - 40, e.clientY - dragOffset.current.y)),
+      });
+    };
+    const onUp = () => setIsDragging(false);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, [isDragging]);
 
   if (!isLocalhost) return null;
 
@@ -163,13 +184,40 @@ export default function ServerConsole() {
     setLogs((prev) => ({ ...prev, [id]: [] }));
   };
 
+  const launchClaude = async () => {
+    const cmd = `$env:ANTHROPIC_BASE_URL='http://localhost:8080'\n$env:ANTHROPIC_AUTH_TOKEN='dummy'\nclaude --model ${claudeModel}`;
+    try {
+      const res = await fetch("/api/servers/open-terminal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command: cmd }),
+      });
+      const data = await res.json();
+      if (data.error) console.error("Terminal error:", data.error);
+    } catch (e: any) {
+      console.error("Fetch failed:", e.message);
+    }
+  };
+
+  const onDragStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    dragOffset.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    };
+  };
+
   if (!isOpen) {
     return (
       <button
+        onMouseDown={onDragStart}
         onClick={() => setIsOpen(true)}
-        className="fixed top-2 left-2 z-[9999] flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900/95 px-3 py-1.5 text-xs font-mono text-slate-300 shadow-xl backdrop-blur transition hover:border-cyan-600 hover:bg-slate-800 hover:text-cyan-300"
-        title="Server Console"
+        className="fixed z-[9999] flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900/95 px-3 py-1.5 text-xs font-mono text-slate-300 shadow-xl backdrop-blur transition hover:border-cyan-600 hover:bg-slate-800 hover:text-cyan-300 cursor-move select-none"
+        style={{ left: position.x, top: position.y }}
+        title="Server Console (drag to move)"
       >
+        <GripVertical size={12} className="text-slate-500" />
         <Terminal size={14} />
         <span className="hidden sm:inline">Servers</span>
       </button>
@@ -178,17 +226,22 @@ export default function ServerConsole() {
 
   return (
     <div
-      className={`fixed top-2 left-2 z-[9999] flex flex-col rounded-xl border border-slate-700 bg-slate-900/95 shadow-2xl backdrop-blur-md transition-all ${
+      className={`fixed z-[9999] flex flex-col rounded-xl border border-slate-700 bg-slate-900/95 shadow-2xl backdrop-blur-md transition-all select-none ${
         expanded
           ? "h-[80vh] w-[700px] max-w-[calc(100vw-16px)]"
           : activeServer
           ? "h-[500px] w-[520px] max-w-[calc(100vw-16px)]"
           : "w-[360px] max-w-[calc(100vw-16px)]"
       }`}
+      style={{ left: position.x, top: position.y }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-700 px-3 py-2">
+      {/* Header — drag handle */}
+      <div
+        onMouseDown={onDragStart}
+        className="flex items-center justify-between border-b border-slate-700 px-3 py-2 cursor-move"
+      >
         <div className="flex items-center gap-2">
+          <GripVertical size={14} className="text-slate-500" />
           <Server size={14} className="text-cyan-400" />
           <span className="text-xs font-bold tracking-wide text-slate-200 uppercase">
             Server Console
@@ -310,6 +363,35 @@ export default function ServerConsole() {
                       </a>
                     )}
                   </div>
+
+                  {/* Claude model selector + Launch */}
+                  {server.id === "claude-proxy" && isRunning && (
+                    <div className="mt-2 flex items-center gap-1.5 border-t border-slate-700/50 pt-2">
+                      <select
+                        value={claudeModel}
+                        onChange={(e) => setClaudeModel(e.target.value)}
+                        className="flex-1 rounded-md border border-slate-600 bg-slate-900 px-2 py-1.5 text-[11px] text-slate-200 outline-none focus:border-orange-500"
+                      >
+                        <optgroup label="Google Gemini">
+                          <option value="gemini-3-flash">gemini-3-flash</option>
+                          <option value="gemini-pro-agent">gemini-pro-agent</option>
+                          <option value="gemini-3-flash-agent">gemini-3-flash-agent</option>
+                        </optgroup>
+                        <optgroup label="Anthropic Claude">
+                          <option value="claude-opus-4-20250514">claude-opus-4</option>
+                          <option value="claude-sonnet-4-20250514">claude-sonnet-4</option>
+                          <option value="claude-3-5-haiku-20241022">claude-3.5-haiku</option>
+                        </optgroup>
+                      </select>
+                      <button
+                        onClick={launchClaude}
+                        className="flex items-center gap-1 rounded-md bg-orange-600/20 border border-orange-600/40 px-3 py-1.5 text-[11px] font-semibold text-orange-400 transition hover:bg-orange-600/30"
+                      >
+                        <Terminal size={12} />
+                        Launch Claude
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}
