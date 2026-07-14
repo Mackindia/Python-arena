@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { connectDB } from "@/lib/mongodb";
 import Announcement from "@/src/models/Announcement";
+import { getCached } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,18 +15,20 @@ export async function GET(req: NextRequest) {
     
     console.log(`📣 Fetching announcements for user ${user.username}. Class: "${studentClass}"`);
     
-    await connectDB();
-
-    // Find announcements that are:
-    // 1. Active
-    // 2. Target "All" OR Target the student's specific class (Case Insensitive)
-    const announcements = await Announcement.find({
-      isActive: true,
-      $or: [
-        { targetClass: "All" },
-        { targetClass: { $regex: new RegExp(`^${studentClass}$`, "i") } }
-      ]
-    }).sort({ createdAt: -1 }).limit(5);
+    const announcements = await getCached(
+      `announcements:${studentClass}`,
+      async () => {
+        await connectDB();
+        return Announcement.find({
+          isActive: true,
+          $or: [
+            { targetClass: "All" },
+            { targetClass: { $regex: new RegExp(`^${studentClass}$`, "i") } }
+          ]
+        }).sort({ createdAt: -1 }).limit(5).lean();
+      },
+      900 // cache for 15 minutes
+    );
 
     console.log(`✅ Found ${announcements.length} matching notices.`);
 

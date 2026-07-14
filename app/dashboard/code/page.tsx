@@ -2,10 +2,12 @@
 
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import Editor from "@monaco-editor/react";
+import dynamic from "next/dynamic";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import MediaLibrary from "@/src/components/media/MediaLibrary";
+
+const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
 // Types
 interface Program {

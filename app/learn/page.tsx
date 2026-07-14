@@ -6,6 +6,9 @@ import { connectDB } from "@/lib/mongodb";
 import Subject from "@/src/models/lms/Subject";
 import ClassModel from "@/src/models/lms/Class";
 
+// Revalidate this page every hour (ISR)
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Learning Tracks | Python Arena",
   description: "Explore AI, Python and Computer Science tracks by class.",

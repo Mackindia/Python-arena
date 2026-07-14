@@ -2,16 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Subject from "@/models/lms/Subject";
 import ClassModel from "@/models/lms/Class";
+import { getCached } from "@/lib/redis";
 
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    await connectDB();
-    const subjects = await Subject.find({})
-      .select("_id slug name description")
-      .sort({ name: 1 })
-      .lean();
+    const subjects = await getCached(
+      "lms:subjects:all",
+      async () => {
+        await connectDB();
+        return Subject.find({})
+          .select("_id slug name description")
+          .sort({ name: 1 })
+          .lean();
+      },
+      3600 // cache for 1 hour
+    );
 
     return NextResponse.json({
       subjects: subjects.map((s) => {

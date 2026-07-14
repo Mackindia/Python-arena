@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { syncCurrentUser } from "@/lib/user-sync";
 import { getUserProgressSummary } from "@/lib/lms-progress";
+import { getCached } from "@/lib/redis";
 
 export const runtime = "nodejs";
 
@@ -15,7 +16,11 @@ export async function GET() {
 
     await syncCurrentUser();
 
-    const summary = await getUserProgressSummary(authUser.id);
+    const summary = await getCached(
+      `progress:summary:${authUser.id}`,
+      () => getUserProgressSummary(authUser.id),
+      300 // cache for 5 minutes
+    );
 
     return NextResponse.json({
       summary,

@@ -5,7 +5,8 @@ import SubjectModel from "@/models/lms/Subject";
 import ClassModel from "@/models/lms/Class";
 import PracticeResourceModel from "@/models/practice/PracticeResource";
 
-export const dynamic = "force-dynamic";
+// Revalidate every hour instead of dynamic rendering
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Practice Question Paper",

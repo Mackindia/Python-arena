@@ -2,9 +2,11 @@
 
 import { Suspense, useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import Editor from "@monaco-editor/react";
+import dynamic from "next/dynamic";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
+
+const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
 // Types
 interface PythonProgram {

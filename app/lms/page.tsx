@@ -4,6 +4,9 @@ import { connectDB } from "@/lib/mongodb";
 import Subject from "@/models/lms/Subject";
 import LessonSearchSection from "@/src/components/learn/LessonSearchSection";
 
+// Revalidate this page every hour (ISR)
+export const revalidate = 3600;
+
 type SubjectCardData = {
   slug: string;
   name: string;
