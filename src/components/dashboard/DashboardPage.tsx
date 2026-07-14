@@ -4,6 +4,8 @@ import { UserButton } from "@clerk/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getDashboardData } from "@/lib/user-sync";
 import { cookies } from "next/headers";
+import { connectDB } from "@/lib/mongodb";
+import User from "@/models/User";
 
 const DASHBOARD_DATA_TIMEOUT_MS = 4000;
 
@@ -32,6 +34,21 @@ export default async function DashboardPage() {
       redirect("/online-class");
     }
     redirect("/sign-in?redirect_url=/dashboard");
+  }
+
+  // Check if user is approved
+  await connectDB();
+  const dbUser = await User.findOne({ clerkId: userId }).select("status role").lean();
+
+  // Admins always have access
+  const isAdmin = dbUser?.role === "admin" || dbUser?.role === "super_admin";
+
+  if (!isAdmin && dbUser?.status === "pending") {
+    redirect("/pending-approval");
+  }
+
+  if (!isAdmin && dbUser?.status === "rejected") {
+    redirect("/pending-approval");
   }
 
   const clerkUser = await currentUser();

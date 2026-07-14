@@ -70,6 +70,13 @@ export async function syncCurrentUser() {
   delete profileWithoutManagedFields.email;
   delete profileWithoutManagedFields.studentClass;
 
+  // Check if user already exists
+  const existingUser = await User.findOne({ clerkId: profile.clerkId });
+
+  // Determine initial status: admin gets approved, others need approval
+  const isAdmin = profile.role === "admin" || profile.role === "super_admin";
+  const initialStatus = isAdmin ? "approved" : "pending";
+
   const user = await User.findOneAndUpdate(
     { clerkId: profile.clerkId },
     {
@@ -79,6 +86,7 @@ export async function syncCurrentUser() {
         role: profile.role,
         email: profile.email,
         studentClass: profile.studentClass,
+        status: initialStatus, // New users need approval
       },
     },
     { returnDocument: "after", upsert: true, setDefaultsOnInsert: true },

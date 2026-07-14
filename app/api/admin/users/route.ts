@@ -36,14 +36,24 @@ async function isAdmin() {
   return false;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     if (!(await isAdmin())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await connectDB();
-    const users = await User.find({}).sort({ createdAt: -1 }).lean();
+
+    // Check for status filter
+    const { searchParams } = new URL(request.url);
+    const statusFilter = searchParams.get("status");
+
+    let query: Record<string, any> = {};
+    if (statusFilter && ["pending", "approved", "rejected"].includes(statusFilter)) {
+      query.status = statusFilter;
+    }
+
+    const users = await User.find(query).sort({ createdAt: -1 }).lean();
     return NextResponse.json({ users });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

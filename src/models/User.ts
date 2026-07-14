@@ -59,6 +59,11 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  status: {
+    type: String,
+    default: "approved", // "pending" | "approved" | "rejected"
+    enum: ["pending", "approved", "rejected"],
+  },
   enrolledCourses: {
     type: [String],
     default: [],
