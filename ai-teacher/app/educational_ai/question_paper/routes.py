@@ -135,7 +135,7 @@ def solve_topic(request: SolvePaperRequest) -> dict[str, Any]:
         import json
         import re
 
-        model = get_model("pro")
+        model = get_model("fast")
         context = context_result["context"]
 
         prompt = f"""Generate a {request.total_marks}-mark question paper for class {request.class_level} {request.subject}.

@@ -147,7 +147,7 @@ def generate_question_bank(
     if not context.strip():
         raise ValueError("No retrieved context available for question bank generation.")
 
-    model = get_model("pro")
+    model = get_model("fast")
 
     # Generate in bounded batches to keep prompt/response size manageable.
     batch_size = min(100, total_questions)

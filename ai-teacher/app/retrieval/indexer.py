@@ -5,11 +5,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app.retrieval.registry import get_book, register_book
 
@@ -17,8 +13,9 @@ INDEX_DIR = Path("faiss_multi_index")
 
 
 @lru_cache(maxsize=1)
-def get_embeddings_model() -> HuggingFaceEmbeddings:
+def get_embeddings_model():
     """Cache embedding model to avoid repeated initialization overhead."""
+    from langchain_community.embeddings import HuggingFaceEmbeddings
     return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 
@@ -66,6 +63,7 @@ def _build_chunks_with_metadata(
     subject: str | None = None,
     chapter_lookup: dict[int, dict[str, Any]] | None = None,
 ) -> list[Document]:
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200,
@@ -101,7 +99,8 @@ def _build_chunks_with_metadata(
     return enriched
 
 
-def _load_or_create_index() -> FAISS:
+def _load_or_create_index():
+    from langchain_community.vectorstores import FAISS
     embeddings = get_embeddings_model()
     if INDEX_DIR.exists():
         return FAISS.load_local(
@@ -148,6 +147,7 @@ def index_book(
             "chunk_count": int(existing.get("chunk_count", 0)),
         }
 
+    from langchain_community.document_loaders import PyPDFLoader
     loader = PyPDFLoader(str(path))
     pages = loader.load()
     if not pages:

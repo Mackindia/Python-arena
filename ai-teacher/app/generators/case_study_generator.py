@@ -112,7 +112,7 @@ def generate_case_studies(
     if not context.strip():
         raise ValueError("No retrieved context available for case study generation.")
 
-    model = get_model("pro")
+    model = get_model("fast")
     targets = _allocate_counts(num_cases, {"Easy": 0.20, "Medium": 0.50, "Hard": 0.30})
 
     issues: list[str] = []

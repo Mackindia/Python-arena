@@ -68,7 +68,7 @@ def solve_single_question(
     )
     context = context_result["context"]
 
-    model = get_model("pro")
+    model = get_model("fast")
     prompt = build_solve_prompt(
         question_text=question_text,
         marks=marks,
@@ -199,7 +199,7 @@ def generate_answer_key(
     )
     context = context_result["context"]
 
-    model = get_model("pro")
+    model = get_model("fast")
     prompt = build_generate_answers_prompt(
         questions=questions,
         class_level=class_level,

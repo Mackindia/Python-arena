@@ -1,4 +1,3 @@
-import fitz  # PyMuPDF — installed as 'pymupdf', imported as 'fitz'
 import os
 
 UPLOAD_DIR = "uploads"
@@ -28,6 +27,7 @@ def extract_text(file_path: str) -> dict:
         estimated_tokens - rough token count (chars / 4)
         fits_in_model  - whether it fits safely in gemini-2.5-flash
     """
+    import fitz  # PyMuPDF — installed as 'pymupdf', imported as 'fitz'
     doc = fitz.open(file_path)
     full_text = ""
     page_count = len(doc)       # ← save BEFORE closing

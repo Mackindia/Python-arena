@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Python Runner</title>
+</head>
+<body>
+<h2>Python Runner (input() works here!)</h2>
+<textarea id="code" rows="15" cols="60">
+num1 = int(input("Enter first number: "))
+num2 = int(input("Enter second number: "))
+result = num1 + num2
+print("The sum is:", result)
+</textarea>
+<br>
+<button onclick="runPython()">Run</button>
+<pre id="output"></pre>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+<script>
+let pyodideReady = false;
+let pyodide;
+
+async function initPyodide() {
+  document.getElementById("output").textContent = "Loading Python... please wait";
+  pyodide = await loadPyodide({
+    stdin: () => prompt("Enter value:")
+  });
+  pyodideReady = true;
+  document.getElementById("output").textContent = "Ready! Paste your code and click Run.";
+}
+
+async function runPython() {
+  if (!pyodideReady) {
+    alert("Python is still loading, please wait...");
+    return;
+  }
+
+  let outputDiv = document.getElementById("output");
+  outputDiv.textContent = "Running...";
+
+  let code = document.getElementById("code").value;
+
+  pyodide.runPython(`
+import sys
+from io import StringIO
+sys.stdout = StringIO()
+sys.stderr = StringIO()
+`);
+
+  try {
+    await pyodide.runPythonAsync(code);
+
+    let stdout = pyodide.runPython("sys.stdout.getvalue()");
+    let stderr = pyodide.runPython("sys.stderr.getvalue()");
+
+    pyodide.runPython("sys.stdout = sys.__stdout__");
+    pyodide.runPython("sys.stderr = sys.__stderr__");
+
+    outputDiv.textContent = stdout + stderr;
+  } catch (err) {
+    pyodide.runPython("sys.stdout = sys.__stdout__");
+    pyodide.runPython("sys.stderr = sys.__stderr__");
+    outputDiv.textContent = "Error: " + err.message;
+  }
+}
+
+initPyodide();
+</script>
+</body>
+</html>

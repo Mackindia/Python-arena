@@ -3,9 +3,6 @@ import re
 from functools import lru_cache
 from typing import Any
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-
 from app.core.generator import _allocate_counts
 from app.core.llm import get_model
 from app.core.worksheet_formatter import build_structured_output, format_worksheet
@@ -13,8 +10,10 @@ from app.core.worksheet_validator import TOTAL_QUESTION_UNITS, build_distributio
 
 
 @lru_cache(maxsize=1)
-def _get_vector_db() -> FAISS:
+def _get_vector_db():
     """Load FAISS index once per process for fast worksheet generation."""
+    from langchain_community.embeddings import HuggingFaceEmbeddings
+    from langchain_community.vectorstores import FAISS
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     return FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
 

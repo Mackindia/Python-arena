@@ -3,8 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from langchain_community.document_loaders import PyPDFLoader
-
 from app.retrieval.indexer import index_book
 from app.educational_ai.registry.store import register_book, upsert_chapters
 from app.educational_ai.utils.chapter_detection import build_chapter_lookup, detect_chapters
@@ -31,6 +29,7 @@ def ingest_pdf(
         raise FileNotFoundError(f"PDF not found: {pdf_path}")
 
     resolved_book_id = book_id or build_book_id(subject, class_level, book_name)
+    from langchain_community.document_loaders import PyPDFLoader
     loader = PyPDFLoader(str(path))
     pages = loader.load()
     if not pages:

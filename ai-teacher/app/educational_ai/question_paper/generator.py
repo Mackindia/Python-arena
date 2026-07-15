@@ -94,7 +94,7 @@ def generate_paper(
     )
     context = context_result["context"]
 
-    model = get_model("pro")
+    model = get_model("fast")
     prompt = build_generate_paper_prompt(
         class_level=class_level,
         subject=subject,
@@ -209,7 +209,7 @@ def generate_with_answers(
     )
     context = context_result["context"]
 
-    model = get_model("pro")
+    model = get_model("fast")
     prompt = build_generate_answers_prompt(
         questions=questions,
         class_level=class_level,

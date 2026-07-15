@@ -228,7 +228,7 @@ Return STRICTLY valid JSON:
 """
 
     try:
-        model = get_model("pro")
+        model = get_model("fast")
         response = model.generate_content(prompt)
         text = response.text or ""
         fenced = re.search(r"```(?:json)?\s*(.*?)\s*```", text, flags=re.DOTALL)

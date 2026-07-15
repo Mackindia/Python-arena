@@ -37,7 +37,7 @@ def extract_questions_from_text(
 
     Returns dict with keys: total_marks, duration, sections, questions.
     """
-    model = get_model("pro")
+    model = get_model("fast")
     prompt = build_extraction_prompt(class_level, subject, raw_text)
 
     issues: list[str] = []

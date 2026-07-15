@@ -43,7 +43,7 @@ def analyze_pattern(
     stat_analysis = _statistical_analysis(solved_questions, paper_info)
 
     # Then use LLM for deeper analysis (repeat candidates, study plan)
-    model = get_model("pro")
+    model = get_model("fast")
     prompt = build_pattern_analysis_prompt(
         paper_info=paper_info,
         solved_questions=solved_questions,
