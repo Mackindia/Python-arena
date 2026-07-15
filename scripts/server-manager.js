@@ -57,10 +57,13 @@ function startServer(id) {
     return { error: `Directory not found: ${config.cwd}` };
   }
 
-  const cmdStr = `"${config.cmd}"`;
-  const proc = spawn(cmdStr, config.args, {
+  // On Windows, npm/cmd need shell:true, but we must not wrap in extra quotes
+  const isWin = process.platform === 'win32';
+  const cmd = (isWin && config.cmd === 'npm') ? 'npm.cmd' : config.cmd;
+
+  const proc = spawn(cmd, config.args, {
     cwd: config.cwd,
-    shell: true,
+    shell: isWin,
     stdio: ["ignore", "pipe", "pipe"],
     env: { ...process.env, FORCE_COLOR: "1" },
   });

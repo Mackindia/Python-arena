@@ -10,6 +10,7 @@ import { checkTeacherCollision as engineCheckTeacherCollision } from '../service
 import { generateTeacherUsageGrid } from '../services/derivedViewEngine';
 import { rawCsvData } from '../data/csvData';
 import { syncService } from '../services/syncService';
+import { timetableLockService } from '../services/timetableLockService';
 
 const parseCSVInitialData = () => {
   try {
@@ -76,6 +77,9 @@ export const TimetableProvider = ({ children }) => {
 
   // Sync service state
   const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'synced' | 'receiving'
+  const [isTimetableLocked, setIsTimetableLocked] = useState(true); // Default: locked (safe)
+  const [lockStatus, setLockStatus] = useState('frozen'); // 'draft' | 'frozen'
+  const [lockInfo, setLockInfo] = useState({ frozenAt: null, frozenBy: null });
   const syncReady = useRef(false);   // only push after initial hydration
   const syncPushTimers = useRef({});
   const isRemoteUpdate = useRef(false);
@@ -234,8 +238,24 @@ export const TimetableProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    // Initialize lock service with new status format
+    timetableLockService.init((status, locked) => {
+      setIsTimetableLocked(locked);
+      setLockStatus(status);
+      setLockInfo(timetableLockService.freezeInfo);
+      
+      if (locked) {
+        console.warn(`[lock] Timetable is now FROZEN (status: ${status}). Edits are disabled.`);
+      } else {
+        console.log(`[lock] Timetable is now DRAFT (status: ${status}). Edits are enabled.`);
+      }
+    });
+
     syncService.init(onRemoteChange);
-    return () => syncService.destroy();
+    return () => {
+      syncService.destroy();
+      timetableLockService.destroy();
+    };
   }, [onRemoteChange]);
 
   // ── Sync Service: push local changes (debounced 800ms per field) ──────────
@@ -529,6 +549,9 @@ export const TimetableProvider = ({ children }) => {
 
   // Update a specific slot in a class timetable
   const updateSlot = (classId, day, period, subject, teacher, assignedTeachers = null, clashes = []) => {
+    // Check if timetable is locked
+    if (!timetableLockService.canEdit()) return;
+
     setTimetables(prev => {
       const classSchedule = [...(prev[classId] || [])];
       
@@ -561,6 +584,9 @@ export const TimetableProvider = ({ children }) => {
 
   // Update teacher for a specific subject in a class
   const updateTeacherForSubject = (classId, subject, newTeacher) => {
+    // Check if timetable is locked
+    if (!timetableLockService.canEdit()) return;
+
     setTimetables(prev => {
       const classSchedule = [...(prev[classId] || [])];
       
@@ -922,6 +948,9 @@ export const TimetableProvider = ({ children }) => {
   };
 
   const addSubstitution = (dateString, period, classId, subject, absentTeacher, substituteTeacher, isManual = false) => {
+    // Check if timetable is locked
+    if (!timetableLockService.canEdit()) return;
+
     setSubstitutions(prev => {
       const dailySubs = prev[dateString] || [];
       const filtered = dailySubs.filter(s => !(s.period === period && s.classId === classId));
@@ -980,6 +1009,38 @@ export const TimetableProvider = ({ children }) => {
   const getTeacherSlotUsage = () => {
     return generateTeacherUsageGrid(timetables, teachers);
   };
+
+  // Freeze the timetable (no password required)
+  const freezeTimetable = useCallback(async () => {
+    const result = await timetableLockService.freeze();
+    if (result.success) {
+      alert('Timetable is now FROZEN. No changes allowed until unfrozen.');
+    } else {
+      alert('Failed to freeze timetable: ' + result.error);
+    }
+    return result;
+  }, []);
+
+  // Unfreeze the timetable (requires password)
+  const unfreezeTimetable = useCallback(async (password) => {
+    if (!password) {
+      alert('Password required to unfreeze timetable.');
+      return { success: false, error: 'Password required' };
+    }
+    
+    const result = await timetableLockService.unfreeze(password);
+    if (result.success) {
+      alert('Timetable is now in DRAFT mode. You can make changes.');
+    } else {
+      alert('Failed to unfreeze timetable: ' + result.error);
+    }
+    return result;
+  }, []);
+
+  // Get lock status text
+  const getLockStatusText = useCallback(() => {
+    return timetableLockService.getStatusText();
+  }, []);
 
   const importBackup = useCallback(async (backupData) => {
     try {
@@ -1054,6 +1115,9 @@ export const TimetableProvider = ({ children }) => {
   }, []);
 
   const forcePushAllToServer = useCallback(async () => {
+    // Check if timetable is locked
+    if (!timetableLockService.canEdit()) return false;
+
     try {
       const payload = {};
       if (Object.keys(timetables).length > 0) payload.timetables = timetables;
@@ -1137,7 +1201,13 @@ export const TimetableProvider = ({ children }) => {
       importBackup,
       forcePushAllToServer,
       syncStatus,
-      teachersSynced
+      teachersSynced,
+      isTimetableLocked,
+      lockStatus,
+      lockInfo,
+      freezeTimetable,
+      unfreezeTimetable,
+      getLockStatusText,
     }}>
       {children}
     </TimetableContext.Provider>

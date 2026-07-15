@@ -2,8 +2,23 @@ import mongoose from "mongoose";
 
 const TimetableLockSchema = new mongoose.Schema({
   key: { type: String, default: "global", unique: true },
-  isLocked: { type: Boolean, default: false },
-  updatedAt: { type: Date, default: Date.now },
+  // Legacy field - kept for backward compatibility
+  isLocked: { type: Boolean, default: true },
+  // NEW: Status-based lock (draft = can edit, frozen = cannot edit)
+  status: { 
+    type: String, 
+    enum: ["draft", "frozen"], 
+    default: "frozen"  // DEFAULT: Frozen (safe - no accidental changes)
+  },
+  // Freeze tracking
+  frozenAt: { type: Date, default: Date.now },
+  frozenBy: { type: String, default: "system" },
+  // Unfreeze tracking
+  unfrozenAt: { type: Date, default: null },
+  unfrozenBy: { type: String, default: null },
+  // Version tracking
+  version: { type: Number, default: 1 },
+  lastModified: { type: Date, default: Date.now },
 });
 
 const TimetableSchema = new mongoose.Schema({

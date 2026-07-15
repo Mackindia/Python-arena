@@ -2,6 +2,7 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { TimetableProvider } from './context/TimetableContext';
 import Navigation from './components/Navigation';
+import FreezeControl from './components/FreezeControl';
 import Mastersheet from './components/Mastersheet';
 import ClassTimetable from './components/ClassTimetable';
 import TeacherView from './components/TeacherView';
@@ -16,6 +17,8 @@ function App() {
       <Router>
         <div className="app-container">
           <Navigation />
+          {/* Freeze/Unfreeze Control - Shows lock status */}
+          <FreezeControl />
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Mastersheet />} />
