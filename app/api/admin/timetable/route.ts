@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "../../../../lib/mongodb";
 import Timetable from "../../../../models/Timetable";
 import User from "../../../../models/User";
+import { isTimetableLocked } from "../../../../lib/timetable-lock";
 
 export async function GET() {
   try {
@@ -15,6 +16,15 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    // FIX 1: Check if timetable is locked
+    const lockStatus = await isTimetableLocked();
+    if (lockStatus.locked) {
+      return NextResponse.json(
+        { success: false, error: lockStatus.error, locked: true },
+        { status: 403 }
+      );
+    }
+
     await connectDB();
     const body = await req.json();
     const { class: className, section, group, day, period_no, subject, teacher_id, teacher_name } = body;

@@ -6,6 +6,7 @@ import Timetable from "../../../../../models/Timetable";
 import User from "../../../../../models/User";
 import { auth } from "@clerk/nextjs/server";
 import { cookies } from "next/headers";
+import { isTimetableLocked } from "../../../../../lib/timetable-lock";
 import {
   buildTimetablePreviewToken,
   normalizeTimetablesObject,
@@ -34,6 +35,15 @@ export async function POST(req: Request) {
   try {
     if (!(await isAdmin())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // FIX 1: Check if timetable is locked
+    const lockStatus = await isTimetableLocked();
+    if (lockStatus.locked) {
+      return NextResponse.json(
+        { error: lockStatus.error, locked: true },
+        { status: 403 }
+      );
     }
 
     await connectDB();

@@ -313,8 +313,33 @@ export async function exportPaperInline(payload: {
   data: any;
   format: "pdf" | "docx" | "txt";
 }) {
-  return requestJSON<any>("/exam/export-inline", {
-    method: "POST",
-    body: JSON.stringify({ data: payload.data, format: payload.format }),
-  }, 120_000);
+  const result = await requestJSON<{ format: string; content: string; filename: string }>(
+    "/exam/export-inline",
+    {
+      method: "POST",
+      body: JSON.stringify({ data: payload.data, format: payload.format }),
+    },
+    120_000,
+  );
+
+  const mimeMap: Record<string, string> = {
+    pdf: "application/pdf",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    txt: "text/plain",
+  };
+
+  const mime = mimeMap[result.format] || "application/octet-stream";
+  const bytes =
+    result.format === "txt"
+      ? new TextEncoder().encode(result.content)
+      : Uint8Array.from(atob(result.content), (c) => c.charCodeAt(0));
+
+  const blob = new Blob([bytes], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = result.filename;
+  a.click();
+  URL.revokeObjectURL(url);
+  return { success: true };
 }

@@ -127,9 +127,29 @@ class SyncService {
       const res = await fetch('/api/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientId: this._clientId, payload }),
+        // FIX 3: Send clientVersion so server can reject stale data
+        body: JSON.stringify({
+          clientId: this._clientId,
+          payload,
+          clientVersion: this._knownVersion,
+        }),
         signal: AbortSignal.timeout(5000),
       });
+
+      if (res.status === 409) {
+        // Server rejected our push as stale — fetch latest instead
+        console.warn('[sync] Server rejected push (stale data). Fetching latest...');
+        this._poll();
+        return;
+      }
+
+      if (res.status === 403) {
+        // Timetable is locked
+        const data = await res.json().catch(() => ({}));
+        console.warn('[sync] Timetable is locked:', data.error || 'Cannot push changes');
+        return;
+      }
+
       if (!res.ok) {
         console.error(`[sync] Push failed with status ${res.status}`);
       }

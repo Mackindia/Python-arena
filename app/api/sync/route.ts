@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../lib/mongodb";
 import SyncStore from "../../../models/SyncStore";
+import { isTimetableLocked } from "../../../lib/timetable-lock";
 
 export async function GET(req: Request) {
   try {
@@ -53,8 +54,18 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     await connectDB();
+
+    // FIX 1: Check if timetable is locked
+    const lockStatus = await isTimetableLocked();
+    if (lockStatus.locked) {
+      return NextResponse.json(
+        { error: lockStatus.error, locked: true },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
-    const { clientId, payload } = body;
+    const { clientId, payload, clientVersion } = body;
 
     if (!payload || typeof payload !== 'object') {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -76,6 +87,20 @@ export async function POST(req: Request) {
         addedTeachers: [],
         deletedTeachers: [],
       });
+    }
+
+    // FIX 3: Version check — reject stale data
+    // If clientVersion is provided and is older than server, reject the push
+    if (clientVersion !== undefined && clientVersion < syncStore.version) {
+      return NextResponse.json(
+        {
+          error: "Stale data rejected",
+          reason: `Client version ${clientVersion} is older than server version ${syncStore.version}`,
+          serverVersion: syncStore.version,
+          rejected: true,
+        },
+        { status: 409 }
+      );
     }
 
     const updatedFields: any = {
