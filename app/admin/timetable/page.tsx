@@ -151,6 +151,10 @@ export default function AdminTimetablePage({ defaultVerificationMode = false }: 
 
   const [isTimetableLocked, setIsTimetableLocked] = useState<boolean>(false);
   const [lockLoading, setLockLoading] = useState<boolean>(false);
+  const [lockFrozenAt, setLockFrozenAt] = useState<string>("");
+  const [lockFrozenBy, setLockFrozenBy] = useState<string>("");
+  const [showUnfreezeModal, setShowUnfreezeModal] = useState<boolean>(false);
+  const [unfreezePassword, setUnfreezePassword] = useState<string>("");
 
   const loadLockStatus = useCallback(async () => {
     try {
@@ -158,6 +162,8 @@ export default function AdminTimetablePage({ defaultVerificationMode = false }: 
       if (res.ok) {
         const data = await res.json();
         setIsTimetableLocked(Boolean(data.isLocked));
+        if (data.frozenAt) setLockFrozenAt(new Date(data.frozenAt).toLocaleString());
+        if (data.frozenBy) setLockFrozenBy(data.frozenBy);
       }
     } catch {
       // Silently ignore lock status load errors
@@ -168,18 +174,49 @@ export default function AdminTimetablePage({ defaultVerificationMode = false }: 
     void loadLockStatus();
   }, [loadLockStatus]);
 
-  const toggleTimetableLock = async () => {
+  const handleFreeze = async () => {
+    if (!window.confirm("FREEZE the timetable? All edits will be blocked until unfrozen with the admin password.")) return;
     try {
       setLockLoading(true);
-      const newLocked = !isTimetableLocked;
       const res = await fetch("/api/admin/timetable/lock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isLocked: newLocked }),
+        body: JSON.stringify({ action: "freeze" }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setIsTimetableLocked(Boolean(data.isLocked));
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsTimetableLocked(true);
+        if (data.frozenAt) setLockFrozenAt(new Date(data.frozenAt).toLocaleString());
+        setLockFrozenBy(data.frozenBy || "admin");
+      }
+    } catch {
+      // Silently ignore
+    } finally {
+      setLockLoading(false);
+    }
+  };
+
+  const handleUnfreeze = async () => {
+    if (!unfreezePassword) {
+      alert("Enter the admin password to unfreeze.");
+      return;
+    }
+    try {
+      setLockLoading(true);
+      const res = await fetch("/api/admin/timetable/lock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "unfreeze", password: unfreezePassword }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsTimetableLocked(false);
+        setLockFrozenAt("");
+        setLockFrozenBy("");
+        setShowUnfreezeModal(false);
+        setUnfreezePassword("");
+      } else {
+        alert(data.error || "Failed to unfreeze. Check the password.");
       }
     } catch {
       // Silently ignore
@@ -371,26 +408,33 @@ export default function AdminTimetablePage({ defaultVerificationMode = false }: 
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={toggleTimetableLock}
-              disabled={lockLoading}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition ${
-                isTimetableLocked
-                  ? "border border-amber-400/20 bg-amber-500/10 text-amber-100 hover:bg-amber-500/20"
-                  : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-              } disabled:opacity-50`}
-              title={isTimetableLocked ? "Timetable is locked. Click to unlock." : "Timetable is unlocked. Click to lock."}
-            >
-              {lockLoading ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : isTimetableLocked ? (
-                <Lock className="h-4 w-4" />
-              ) : (
-                <Unlock className="h-4 w-4" />
-              )}
-              {isTimetableLocked ? "Locked" : "Unlocked"}
-            </button>
+            {isTimetableLocked ? (
+              <div className="flex items-center gap-2 rounded-xl border border-red-400/30 bg-red-500/15 px-4 py-2">
+                <Lock className="h-4 w-4 text-red-400" />
+                <span className="text-sm font-semibold text-red-300">FROZEN</span>
+                {lockFrozenAt && (
+                  <span className="text-xs text-red-400/70 hidden sm:inline">since {lockFrozenAt}</span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => { setShowUnfreezeModal(true); setUnfreezePassword(""); }}
+                  disabled={lockLoading}
+                  className="ml-2 rounded-lg bg-blue-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-blue-500 disabled:opacity-50"
+                >
+                  {lockLoading ? "..." : "Unfreeze"}
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleFreeze}
+                disabled={lockLoading}
+                className="flex items-center gap-2 rounded-xl border border-amber-400/20 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-100 transition hover:bg-amber-500/20 disabled:opacity-50"
+              >
+                {lockLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Unlock className="h-4 w-4" />}
+                {lockLoading ? "Processing..." : "Freeze Timetable"}
+              </button>
+            )}
             <Link
               href={timetableUrl}
               className="flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20"
@@ -767,6 +811,50 @@ export default function AdminTimetablePage({ defaultVerificationMode = false }: 
         </div>
 
       </div>
+
+      {/* Unfreeze Password Modal */}
+      {showUnfreezeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
+            <h3 className="mb-2 text-lg font-bold text-white">Unfreeze Timetable</h3>
+            <p className="mb-4 text-sm text-slate-400">
+              Enter the admin password to unfreeze the timetable and enable editing.
+            </p>
+            {lockFrozenAt && (
+              <p className="mb-3 text-xs text-red-400">
+                Currently frozen{lockFrozenBy ? ` by ${lockFrozenBy}` : ""} since {lockFrozenAt}
+              </p>
+            )}
+            <input
+              type="password"
+              value={unfreezePassword}
+              onChange={(e) => setUnfreezePassword(e.target.value)}
+              placeholder="Enter admin password"
+              className="mb-4 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              onKeyDown={(e) => { if (e.key === "Enter") handleUnfreeze(); }}
+              autoFocus
+            />
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => { setShowUnfreezeModal(false); setUnfreezePassword(""); }}
+                disabled={lockLoading}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300 transition hover:bg-white/10"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleUnfreeze}
+                disabled={lockLoading || !unfreezePassword}
+                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-500 disabled:opacity-50"
+              >
+                {lockLoading ? "Unfreezing..." : "Unfreeze"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

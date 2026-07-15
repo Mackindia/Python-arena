@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import GlassCard from "../../../components/ui/GlassCard";
-import { Save, Calendar, Clock, RefreshCw } from "lucide-react";
+import { Save, Calendar, Clock, RefreshCw, Lock, Unlock } from "lucide-react";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const CLASSES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
@@ -23,6 +23,14 @@ export default function OnlineSchedulerPage() {
   const [showBellModal, setShowBellModal] = useState(false);
   const [bellTimings, setBellTimings] = useState<any[]>([]);
   const [savingBells, setSavingBells] = useState(false);
+
+  // Freeze State
+  const [isTimetableLocked, setIsTimetableLocked] = useState<boolean>(false);
+  const [lockFrozenAt, setLockFrozenAt] = useState<string>("");
+  const [lockFrozenBy, setLockFrozenBy] = useState<string>("");
+  const [lockLoading, setLockLoading] = useState<boolean>(false);
+  const [showUnfreezeModal, setShowUnfreezeModal] = useState<boolean>(false);
+  const [unfreezePassword, setUnfreezePassword] = useState<string>("");
 
   // Form State
   const [selectedClass, setSelectedClass] = useState("6");
@@ -94,6 +102,55 @@ export default function OnlineSchedulerPage() {
       fetchSchedule();
     }
   }, [adminChecked, selectedClass, selectedSection, selectedDay]);
+
+  const loadLockStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/timetable/lock", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setIsTimetableLocked(Boolean(data.isLocked));
+        if (data.frozenAt) setLockFrozenAt(new Date(data.frozenAt).toLocaleString());
+        if (data.frozenBy) setLockFrozenBy(data.frozenBy);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => { void loadLockStatus(); }, [loadLockStatus]);
+
+  const handleFreeze = async () => {
+    if (!window.confirm("FREEZE the timetable? All edits will be blocked until unfrozen with the admin password.")) return;
+    try {
+      setLockLoading(true);
+      const res = await fetch("/api/admin/timetable/lock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "freeze" }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsTimetableLocked(true);
+        if (data.frozenAt) setLockFrozenAt(new Date(data.frozenAt).toLocaleString());
+        setLockFrozenBy(data.frozenBy || "admin");
+      }
+    } catch {} finally { setLockLoading(false); }
+  };
+
+  const handleUnfreeze = async () => {
+    if (!unfreezePassword) { alert("Enter the admin password to unfreeze."); return; }
+    try {
+      setLockLoading(true);
+      const res = await fetch("/api/admin/timetable/lock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "unfreeze", password: unfreezePassword }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsTimetableLocked(false); setLockFrozenAt(""); setLockFrozenBy("");
+        setShowUnfreezeModal(false); setUnfreezePassword("");
+      } else { alert(data.error || "Failed to unfreeze. Check the password."); }
+    } catch {} finally { setLockLoading(false); }
+  };
 
   const fetchTeachers = async () => {
     try {
@@ -426,6 +483,31 @@ export default function OnlineSchedulerPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {isTimetableLocked ? (
+              <div className="flex items-center gap-2 rounded-xl border border-red-400/30 bg-red-500/15 px-4 py-2">
+                <Lock className="h-4 w-4 text-red-400" />
+                <span className="text-sm font-semibold text-red-300">FROZEN</span>
+                {lockFrozenAt && (
+                  <span className="text-xs text-red-400/70 hidden sm:inline">since {lockFrozenAt}</span>
+                )}
+                <button
+                  onClick={() => { setShowUnfreezeModal(true); setUnfreezePassword(""); }}
+                  disabled={lockLoading}
+                  className="ml-2 rounded-lg bg-blue-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-blue-500 disabled:opacity-50"
+                >
+                  {lockLoading ? "..." : "Unfreeze"}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleFreeze}
+                disabled={lockLoading}
+                className="flex items-center gap-2 rounded-xl border border-amber-400/20 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-100 transition hover:bg-amber-500/20 disabled:opacity-50"
+              >
+                {lockLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Unlock className="h-4 w-4" />}
+                {lockLoading ? "..." : "Freeze Timetable"}
+              </button>
+            )}
             <button
               onClick={() => setShowSettingsModal(true)}
               className="flex items-center gap-2 rounded-xl border border-indigo-500/50 bg-indigo-500/10 px-4 py-3 text-sm font-bold text-indigo-300 transition hover:bg-indigo-500 hover:text-white"
@@ -442,7 +524,7 @@ export default function OnlineSchedulerPage() {
             </button>
             <button
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || isTimetableLocked}
               className="flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)] disabled:opacity-50"
             >
               {saving ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
@@ -530,6 +612,14 @@ export default function OnlineSchedulerPage() {
             ) : null}
           </div>
         ) : null}
+
+        {isTimetableLocked && (
+          <div className="mb-6 rounded-xl border border-red-400/30 bg-red-500/10 p-4 text-center">
+            <p className="text-sm font-semibold text-red-300">
+              Timetable is FROZEN. All edits are blocked. Unfreeze to make changes.
+            </p>
+          </div>
+        )}
 
         <GlassCard className="mb-6 border border-cyan-300/30 bg-[#0b1322]/90 p-6">
           <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -780,6 +870,48 @@ export default function OnlineSchedulerPage() {
                 className="flex items-center gap-2 rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-cyan-500 disabled:opacity-50"
               >
                 {savingBells ? "SAVING..." : "SAVE BELL TIMINGS"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Unfreeze Password Modal */}
+      {showUnfreezeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl">
+            <h3 className="mb-2 text-lg font-bold text-white">Unfreeze Timetable</h3>
+            <p className="mb-4 text-sm text-slate-400">
+              Enter the admin password to unfreeze and enable editing.
+            </p>
+            {lockFrozenAt && (
+              <p className="mb-3 text-xs text-red-400">
+                Frozen{lockFrozenBy ? ` by ${lockFrozenBy}` : ""} since {lockFrozenAt}
+              </p>
+            )}
+            <input
+              type="password"
+              value={unfreezePassword}
+              onChange={(e) => setUnfreezePassword(e.target.value)}
+              placeholder="Enter admin password"
+              className="mb-4 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              onKeyDown={(e) => { if (e.key === "Enter") handleUnfreeze(); }}
+              autoFocus
+            />
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => { setShowUnfreezeModal(false); setUnfreezePassword(""); }}
+                disabled={lockLoading}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300 transition hover:bg-white/10"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUnfreeze}
+                disabled={lockLoading || !unfreezePassword}
+                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-500 disabled:opacity-50"
+              >
+                {lockLoading ? "Unfreezing..." : "Unfreeze"}
               </button>
             </div>
           </div>
