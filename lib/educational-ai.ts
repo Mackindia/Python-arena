@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE = process.env.NEXT_PUBLIC_EDUCATIONAL_AI_API_URL || "http://localhost:8000";
+const DEFAULT_API_BASE = "/api/ai";
 
 async function requestJSON<T>(path: string, options: RequestInit = {}, timeoutMs = 30_000): Promise<T> {
   const controller = new AbortController();

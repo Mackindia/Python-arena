@@ -9,15 +9,33 @@ import CommandCenter from "@/src/sections/CommandCenter";
 
 export default function Home() {
   const { user } = useUser();
-  const role = user?.publicMetadata?.role as string | undefined;
-  const isAdmin = role === "admin" || role === "super_admin";
+  const clerkRole = user?.publicMetadata?.role as string | undefined;
+  const [dbRole, setDbRole] = useState<string | undefined>(undefined);
   const [isLocalhost, setIsLocalhost] = useState(false);
+
+  const role = clerkRole || dbRole;
+  const isAdmin = role === "admin" || role === "super_admin";
 
   useEffect(() => {
     setIsLocalhost(
       window.location.hostname === "localhost" ||
       window.location.hostname === "127.0.0.1"
     );
+  }, []);
+
+  useEffect(() => {
+    async function fetchDbUser() {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user?.role) {
+            setDbRole(data.user.role);
+          }
+        }
+      } catch {}
+    }
+    fetchDbUser();
   }, []);
 
   return (

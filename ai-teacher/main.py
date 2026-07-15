@@ -2,6 +2,11 @@ from fastapi.responses import HTMLResponse
 from fastapi import FastAPI, HTTPException, UploadFile, File, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from app.core.llm import get_model, get_token_budget, get_registry
 from app.core.pdf_processor import save_pdf, extract_text
 from app.core.generator import generate_notes, generate_mcqs
@@ -21,9 +26,18 @@ app = FastAPI(title="AI Teacher Assistant", version="1.0")
 app.include_router(educational_router)
 app.include_router(exam_router)
 
+# CORS: allow localhost (dev) + production URL from env var
+CORS_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000",
+]
+if os.getenv("NEXTJS_URL"):
+    CORS_ORIGINS.append(os.getenv("NEXTJS_URL"))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "*"],
+    allow_origins=CORS_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -324,3 +338,9 @@ def question_bank_endpoint(request: QuestionBankRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Question bank generation failed: {str(e)}")
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

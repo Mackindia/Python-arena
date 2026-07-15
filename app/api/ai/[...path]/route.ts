@@ -4,6 +4,11 @@ import { requireAdminApi } from "@/lib/admin-api";
 const AI_BACKEND_URL = process.env.AI_BACKEND_URL || "http://127.0.0.1:8000";
 
 async function proxyRequest(request: NextRequest, { params }: { params: Promise<{ path: string[] }> | { path: string[] } }) {
+  const auth = await requireAdminApi();
+  if (!auth.ok) {
+    return auth.response;
+  }
+
   try {
     // In Next.js 15, params is a Promise. We support both to be safe.
     const resolvedParams = await Promise.resolve(params);

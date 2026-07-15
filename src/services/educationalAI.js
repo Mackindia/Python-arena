@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_EDUCATIONAL_AI_API_URL || "http://localhost:8000";
+const API_BASE = "/api/ai";
 
 async function parseResponse(response) {
   const text = await response.text();

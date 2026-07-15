@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdminApi } from "@/lib/admin-api";
 
 // Helper for fetch retries with exponential backoff
 async function fetchWithRetry(
@@ -29,6 +30,11 @@ async function fetchWithRetry(
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdminApi();
+  if (!auth.ok) {
+    return auth.response;
+  }
+
   try {
     const { text, type } = await req.json();
 
