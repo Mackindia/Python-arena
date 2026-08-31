@@ -79,6 +79,7 @@ export async function POST(req: Request) {
       }
 
       thread.messages.push({
+        senderId: authUser.id,
         sender: authUser.name,
         senderRole: authUser.role,
         text: text.trim(),
@@ -103,6 +104,7 @@ export async function POST(req: Request) {
       subject: subject || "General",
       messages: [
         {
+          senderId: authUser.id,
           sender: authUser.name,
           senderRole: authUser.role,
           text: text.trim(),
@@ -130,6 +132,7 @@ export async function GET(req: Request) {
     await connectDB();
     const { searchParams } = new URL(req.url);
     const threadId = searchParams.get("threadId");
+    const since = searchParams.get("since");
 
     if (threadId) {
       const thread = await Message.findById(threadId).lean();
@@ -143,24 +146,73 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
       }
 
-      if (hasAdminAccess) {
-        await Message.findByIdAndUpdate(threadId, { unreadByAdmin: false });
-      } else if (isOwner) {
-        await Message.findByIdAndUpdate(threadId, { unreadByUser: false });
-      }
+      // Mark unread messages as read by current user
+      const now = new Date();
+      await Message.updateOne(
+        { _id: threadId },
+        {
+          $set: {
+            unreadByAdmin: hasAdminAccess ? false : thread.unreadByAdmin,
+            unreadByUser: isOwner ? false : thread.unreadByUser,
+          },
+          $addToSet: {
+            "messages.$[elem].readBy": { userId: authUser.id, readAt: now },
+          },
+        },
+        {
+          arrayFilters: [{ "elem.readBy.userId": { $ne: authUser.id } }],
+        }
+      );
 
-      return NextResponse.json({ thread });
+      // Return updated thread
+      const updatedThread = await Message.findById(threadId).lean();
+      return NextResponse.json({ thread: updatedThread });
     }
 
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "20");
+    const skip = (page - 1) * limit;
+
+    let filter: any = {};
     if (isAdmin(authUser.role)) {
-      const threads = await Message.find().sort({ updatedAt: -1 }).lean();
-      return NextResponse.json({ threads, isAdmin: true });
+      if (since) {
+        filter.updatedAt = { $gt: new Date(since) };
+      }
+    } else {
+      filter.userId = authUser.id;
+      if (since) {
+        filter.updatedAt = { $gt: new Date(since) };
+      }
     }
 
-    const threads = await Message.find({ userId: authUser.id })
-      .sort({ updatedAt: -1 })
-      .lean();
-    return NextResponse.json({ threads, isAdmin: false });
+    const [threads, total] = await Promise.all([
+      Message.find(filter).sort({ updatedAt: -1 }).skip(since ? 0 : skip).limit(since ? 100 : limit).lean(),
+      Message.countDocuments(isAdmin(authUser.role) ? {} : { userId: authUser.id }),
+    ]);
+
+    // Add unread message count for each thread
+    const threadsWithUnread = threads.map((thread) => {
+      const unreadCount = thread.messages.filter((msg: any) => {
+        const isOwnMessage = msg.senderId === authUser.id;
+        if (isOwnMessage) return false;
+        const hasRead = msg.readBy?.some((r: any) => r.userId === authUser.id);
+        return !hasRead;
+      }).length;
+      return { ...thread, unreadCount };
+    });
+
+    return NextResponse.json({
+      threads: threadsWithUnread,
+      isAdmin: isAdmin(authUser.role),
+      ...(since ? {} : {
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit),
+        },
+      }),
+    });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

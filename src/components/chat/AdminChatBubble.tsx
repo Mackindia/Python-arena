@@ -11,12 +11,35 @@ import {
   Wifi,
   WifiOff,
   Bell,
+  Check,
+  CheckCheck,
 } from "lucide-react";
 
+type ReadBy = {
+  userId: string;
+  readAt: string;
+};
+
+function ReadReceipt({ readBy, isSenderAdmin }: { readBy: ReadBy[]; isSenderAdmin: boolean }) {
+  if (!isSenderAdmin) return null;
+  const readCount = readBy?.length || 0;
+  return (
+    <span className="inline-flex items-center ml-1">
+      {readCount > 0 ? (
+        <CheckCheck className="h-3.5 w-3.5 text-blue-300" />
+      ) : (
+        <Check className="h-3.5 w-3.5 text-white/50" />
+      )}
+    </span>
+  );
+}
+
 type Message = {
+  senderId: string;
   sender: string;
   senderRole: string;
   text: string;
+  readBy: ReadBy[];
   createdAt: string;
 };
 
@@ -29,6 +52,8 @@ type Thread = {
   messages: Message[];
   status: string;
   unreadByAdmin: boolean;
+  unreadByUser: boolean;
+  unreadCount: number;
   updatedAt: string;
 };
 
@@ -54,6 +79,11 @@ export default function AdminChatBubble() {
   const [open, setOpen] = useState(false);
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeThread, setActiveThread] = useState<Thread | null>(null);
+  const activeThreadRef = useRef<string | null>(null);
+  const setActiveThreadWrapper = (thread: Thread | null) => {
+    activeThreadRef.current = thread?._id || null;
+    setActiveThread(thread);
+  };
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
@@ -67,31 +97,50 @@ export default function AdminChatBubble() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const prevUnreadRef = useRef(0);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
+  const lastCheckedRef = useRef<string>(new Date().toISOString());
 
-  const fetchThreads = useCallback(async () => {
+  const fetchThreads = useCallback(async (incremental = false) => {
     try {
-      const res = await fetch("/api/messages");
+      const url = incremental
+        ? `/api/messages?since=${lastCheckedRef.current}`
+        : "/api/messages";
+      const res = await fetch(url);
       if (!res.ok) return;
       const data = await res.json();
       if (data.threads) {
-        const newUnread = data.threads.filter((t: Thread) => t.unreadByAdmin).length;
-        setThreads(data.threads);
-
-        if (newUnread > prevUnreadRef.current && !open) {
-          playNotificationSound();
-          setPulse(true);
-          setTimeout(() => setPulse(false), 1500);
+        if (incremental && data.threads.length > 0) {
+          setThreads((prev) => {
+            const map = new Map(prev.map((t) => [t._id, t]));
+            for (const t of data.threads) {
+              map.set(t._id, t);
+            }
+            return Array.from(map.values()).sort(
+              (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+            );
+          });
+        } else if (!incremental) {
+          setThreads(data.threads);
         }
-        prevUnreadRef.current = newUnread;
-        setUnreadCount(newUnread);
 
-        if (activeThread) {
-          const updated = data.threads.find((t: Thread) => t._id === activeThread._id);
-          if (updated) setActiveThread(updated);
+        if (!incremental) {
+          const newUnread = data.threads.filter((t: Thread) => t.unreadByAdmin).length;
+          if (newUnread > prevUnreadRef.current && !open) {
+            playNotificationSound();
+            setPulse(true);
+            setTimeout(() => setPulse(false), 1500);
+          }
+          prevUnreadRef.current = newUnread;
+          setUnreadCount(newUnread);
         }
+
+        if (activeThreadRef.current) {
+          const updated = data.threads.find((t: Thread) => t._id === activeThreadRef.current);
+          if (updated) setActiveThreadWrapper(updated);
+        }
+        lastCheckedRef.current = new Date().toISOString();
       }
     } catch {}
-  }, [activeThread, open]);
+  }, [open]);
 
   const sendHeartbeat = useCallback(async () => {
     try {
@@ -100,13 +149,13 @@ export default function AdminChatBubble() {
   }, []);
 
   const checkUserOnline = useCallback(async () => {
-    if (!activeThread) return;
+    if (!activeThreadRef.current) return;
     try {
-      const res = await fetch(`/api/messages/online?threadId=${activeThread._id}`);
+      const res = await fetch(`/api/messages/online?threadId=${activeThreadRef.current}`);
       const data = await res.json();
       setUserOnline(data.online || false);
     } catch {}
-  }, [activeThread]);
+  }, []);
 
   useEffect(() => {
     fetchThreads();
@@ -115,7 +164,7 @@ export default function AdminChatBubble() {
 
   useEffect(() => {
     pollRef.current = setInterval(() => {
-      fetchThreads();
+      fetchThreads(true);
       sendHeartbeat();
       checkUserOnline();
     }, 5000);
@@ -123,10 +172,6 @@ export default function AdminChatBubble() {
       if (pollRef.current) clearInterval(pollRef.current);
     };
   }, [fetchThreads, sendHeartbeat, checkUserOnline]);
-
-  useEffect(() => {
-    if (activeThread) checkUserOnline();
-  }, [activeThread, checkUserOnline]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -149,7 +194,7 @@ export default function AdminChatBubble() {
         return;
       }
       if (data.thread) {
-        setActiveThread(data.thread);
+        setActiveThreadWrapper(data.thread);
         setThreads((prev) =>
           prev.map((t) => (t._id === data.thread._id ? data.thread : t))
         );
@@ -198,9 +243,8 @@ export default function AdminChatBubble() {
     return (
       thread.unreadByAdmin &&
       thread.messages.length > 0 &&
-      (thread.messages[thread.messages.length - 1].senderRole === "student" ||
-        thread.messages[thread.messages.length - 1].senderRole !== "super_admin" &&
-        thread.messages[thread.messages.length - 1].senderRole !== "admin")
+      thread.messages[thread.messages.length - 1].senderRole !== "super_admin" &&
+      thread.messages[thread.messages.length - 1].senderRole !== "admin"
     );
   }
 
@@ -212,7 +256,7 @@ export default function AdminChatBubble() {
           setOpen(!open);
           if (!open) {
             setView("list");
-            setActiveThread(null);
+            setActiveThreadWrapper(null);
           }
         }}
         className={`fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 hover:shadow-emerald-500/50 ${
@@ -236,7 +280,7 @@ export default function AdminChatBubble() {
           {/* Header */}
           <div className="flex items-center gap-3 bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3">
             {view === "chat" ? (
-              <button onClick={() => { setView("list"); setActiveThread(null); }} className="text-white">
+              <button onClick={() => { setView("list"); setActiveThreadWrapper(null); }} className="text-white">
                 <ArrowLeft className="h-5 w-5" />
               </button>
             ) : null}
@@ -275,7 +319,7 @@ export default function AdminChatBubble() {
                       <button
                         key={thread._id}
                         onClick={() => {
-                          setActiveThread(thread);
+                          setActiveThreadWrapper(thread);
                           setView("chat");
                         }}
                         className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-white/5"
@@ -294,9 +338,16 @@ export default function AdminChatBubble() {
                             }`}>
                               {thread.userName}
                             </p>
-                            <span className="ml-2 shrink-0 text-[10px] text-slate-500">
-                              {formatTime(thread.updatedAt)}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              {thread.unreadCount > 0 && (
+                                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-500 px-1.5 text-[10px] font-bold text-white">
+                                  {thread.unreadCount > 99 ? "99+" : thread.unreadCount}
+                                </span>
+                              )}
+                              <span className="shrink-0 text-[10px] text-slate-500">
+                                {formatTime(thread.updatedAt)}
+                              </span>
+                            </div>
                           </div>
                           <p className="text-xs text-slate-500 mt-0.5">{thread.subject}</p>
                           <p className="mt-0.5 truncate text-xs text-slate-400">
@@ -329,9 +380,12 @@ export default function AdminChatBubble() {
                             {msg.sender}
                           </p>
                           <p className="text-sm leading-relaxed">{msg.text}</p>
-                          <p className={`mt-1 text-[10px] ${isSenderAdmin ? "text-white/50" : "text-slate-500"}`}>
-                            {formatTime(msg.createdAt)}
-                          </p>
+                          <div className={`flex items-center justify-end gap-0.5 mt-1 ${isSenderAdmin ? "" : ""}`}>
+                            <p className={`text-[10px] ${isSenderAdmin ? "text-white/50" : "text-slate-500"}`}>
+                              {formatTime(msg.createdAt)}
+                            </p>
+                            <ReadReceipt readBy={msg.readBy} isSenderAdmin={isSenderAdmin} />
+                          </div>
                         </div>
                       </div>
                     );

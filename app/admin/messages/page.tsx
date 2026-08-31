@@ -12,12 +12,35 @@ import {
   Wifi,
   WifiOff,
   RefreshCw,
+  Check,
+  CheckCheck,
 } from "lucide-react";
 
+type ReadBy = {
+  userId: string;
+  readAt: string;
+};
+
+function ReadReceipt({ readBy, isAdmin }: { readBy: ReadBy[]; isAdmin: boolean }) {
+  if (!isAdmin) return null;
+  const readCount = readBy?.length || 0;
+  return (
+    <span className="inline-flex items-center ml-1">
+      {readCount > 0 ? (
+        <CheckCheck className="h-3.5 w-3.5 text-blue-300" />
+      ) : (
+        <Check className="h-3.5 w-3.5 text-white/50" />
+      )}
+    </span>
+  );
+}
+
 type Message = {
+  senderId: string;
   sender: string;
   senderRole: string;
   text: string;
+  readBy: ReadBy[];
   createdAt: string;
 };
 
@@ -30,12 +53,19 @@ type Thread = {
   messages: Message[];
   status: string;
   unreadByAdmin: boolean;
+  unreadByUser: boolean;
+  unreadCount: number;
   updatedAt: string;
 };
 
 export default function AdminMessagesPage() {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeThread, setActiveThread] = useState<Thread | null>(null);
+  const activeThreadRef = useRef<string | null>(null);
+  const setActiveThreadWrapper = (thread: Thread | null) => {
+    activeThreadRef.current = thread?._id || null;
+    setActiveThread(thread);
+  };
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -44,22 +74,38 @@ export default function AdminMessagesPage() {
   const [userOnline, setUserOnline] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
+  const lastCheckedRef = useRef<string>(new Date().toISOString());
 
-  const fetchThreads = useCallback(async () => {
+  const fetchThreads = useCallback(async (incremental = false) => {
     try {
-      const res = await fetch("/api/messages");
+      const url = incremental
+        ? `/api/messages?since=${lastCheckedRef.current}`
+        : "/api/messages";
+      const res = await fetch(url);
       const data = await res.json();
       if (data.threads) {
-        setThreads(data.threads);
-        // Update active thread
-        if (activeThread) {
-          const updated = data.threads.find((t: Thread) => t._id === activeThread._id);
-          if (updated) setActiveThread(updated);
+        if (incremental && data.threads.length > 0) {
+          setThreads((prev) => {
+            const map = new Map(prev.map((t) => [t._id, t]));
+            for (const t of data.threads) {
+              map.set(t._id, t);
+            }
+            return Array.from(map.values()).sort(
+              (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+            );
+          });
+        } else if (!incremental) {
+          setThreads(data.threads);
         }
+        if (activeThreadRef.current) {
+          const updated = data.threads.find((t: Thread) => t._id === activeThreadRef.current);
+          if (updated) setActiveThreadWrapper(updated);
+        }
+        lastCheckedRef.current = new Date().toISOString();
       }
     } catch {}
     setLoading(false);
-  }, [activeThread]);
+  }, []);
 
   // Heartbeat
   const sendHeartbeat = useCallback(async () => {
@@ -70,13 +116,13 @@ export default function AdminMessagesPage() {
 
   // Check user online
   const checkUserOnline = useCallback(async () => {
-    if (!activeThread) return;
+    if (!activeThreadRef.current) return;
     try {
-      const res = await fetch(`/api/messages/online?threadId=${activeThread._id}`);
+      const res = await fetch(`/api/messages/online?threadId=${activeThreadRef.current}`);
       const data = await res.json();
       setUserOnline(data.online || false);
     } catch {}
-  }, [activeThread]);
+  }, []);
 
   // Initial fetch
   useEffect(() => {
@@ -87,7 +133,7 @@ export default function AdminMessagesPage() {
   // Polling every 5 seconds
   useEffect(() => {
     pollRef.current = setInterval(() => {
-      fetchThreads();
+      fetchThreads(true);
       sendHeartbeat();
       checkUserOnline();
     }, 5000);
@@ -95,11 +141,6 @@ export default function AdminMessagesPage() {
       if (pollRef.current) clearInterval(pollRef.current);
     };
   }, [fetchThreads, sendHeartbeat, checkUserOnline]);
-
-  // Check online when thread changes
-  useEffect(() => {
-    if (activeThread) checkUserOnline();
-  }, [activeThread, checkUserOnline]);
 
   // Scroll to bottom
   useEffect(() => {
@@ -130,7 +171,7 @@ export default function AdminMessagesPage() {
       }
 
       if (data.thread) {
-        setActiveThread(data.thread);
+        setActiveThreadWrapper(data.thread);
         setThreads((prev) =>
           prev.map((t) => (t._id === data.thread._id ? data.thread : t))
         );
@@ -186,8 +227,8 @@ export default function AdminMessagesPage() {
               >
                 <RefreshCw className="h-4 w-4" />
               </button>
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10">
-                <MessageSquare className="h-4 w-4 text-indigo-400" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
+                <MessageSquare className="h-4 w-4 text-emerald-400" />
               </div>
             </div>
           </div>
@@ -198,7 +239,7 @@ export default function AdminMessagesPage() {
               placeholder="Search messages..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-sm text-white placeholder-slate-500 outline-none focus:border-indigo-400/50"
+              className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-sm text-white placeholder-slate-500 outline-none focus:border-emerald-400/50"
             />
           </div>
         </div>
@@ -206,7 +247,7 @@ export default function AdminMessagesPage() {
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-10">
-              <Loader2 className="h-6 w-6 animate-spin text-indigo-400" />
+              <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 text-center">
@@ -218,7 +259,7 @@ export default function AdminMessagesPage() {
               <button
                 key={thread._id}
                 onClick={() => {
-                  setActiveThread(thread);
+                  setActiveThreadWrapper(thread);
                   setThreads((prev) =>
                     prev.map((t) =>
                       t._id === thread._id ? { ...t, unreadByAdmin: false } : t
@@ -231,7 +272,7 @@ export default function AdminMessagesPage() {
               >
                 <div className="mt-0.5">
                   {thread.unreadByAdmin ? (
-                    <CircleDot className="h-4 w-4 text-indigo-400" />
+                    <CircleDot className="h-4 w-4 text-emerald-400" />
                   ) : (
                     <div className="h-4 w-4 rounded-full border-2 border-slate-600" />
                   )}
@@ -247,9 +288,16 @@ export default function AdminMessagesPage() {
                     >
                       {thread.subject}
                     </p>
-                    <span className="ml-2 shrink-0 text-[10px] text-slate-500">
-                      {formatTime(thread.updatedAt)}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {thread.unreadCount > 0 && (
+                        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-500 px-1.5 text-[10px] font-bold text-white">
+                          {thread.unreadCount > 99 ? "99+" : thread.unreadCount}
+                        </span>
+                      )}
+                      <span className="shrink-0 text-[10px] text-slate-500">
+                        {formatTime(thread.updatedAt)}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <User className="h-3 w-3 text-slate-500" />
@@ -288,12 +336,12 @@ export default function AdminMessagesPage() {
             {/* Thread Header */}
             <div className="shrink-0 flex items-center gap-3 border-b border-white/10 bg-black/20 px-4 py-3">
               <button
-                onClick={() => setActiveThread(null)}
+                onClick={() => setActiveThreadWrapper(null)}
                 className="lg:hidden text-slate-400 hover:text-white"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/10 text-sm font-bold text-indigo-400">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-sm font-bold text-emerald-400">
                 {activeThread.userName?.[0] || "U"}
               </div>
               <div className="flex-1">
@@ -342,7 +390,7 @@ export default function AdminMessagesPage() {
                     <div
                       className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                         isAdmin
-                          ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white"
+                          ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white"
                           : "bg-white/10 text-slate-200 border border-white/10"
                       }`}
                     >
@@ -350,13 +398,16 @@ export default function AdminMessagesPage() {
                         {msg.sender}
                       </p>
                       <p className="text-sm leading-relaxed">{msg.text}</p>
-                      <p
-                        className={`mt-1 text-[10px] ${
-                          isAdmin ? "text-white/50" : "text-slate-500"
-                        }`}
-                      >
-                        {formatTime(msg.createdAt)}
-                      </p>
+                      <div className={`flex items-center justify-end gap-0.5 mt-1`}>
+                        <p
+                          className={`text-[10px] ${
+                            isAdmin ? "text-white/50" : "text-slate-500"
+                          }`}
+                        >
+                          {formatTime(msg.createdAt)}
+                        </p>
+                        <ReadReceipt readBy={msg.readBy} isAdmin={isAdmin} />
+                      </div>
                     </div>
                   </div>
                 );
@@ -382,12 +433,12 @@ export default function AdminMessagesPage() {
                     }
                   }}
                   rows={1}
-                  className="flex-1 resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-indigo-400/50"
+                  className="flex-1 resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-emerald-400/50"
                 />
                 <button
                   onClick={handleReply}
                   disabled={!reply.trim() || sending}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-blue-500 text-white transition hover:shadow-lg hover:shadow-indigo-500/25 disabled:opacity-50"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white transition hover:shadow-lg hover:shadow-emerald-500/25 disabled:opacity-50"
                 >
                   {sending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

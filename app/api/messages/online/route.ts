@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Message from "@/src/models/Message";
+import OnlinePresence from "@/src/models/OnlinePresence";
 import { auth } from "@clerk/nextjs/server";
 import { cookies } from "next/headers";
 
@@ -8,16 +9,6 @@ const ADMIN_ROLES = ["super_admin", "admin"];
 
 function isAdmin(role: string) {
   return ADMIN_ROLES.includes(role);
-}
-
-// Track online users in memory (resets on server restart)
-const onlineUsers = new Map<string, { lastSeen: number; name: string; role: string }>();
-
-function cleanStale() {
-  const now = Date.now();
-  for (const [id, data] of onlineUsers) {
-    if (now - data.lastSeen > 30000) onlineUsers.delete(id);
-  }
 }
 
 async function getAuthUser() {
@@ -61,12 +52,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    cleanStale();
-    onlineUsers.set(authUser.id, {
-      lastSeen: Date.now(),
-      name: authUser.name,
-      role: authUser.role,
-    });
+    await connectDB();
+    await OnlinePresence.findOneAndUpdate(
+      { userId: authUser.id },
+      {
+        userId: authUser.id,
+        name: authUser.name,
+        role: authUser.role,
+        lastSeen: new Date(),
+      },
+      { upsert: true }
+    );
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
@@ -82,47 +78,57 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    cleanStale();
+    await connectDB();
 
     const { searchParams } = new URL(req.url);
     const threadId = searchParams.get("threadId");
 
     // If threadId provided, check if the OTHER person in the thread is online
     if (threadId) {
-      await connectDB();
       const thread = await Message.findById(threadId).lean();
       if (!thread) {
         return NextResponse.json({ online: false });
       }
 
-      // For admin: check if the user who started the thread is online
-      // For regular user: check if any admin is online
       let targetUserId: string | null = null;
       if (isAdmin(authUser.role)) {
         targetUserId = thread.userId;
       } else {
-        // Find any admin's id
-        for (const [id, data] of onlineUsers) {
-          if (isAdmin(data.role)) {
-            targetUserId = id;
-            break;
-          }
+        const adminOnline = await OnlinePresence.findOne({
+          role: { $in: ADMIN_ROLES },
+          lastSeen: { $gt: new Date(Date.now() - 30000) },
+        }).lean();
+        if (adminOnline) {
+          targetUserId = adminOnline.userId;
         }
       }
 
-      const isOnline = targetUserId ? onlineUsers.has(targetUserId) : false;
-      return NextResponse.json({ online: isOnline });
+      if (!targetUserId) {
+        return NextResponse.json({ online: false });
+      }
+
+      const presence = await OnlinePresence.findOne({
+        userId: targetUserId,
+        lastSeen: { $gt: new Date(Date.now() - 30000) },
+      }).lean();
+
+      return NextResponse.json({ online: !!presence });
     }
 
-    // General online status - who is online
-    const onlineList = Array.from(onlineUsers.entries()).map(([id, data]) => ({
-      id,
-      name: data.name,
-      role: data.role,
-      lastSeen: data.lastSeen,
+    // General online status
+    const thirtySecsAgo = new Date(Date.now() - 30000);
+    const onlineUsers = await OnlinePresence.find({
+      lastSeen: { $gt: thirtySecsAgo },
+    }).lean();
+
+    const users = onlineUsers.map((u) => ({
+      id: u.userId,
+      name: u.name,
+      role: u.role,
+      lastSeen: u.lastSeen.getTime(),
     }));
 
-    return NextResponse.json({ online: true, users: onlineList });
+    return NextResponse.json({ online: true, users });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

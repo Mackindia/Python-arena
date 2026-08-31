@@ -1,21 +1,47 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { MessageCircle, X, Send, ArrowLeft, Loader2, CircleDot, Wifi, WifiOff } from "lucide-react";
+import { MessageCircle, X, Send, ArrowLeft, Loader2, CircleDot, Wifi, WifiOff, Check, CheckCheck } from "lucide-react";
+
+type ReadBy = {
+  userId: string;
+  readAt: string;
+};
 
 type Message = {
+  senderId: string;
   sender: string;
   senderRole: string;
   text: string;
+  readBy: ReadBy[];
   createdAt: string;
 };
 
+function ReadReceipt({ readBy, isUser }: { readBy: ReadBy[]; isUser: boolean }) {
+  if (!isUser) return null;
+  const readCount = readBy?.length || 0;
+  return (
+    <span className="inline-flex items-center ml-1">
+      {readCount > 0 ? (
+        <CheckCheck className="h-3.5 w-3.5 text-blue-300" />
+      ) : (
+        <Check className="h-3.5 w-3.5 text-white/50" />
+      )}
+    </span>
+  );
+}
+
 type Thread = {
   _id: string;
+  userId: string;
+  userName: string;
+  userRole: string;
   subject: string;
   messages: Message[];
   status: string;
+  unreadByAdmin: boolean;
   unreadByUser: boolean;
+  unreadCount: number;
   updatedAt: string;
 };
 
@@ -23,6 +49,11 @@ export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [threads, setThreads] = useState<Thread[]>([]);
   const [activeThread, setActiveThread] = useState<Thread | null>(null);
+  const activeThreadRef = useRef<string | null>(null);
+  const setActiveThreadWrapper = (thread: Thread | null) => {
+    activeThreadRef.current = thread?._id || null;
+    setActiveThread(thread);
+  };
   const [newSubject, setNewSubject] = useState("");
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,26 +65,42 @@ export default function ChatWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
+  const lastCheckedRef = useRef<string>(new Date().toISOString());
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   // Fetch threads
-  const fetchThreads = useCallback(async () => {
+  const fetchThreads = useCallback(async (incremental = false) => {
     try {
-      const res = await fetch("/api/messages");
+      const url = incremental
+        ? `/api/messages?since=${lastCheckedRef.current}`
+        : "/api/messages";
+      const res = await fetch(url);
       const data = await res.json();
       if (data.threads) {
-        setThreads(data.threads);
-        // Update active thread if it was refreshed
-        if (activeThread) {
-          const updated = data.threads.find((t: Thread) => t._id === activeThread._id);
-          if (updated) setActiveThread(updated);
+        if (incremental && data.threads.length > 0) {
+          setThreads((prev) => {
+            const map = new Map(prev.map((t) => [t._id, t]));
+            for (const t of data.threads) {
+              map.set(t._id, t);
+            }
+            return Array.from(map.values()).sort(
+              (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+            );
+          });
+        } else if (!incremental) {
+          setThreads(data.threads);
         }
+        if (activeThreadRef.current) {
+          const updated = data.threads.find((t: Thread) => t._id === activeThreadRef.current);
+          if (updated) setActiveThreadWrapper(updated);
+        }
+        lastCheckedRef.current = new Date().toISOString();
       }
     } catch {}
-  }, [activeThread]);
+  }, []);
 
   // Heartbeat - mark self as online
   const sendHeartbeat = useCallback(async () => {
@@ -65,14 +112,14 @@ export default function ChatWidget() {
   // Check admin online status
   const checkAdminOnline = useCallback(async () => {
     try {
-      const url = activeThread
-        ? `/api/messages/online?threadId=${activeThread._id}`
+      const url = activeThreadRef.current
+        ? `/api/messages/online?threadId=${activeThreadRef.current}`
         : "/api/messages/online";
       const res = await fetch(url);
       const data = await res.json();
       if (data.online !== undefined) setAdminOnline(data.online);
     } catch {}
-  }, [activeThread]);
+  }, []);
 
   // Initial fetch + polling
   useEffect(() => {
@@ -86,7 +133,7 @@ export default function ChatWidget() {
   useEffect(() => {
     if (open) {
       pollRef.current = setInterval(() => {
-        fetchThreads();
+        fetchThreads(true);
         sendHeartbeat();
         checkAdminOnline();
       }, 5000);
@@ -95,11 +142,6 @@ export default function ChatWidget() {
       if (pollRef.current) clearInterval(pollRef.current);
     };
   }, [open, fetchThreads, sendHeartbeat, checkAdminOnline]);
-
-  // Check admin online when thread changes
-  useEffect(() => {
-    if (activeThread) checkAdminOnline();
-  }, [activeThread, checkAdminOnline]);
 
   // Scroll to bottom
   useEffect(() => {
@@ -134,11 +176,11 @@ export default function ChatWidget() {
       if (data.thread) {
         if (view === "new") {
           setThreads((prev) => [data.thread, ...prev]);
-          setActiveThread(data.thread);
+          setActiveThreadWrapper(data.thread);
           setView("chat");
           setNewSubject("");
         } else {
-          setActiveThread(data.thread);
+          setActiveThreadWrapper(data.thread);
           setThreads((prev) =>
             prev.map((t) => (t._id === data.thread._id ? data.thread : t))
           );
@@ -187,7 +229,7 @@ export default function ChatWidget() {
               <button
                 onClick={() => {
                   setView("list");
-                  setActiveThread(null);
+                  setActiveThreadWrapper(null);
                 }}
                 className="text-white"
               >
@@ -257,7 +299,7 @@ export default function ChatWidget() {
                       <button
                         key={thread._id}
                         onClick={() => {
-                          setActiveThread(thread);
+                          setActiveThreadWrapper(thread);
                           setView("chat");
                         }}
                         className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-white"
@@ -367,14 +409,20 @@ export default function ChatWidget() {
                               : "bg-white border border-slate-200 text-slate-800"
                           }`}
                         >
-                          <p className="text-sm leading-relaxed">{msg.text}</p>
-                          <p
-                            className={`mt-1 text-[10px] ${
-                              isUser ? "text-white/60" : "text-slate-400"
-                            }`}
-                          >
-                            {formatTime(msg.createdAt)}
+                          <p className={`text-[10px] font-medium mb-1 ${isUser ? "text-white/70" : "text-slate-500"}`}>
+                            {msg.sender}
                           </p>
+                          <p className="text-sm leading-relaxed">{msg.text}</p>
+                          <div className="flex items-center justify-end gap-0.5 mt-1">
+                            <p
+                              className={`text-[10px] ${
+                                isUser ? "text-white/60" : "text-slate-400"
+                              }`}
+                            >
+                              {formatTime(msg.createdAt)}
+                            </p>
+                            <ReadReceipt readBy={msg.readBy} isUser={isUser} />
+                          </div>
                         </div>
                       </div>
                     );

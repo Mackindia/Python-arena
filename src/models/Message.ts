@@ -21,9 +21,16 @@ const MessageSchema = new mongoose.Schema(
     },
     messages: [
       {
+        senderId: { type: String, required: true },
         sender: { type: String, required: true },
         senderRole: { type: String, default: "student" },
         text: { type: String, required: true },
+        readBy: [
+          {
+            userId: { type: String, required: true },
+            readAt: { type: Date, default: Date.now },
+          },
+        ],
         createdAt: { type: Date, default: Date.now },
       },
     ],
