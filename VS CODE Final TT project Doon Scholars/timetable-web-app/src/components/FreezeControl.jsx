@@ -1,28 +1,20 @@
 import React, { useState } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 
-/**
- * FreezeControl Component
- * 
- * Provides UI for freezing/unfreezing the timetable.
- * Shows current lock status and allows admin to toggle.
- */
 const FreezeControl = () => {
-  const { 
-    isTimetableLocked, 
-    lockStatus, 
-    lockInfo, 
-    freezeTimetable, 
+  const {
+    isTimetableLocked,
+    freezeTimetable,
     unfreezeTimetable,
-    getLockStatusText 
+    getLockStatusText
   } = useTimetable();
-  
+
   const [showUnfreezeModal, setShowUnfreezeModal] = useState(false);
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleFreeze = async () => {
-    if (window.confirm('Are you sure you want to FREEZE the timetable? No changes will be allowed until unfrozen.')) {
+    if (window.confirm('FREEZE timetable? All edits will be blocked.')) {
       setLoading(true);
       await freezeTimetable();
       setLoading(false);
@@ -30,181 +22,98 @@ const FreezeControl = () => {
   };
 
   const handleUnfreeze = async () => {
-    if (!password) {
-      alert('Please enter the password to unfreeze.');
-      return;
-    }
-    
+    if (!password) return;
     setLoading(true);
     const result = await unfreezeTimetable(password);
     setLoading(false);
-    
     if (result.success) {
       setShowUnfreezeModal(false);
       setPassword('');
     }
   };
 
-  const openUnfreezeModal = () => {
-    setShowUnfreezeModal(true);
-    setPassword('');
-  };
-
-  const closeUnfreezeModal = () => {
-    setShowUnfreezeModal(false);
-    setPassword('');
-  };
-
-  // Status badge colors
-  const getStatusBadge = () => {
-    if (isTimetableLocked) {
-      return (
-        <span style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          padding: '4px 12px',
-          borderRadius: '9999px',
-          backgroundColor: '#FEE2E2',
-          color: '#991B1B',
-          fontSize: '14px',
-          fontWeight: '600',
-        }}>
-          <span style={{ marginRight: '6px' }}>🔒</span>
-          FROZEN
-        </span>
-      );
-    }
-    return (
-      <span style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        padding: '4px 12px',
-        borderRadius: '9999px',
-        backgroundColor: '#D1FAE5',
-        color: '#065F46',
-        fontSize: '14px',
-        fontWeight: '600',
-      }}>
-        <span style={{ marginRight: '6px' }}>✏️</span>
-        DRAFT
-      </span>
-    );
-  };
-
   return (
     <>
-      <div style={{
-        padding: '16px',
+      {/* Sticky compact status bar */}
+      <div className="no-print" style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '6px 14px',
+        marginBottom: '14px',
         backgroundColor: isTimetableLocked ? '#FEF2F2' : '#F0FDF4',
-        border: `2px solid ${isTimetableLocked ? '#FECACA' : '#BBF7D0'}`,
-        borderRadius: '8px',
-        marginBottom: '16px',
+        border: `1px solid ${isTimetableLocked ? '#FECACA' : '#BBF7D0'}`,
+        borderRadius: '6px',
+        fontSize: '13px',
+        gap: '12px',
+        flexWrap: 'wrap',
       }}>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px',
-        }}>
-          <div>
-            <h3 style={{ 
-              margin: '0 0 8px 0', 
-              fontSize: '18px', 
-              fontWeight: '600',
-              color: '#1F2937',
-            }}>
-              Timetable Lock Status
-            </h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {getStatusBadge()}
-              <span style={{ 
-                fontSize: '14px', 
-                color: '#6B7280',
-              }}>
-                {getLockStatusText()}
-              </span>
-            </div>
-          </div>
-          
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {isTimetableLocked ? (
+        {/* Left: status */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+          <span style={{ fontSize: '13px' }}>{isTimetableLocked ? '🔒' : '✏️'}</span>
+          <span style={{
+            fontWeight: '600',
+            color: isTimetableLocked ? '#991B1B' : '#065F46',
+            whiteSpace: 'nowrap',
+          }}>
+            {isTimetableLocked ? 'FROZEN' : 'DRAFT'}
+          </span>
+          <span style={{ color: '#6B7280', fontSize: '12px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {getLockStatusText()}
+          </span>
+        </div>
+
+        {/* Right: action button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+          {isTimetableLocked ? (
+            <>
+              <span style={{ color: '#991B1B', fontSize: '11px' }}>Edits blocked</span>
               <button
-                onClick={openUnfreezeModal}
+                onClick={() => setShowUnfreezeModal(true)}
                 disabled={loading}
                 style={{
-                  padding: '10px 20px',
+                  padding: '4px 10px',
                   backgroundColor: '#3B82F6',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
                   fontWeight: '600',
                   cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.7 : 1,
                 }}
               >
-                {loading ? 'Processing...' : '🔓 Unfreeze (Edit Mode)'}
+                🔓 Unfreeze
               </button>
-            ) : (
-              <button
-                onClick={handleFreeze}
-                disabled={loading}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#EF4444',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.7 : 1,
-                }}
-              >
-                {loading ? 'Processing...' : '🔒 Freeze (Lock Permanently)'}
-              </button>
-            )}
-          </div>
+            </>
+          ) : (
+            <button
+              onClick={handleFreeze}
+              disabled={loading}
+              style={{
+                padding: '4px 10px',
+                backgroundColor: '#EF4444',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                fontSize: '12px',
+                fontWeight: '600',
+                cursor: loading ? 'not-allowed' : 'pointer',
+              }}
+            >
+              🔒 Freeze
+            </button>
+          )}
         </div>
-        
-        {isTimetableLocked && (
-          <p style={{
-            margin: '12px 0 0 0',
-            fontSize: '13px',
-            color: '#991B1B',
-            backgroundColor: '#FEE2E2',
-            padding: '8px 12px',
-            borderRadius: '4px',
-          }}>
-            ⚠️ Timetable is FROZEN. All edits are blocked. Only viewing is allowed.
-            To make changes, click "Unfreeze" and enter the admin password.
-          </p>
-        )}
-        
-        {!isTimetableLocked && (
-          <p style={{
-            margin: '12px 0 0 0',
-            fontSize: '13px',
-            color: '#065F46',
-            backgroundColor: '#D1FAE5',
-            padding: '8px 12px',
-            borderRadius: '4px',
-          }}>
-            ✅ Timetable is in DRAFT mode. You can make changes. 
-            Click "Freeze" when done to lock it permanently.
-          </p>
-        )}
       </div>
 
       {/* Unfreeze Modal */}
       {showUnfreezeModal && (
         <div style={{
           position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
+          top: 0, left: 0, right: 0, bottom: 0,
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           display: 'flex',
           alignItems: 'center',
@@ -213,63 +122,45 @@ const FreezeControl = () => {
         }}>
           <div style={{
             backgroundColor: 'white',
-            padding: '24px',
+            padding: '20px',
             borderRadius: '8px',
-            width: '400px',
+            width: '360px',
             maxWidth: '90%',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
           }}>
-            <h3 style={{ 
-              margin: '0 0 16px 0', 
-              fontSize: '18px', 
-              fontWeight: '600',
-              color: '#1F2937',
-            }}>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '15px', fontWeight: '600', color: '#1F2937' }}>
               🔓 Unfreeze Timetable
             </h3>
-            
-            <p style={{
-              margin: '0 0 16px 0',
-              fontSize: '14px',
-              color: '#6B7280',
-            }}>
-              Enter the admin password to unfreeze the timetable and enable editing.
+            <p style={{ margin: '0 0 10px 0', fontSize: '13px', color: '#6B7280' }}>
+              Enter admin password to enable editing.
             </p>
-            
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password"
+              placeholder="Admin password"
+              autoFocus
               style={{
                 width: '100%',
-                padding: '10px 12px',
-                fontSize: '14px',
+                padding: '8px 10px',
+                fontSize: '13px',
                 border: '1px solid #D1D5DB',
-                borderRadius: '6px',
-                marginBottom: '16px',
+                borderRadius: '4px',
+                marginBottom: '10px',
                 boxSizing: 'border-box',
               }}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') handleUnfreeze();
-              }}
+              onKeyPress={(e) => { if (e.key === 'Enter') handleUnfreeze(); }}
             />
-            
-            <div style={{ 
-              display: 'flex', 
-              gap: '8px', 
-              justifyContent: 'flex-end' 
-            }}>
+            <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
               <button
-                onClick={closeUnfreezeModal}
-                disabled={loading}
+                onClick={() => { setShowUnfreezeModal(false); setPassword(''); }}
                 style={{
-                  padding: '10px 16px',
+                  padding: '6px 12px',
                   backgroundColor: '#F3F4F6',
                   color: '#374151',
                   border: '1px solid #D1D5DB',
-                  borderRadius: '6px',
-                  fontSize: '14px',
+                  borderRadius: '4px',
+                  fontSize: '13px',
                   cursor: 'pointer',
                 }}
               >
@@ -279,18 +170,18 @@ const FreezeControl = () => {
                 onClick={handleUnfreeze}
                 disabled={loading || !password}
                 style={{
-                  padding: '10px 16px',
+                  padding: '6px 12px',
                   backgroundColor: '#3B82F6',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
+                  borderRadius: '4px',
+                  fontSize: '13px',
                   fontWeight: '600',
                   cursor: loading || !password ? 'not-allowed' : 'pointer',
                   opacity: loading || !password ? 0.7 : 1,
                 }}
               >
-                {loading ? 'Unfreezing...' : 'Unlock Timetable'}
+                {loading ? 'Unlocking...' : 'Unlock'}
               </button>
             </div>
           </div>

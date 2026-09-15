@@ -176,6 +176,28 @@ export const TimetableProvider = ({ children }) => {
       setMasterClasses(initialMaster);
       setClasses(Object.keys(currentTT));
     }
+
+    // Rebuild teacherSubjectMap from timetables if it's empty
+    const savedSubjectMap = safeJSONParse('teacherSubjectMap', null);
+    if (!savedSubjectMap || Object.keys(savedSubjectMap).length === 0) {
+      const subjectMap = {};
+      Object.entries(currentTT).forEach(([classId, slots]) => {
+        if (Array.isArray(slots)) {
+          slots.forEach(slot => {
+            if (slot.subject && slot.teacher) {
+              if (!subjectMap[slot.subject]) subjectMap[slot.subject] = {};
+              subjectMap[slot.subject][classId] = slot.teacher;
+            }
+          });
+        }
+      });
+      if (Object.keys(subjectMap).length > 0) {
+        setTeacherSubjectMap(subjectMap);
+        localStorage.setItem('teacherSubjectMap', JSON.stringify(subjectMap));
+        console.log('[Init] Rebuilt teacherSubjectMap with', Object.keys(subjectMap).length, 'subjects');
+      }
+    }
+
     syncReady.current = true;
   }, []);
 
@@ -1056,13 +1078,70 @@ export const TimetableProvider = ({ children }) => {
         return val;
       };
 
+      // Detect format: full backup vs raw timetables
+      // Full backup has keys like "timetables", "teachers", etc.
+      // Raw timetables has class IDs like "1a", "2b", etc.
+      let processedData = backupData;
+      const hasClassIds = Object.keys(backupData).some(key => /^\d+[a-z]$/i.test(key));
+      const hasBackupKeys = backupData.timetables !== undefined || backupData.teachers !== undefined;
+
+      if (hasClassIds && !hasBackupKeys) {
+        // Raw timetables format detected - wrap it properly
+        console.log('[Import] Raw timetables format detected, wrapping in backup format');
+        processedData = {
+          timetables: backupData,
+          teachers: [],
+          teacherSubjectMap: null,
+          loadMaster: null,
+          masterClasses: null
+        };
+      }
+
       const payload = {};
       const syncKeys = ['timetables', 'teachers', 'teacherSubjectMap', 'loadMaster', 'masterClasses', 'substitutions', 'absentTeachers'];
       syncKeys.forEach(key => {
-        if (backupData[key] !== undefined) {
-          payload[key] = parseVal(backupData[key]);
+        if (processedData[key] !== undefined) {
+          payload[key] = parseVal(processedData[key]);
         }
       });
+
+      // If we only have timetables, derive teachers from the data
+      if (payload.timetables && (!payload.teachers || payload.teachers.length === 0)) {
+        const teacherSet = new Set();
+        Object.values(payload.timetables).forEach(schedule => {
+          if (Array.isArray(schedule)) {
+            schedule.forEach(slot => {
+              if (slot.teacher) {
+                slot.teacher.split(',').forEach(t => {
+                  const clean = t.trim().toUpperCase();
+                  if (clean && clean !== 'NAN' && clean !== '0') {
+                    teacherSet.add(clean);
+                  }
+                });
+              }
+            });
+          }
+        });
+        payload.teachers = Array.from(teacherSet).sort();
+        console.log('[Import] Derived', payload.teachers.length, 'teachers from timetable data');
+      }
+
+      // If we have timetables but no teacherSubjectMap, build it from the data
+      if (payload.timetables && !payload.teacherSubjectMap) {
+        const subjectMap = {};
+        Object.entries(payload.timetables).forEach(([classId, slots]) => {
+          if (Array.isArray(slots)) {
+            slots.forEach(slot => {
+              if (slot.subject && slot.teacher) {
+                if (!subjectMap[slot.subject]) subjectMap[slot.subject] = {};
+                subjectMap[slot.subject][classId] = slot.teacher;
+              }
+            });
+          }
+        });
+        payload.teacherSubjectMap = subjectMap;
+        console.log('[Import] Built teacherSubjectMap with', Object.keys(subjectMap).length, 'subjects');
+      }
 
       const response = await fetch('/api/sync', {
         method: 'POST',
@@ -1073,41 +1152,44 @@ export const TimetableProvider = ({ children }) => {
         })
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update sync server with backup data');
-      }
+      let serverSuccess = false;
+      let resJson = {};
 
-      const resJson = await response.json();
-      if (resJson.success) {
-        syncService._knownVersion = resJson.version;
-
-        const safeSet = (key, value) => {
-          if (!value) return;
-          const stringVal = typeof value === 'string' ? value : JSON.stringify(value);
-          localStorage.setItem(key, stringVal);
-        };
-
-        Object.keys(backupData).forEach(key => {
-          safeSet(key, backupData[key]);
-        });
-
-        if (payload.timetables) setTimetables(payload.timetables);
-        if (payload.teachers) {
-          setTeachers(payload.teachers);
-          localStorage.setItem('syncedTeachers', JSON.stringify(payload.teachers));
+      if (response.ok) {
+        resJson = await response.json();
+        serverSuccess = resJson.success;
+        if (serverSuccess) {
+          syncService._knownVersion = resJson.version;
         }
-        if (payload.teacherSubjectMap) setTeacherSubjectMap(payload.teacherSubjectMap);
-        if (payload.loadMaster) setLoadMaster(payload.loadMaster);
-        if (payload.masterClasses) setMasterClasses(payload.masterClasses);
-        if (payload.substitutions) setSubstitutions(payload.substitutions);
-        if (payload.absentTeachers) setAbsentTeachers(payload.absentTeachers);
-
-        alert('Backup Restored and Synced to Server Successfully! The page will now reload.');
-        window.location.reload();
-        return true;
       } else {
-        throw new Error(resJson.error || 'Unknown server error');
+        console.warn('[Import] Sync server not available, saving to localStorage only');
       }
+
+      // Save to localStorage (works with or without server)
+      const safeSet = (key, value) => {
+        if (!value) return;
+        const stringVal = typeof value === 'string' ? value : JSON.stringify(value);
+        localStorage.setItem(key, stringVal);
+      };
+
+      Object.keys(processedData).forEach(key => {
+        safeSet(key, processedData[key]);
+      });
+
+      if (payload.timetables) setTimetables(payload.timetables);
+      if (payload.teachers) {
+        setTeachers(payload.teachers);
+        localStorage.setItem('syncedTeachers', JSON.stringify(payload.teachers));
+      }
+      if (payload.teacherSubjectMap) setTeacherSubjectMap(payload.teacherSubjectMap);
+      if (payload.loadMaster) setLoadMaster(payload.loadMaster);
+      if (payload.masterClasses) setMasterClasses(payload.masterClasses);
+      if (payload.substitutions) setSubstitutions(payload.substitutions);
+      if (payload.absentTeachers) setAbsentTeachers(payload.absentTeachers);
+
+      alert('Data imported successfully! The page will now reload.');
+      window.location.reload();
+      return true;
     } catch (err) {
       alert('Error restoring backup: ' + err.message);
       return false;

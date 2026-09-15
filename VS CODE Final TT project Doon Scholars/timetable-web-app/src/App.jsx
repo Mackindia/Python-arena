@@ -17,9 +17,8 @@ function App() {
       <Router>
         <div className="app-container">
           <Navigation />
-          {/* Freeze/Unfreeze Control - Shows lock status */}
-          <FreezeControl />
           <main className="main-content">
+            <FreezeControl />
             <Routes>
               <Route path="/" element={<Mastersheet />} />
               <Route path="/manage-classes" element={<ClassSectionManager />} />

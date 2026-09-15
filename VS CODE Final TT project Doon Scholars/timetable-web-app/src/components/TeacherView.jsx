@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useTimetable } from '../context/TimetableContext';
-import { User, Activity } from 'lucide-react';
-import { generateTeacherTimetable } from '../services/derivedViewEngine';
+import { getAllTeachersSummary, applyShifts } from '../services/teacherReliefEngine';
+import TeacherLoadHeatmap from './relief/TeacherLoadHeatmap';
+import ShiftQueueSidebar from './relief/ShiftQueueSidebar';
+import RecommendationPanel from './relief/RecommendationPanel';
+import './relief/reliefStyles.css';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 const TeacherView = () => {
-  const { timetables, teachers, getTeacherSlotUsage } = useTimetable();
+  const { timetables, teachers, updateSlot } = useTimetable();
   const [selectedTeacher, setSelectedTeacher] = useState(teachers[0] || '');
-  const [viewMode, setViewMode] = useState('schedule'); // 'schedule' or 'matrix'
+  const [activeTab, setActiveTab] = useState('schedule');
+  const [shiftQueue, setShiftQueue] = useState([]);
 
-  // Calculate teacher's schedule across all classes
+  // Calculate teacher's schedule across all classes (for Schedule tab)
   const getTeacherSchedule = () => {
     const schedule = {};
     DAYS.forEach(day => {
@@ -23,149 +27,162 @@ const TeacherView = () => {
 
     if (!selectedTeacher) return schedule;
 
-    const engineSchedule = generateTeacherTimetable(timetables, selectedTeacher);
-    
-    engineSchedule.forEach(slot => {
-      const p = parseInt(slot.period);
-      if (schedule[slot.day][p]) {
-        schedule[slot.day][p].classId += `, ${slot.classId}`;
-        schedule[slot.day][p].subject += `, ${slot.subject}`;
-      } else {
-        schedule[slot.day][p] = {
-          classId: slot.classId,
-          subject: slot.subject
-        };
-      }
+    Object.entries(timetables).forEach(([classId, classSchedule]) => {
+      classSchedule.forEach(slot => {
+        // Handle comma-separated teachers (e.g., "GA,SA,HSC")
+        const teachers = slot.teacher ? slot.teacher.split(',').map(t => t.trim()) : [];
+        if (teachers.includes(selectedTeacher)) {
+          schedule[slot.day][parseInt(slot.period)] = {
+            classId,
+            subject: slot.subject
+          };
+        }
+      });
     });
 
     return schedule;
   };
 
   const schedule = getTeacherSchedule();
-  const slotUsage = getTeacherSlotUsage();
 
-  // Calculate total classes per week for selected teacher
+  // Calculate total classes per week
   let totalClasses = 0;
   DAYS.forEach(day => {
     PERIODS.forEach(p => {
-      if (schedule[day][p]) {
-        totalClasses += schedule[day][p].classId.split(',').length;
-      }
+      if (schedule[day][p]) totalClasses++;
     });
   });
 
-  // Calculate schedules for ALL teachers for the bulk print feature
-  const allSchedules = React.useMemo(() => {
-    const map = {};
-    teachers.forEach(t => {
-      const sch = {};
-      DAYS.forEach(day => {
-        sch[day] = {};
-        PERIODS.forEach(p => {
-          sch[day][p] = null;
-        });
-      });
-      const engineSchedule = generateTeacherTimetable(timetables, t);
-      engineSchedule.forEach(slot => {
-        const p = parseInt(slot.period);
-        if (sch[slot.day][p]) {
-          sch[slot.day][p].classId += `, ${slot.classId}`;
-          sch[slot.day][p].subject += `, ${slot.subject}`;
-        } else {
-          sch[slot.day][p] = {
-            classId: slot.classId,
-            subject: slot.subject
-          };
+  // Get overloaded count for badge
+  const overloadedCount = useMemo(() => {
+    const summary = getAllTeachersSummary(timetables, teachers);
+    return summary.filter(t => t.overloadedDays.length > 0).length;
+  }, [timetables, teachers]);
+
+  // Shift queue handlers
+  const handleAddShift = useCallback((shift) => {
+    setShiftQueue(prev => [...prev, shift]);
+  }, []);
+
+  const handleRemoveShift = useCallback((index) => {
+    setShiftQueue(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const handleClearQueue = useCallback(() => {
+    setShiftQueue([]);
+  }, []);
+
+  // Recommendation state
+  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [recommendationTeacher, setRecommendationTeacher] = useState(null);
+  const [recommendationDay, setRecommendationDay] = useState(null);
+
+  const handleShowRecommendations = useCallback((teacher, day) => {
+    setRecommendationTeacher(teacher);
+    setRecommendationDay(day);
+    setShowRecommendations(true);
+  }, []);
+
+  const handleCloseRecommendations = useCallback(() => {
+    setShowRecommendations(false);
+    setRecommendationTeacher(null);
+    setRecommendationDay(null);
+  }, []);
+
+  const handleApplyRecommendation = useCallback((rec) => {
+    // Convert recommendation steps to shifts
+    const newShifts = rec.steps
+      .filter(step => step.action === 'swap')
+      .map(step => ({
+        teacher: step.teacher,
+        fromDay: step.from.day,
+        fromPeriod: step.from.period,
+        toDay: step.to.day,
+        toPeriod: step.to.period,
+        sourceSlot: {
+          classId: step.from.classId,
+          subject: rec.sourceSlot?.subject || ''
         }
+      }));
+
+    // Add to shift queue
+    setShiftQueue(prev => [...prev, ...newShifts]);
+    setShowRecommendations(false);
+  }, []);
+
+  const handleApplyAll = useCallback(() => {
+    if (shiftQueue.length === 0) return;
+
+    // Apply all shifts to timetables
+    const newTimetables = applyShifts(timetables, shiftQueue);
+
+    // Update each class timetable in context
+    Object.entries(newTimetables).forEach(([classId, newSchedule]) => {
+      const oldSchedule = timetables[classId] || [];
+
+      // Find slots that were removed (existed in old but not in new)
+      const removedSlots = oldSchedule.filter(oldSlot => {
+        return !newSchedule.some(newSlot =>
+          newSlot.day === oldSlot.day &&
+          newSlot.period === oldSlot.period &&
+          newSlot.teacher === oldSlot.teacher
+        );
       });
-      map[t] = sch;
+
+      // Find slots that were added (exist in new but not in old)
+      const addedSlots = newSchedule.filter(newSlot => {
+        return !oldSchedule.some(oldSlot =>
+          oldSlot.day === newSlot.day &&
+          oldSlot.period === newSlot.period &&
+          oldSlot.teacher === newSlot.teacher
+        );
+      });
+
+      // Remove old slots
+      removedSlots.forEach(slot => {
+        updateSlot(classId, slot.day, slot.period, '', '');
+      });
+
+      // Add new slots
+      addedSlots.forEach(slot => {
+        updateSlot(classId, slot.day, slot.period, slot.subject, slot.teacher);
+      });
     });
-    return map;
-  }, [teachers, timetables]);
 
-  const [printMode, setPrintMode] = useState('single');
+    // Clear the queue
+    setShiftQueue([]);
 
-  const handlePrintAll = () => {
-    setPrintMode('all');
-    setTimeout(() => {
-      window.print();
-      setPrintMode('single');
-    }, 100);
-  };
-
-  const handlePrintSingle = () => {
-    setPrintMode('single');
-    setTimeout(() => {
-      window.print();
-    }, 100);
-  };
+    // Show success message (you could add a toast/notification here)
+    alert(`Applied ${shiftQueue.length} shift(s) successfully!`);
+  }, [shiftQueue, timetables, updateSlot]);
 
   return (
     <div>
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 className="page-title">Teacher View</h1>
-        
-        <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-secondary)', padding: '0.25rem', borderRadius: '8px' }}>
-          {viewMode === 'schedule' && (
-            <button
-              style={{ 
-                display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', 
-                background: '#059669', color: 'white',
-                border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 500
-              }}
-              onClick={handlePrintAll}
-              title="Download every teacher's schedule as a bulk PDF packet"
-            >
-              📑 Print All Teachers
-            </button>
-          )}
-          <button
-            style={{ 
-              display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', 
-              background: '#3b82f6', color: 'white',
-              border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 500
-            }}
-            onClick={handlePrintSingle}
-            title="Download this view as a Landscape PDF"
-          >
-            🖨️ Print Current
-          </button>
-          <button 
-            style={{ 
-              display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', 
-              background: viewMode === 'schedule' ? 'var(--accent)' : 'transparent', 
-              color: viewMode === 'schedule' ? 'white' : 'var(--text-secondary)',
-              border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 500
-            }}
-            onClick={() => setViewMode('schedule')}
-          >
-            <User size={16} /> Individual Schedule
-          </button>
-          <button 
-            style={{ 
-              display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', 
-              background: viewMode === 'matrix' ? 'var(--accent)' : 'transparent', 
-              color: viewMode === 'matrix' ? 'white' : 'var(--text-secondary)',
-              border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 500
-            }}
-            onClick={() => setViewMode('matrix')}
-          >
-            <Activity size={16} /> Slot Usage Matrix
-          </button>
-        </div>
+      {/* Tab Bar */}
+      <div className="relief-tab-bar">
+        <button
+          className={`relief-tab ${activeTab === 'schedule' ? 'active' : ''}`}
+          onClick={() => setActiveTab('schedule')}
+        >
+          Schedule
+        </button>
+        <button
+          className={`relief-tab ${activeTab === 'relief' ? 'active' : ''}`}
+          onClick={() => setActiveTab('relief')}
+        >
+          Relief
+          {overloadedCount > 0 && <span className="badge">{overloadedCount}</span>}
+        </button>
       </div>
 
-      <h1 className={printMode === 'single' ? "print-only-title" : "no-print"} style={{ display: 'none', textAlign: 'center', marginBottom: '20px', fontSize: '24px' }}>
-        Doon Scholars - {viewMode === 'schedule' ? `Teacher Schedule (${selectedTeacher})` : 'Teacher Weekly Load Matrix'}
-      </h1>
-
-      {viewMode === 'schedule' && (
+      {/* Schedule Tab */}
+      {activeTab === 'schedule' && (
         <>
           <div className="filter-bar" style={{ display: 'flex', justifyContent: 'space-between' }}>
             <div className="filter-group">
               <label>Select Teacher:</label>
-              <select 
-                value={selectedTeacher} 
+              <select
+                value={selectedTeacher}
                 onChange={(e) => setSelectedTeacher(e.target.value)}
                 style={{ width: '200px' }}
               >
@@ -175,7 +192,7 @@ const TeacherView = () => {
                 ))}
               </select>
             </div>
-            
+
             {selectedTeacher && (
               <div className="filter-group">
                 <span className="badge badge-success" style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}>
@@ -186,7 +203,7 @@ const TeacherView = () => {
           </div>
 
           {selectedTeacher ? (
-            <div className={`card ${printMode === 'single' ? 'printable-area' : 'no-print'}`}>
+            <div className="card">
               <div className="timetable-grid">
                 <div className="grid-cell grid-header">Day</div>
                 {PERIODS.map(p => (
@@ -206,7 +223,7 @@ const TeacherView = () => {
                               <div className="slot-teacher">{slot.subject}</div>
                             </>
                           ) : (
-                            <div className="slot-teacher" style={{opacity: 0.3}}>- Free -</div>
+                            <div className="slot-teacher" style={{ opacity: 0.3 }}>- Free -</div>
                           )}
                         </div>
                       );
@@ -223,105 +240,35 @@ const TeacherView = () => {
         </>
       )}
 
-      {viewMode === 'matrix' && (
-        <div className={`card ${printMode === 'single' ? 'printable-area' : 'no-print'}`} style={{ padding: 0, overflow: 'hidden' }}>
-          <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Teacher Weekly Load Overview (Total: {teachers.length} Teachers)</h3>
-          </div>
-          <div style={{ overflowX: 'auto', maxHeight: '70vh' }}>
-            <table className="data-table" style={{ whiteSpace: 'nowrap' }}>
-              <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--bg-primary)' }}>
-                <tr>
-                  <th style={{ position: 'sticky', left: 0, background: 'var(--bg-secondary)', zIndex: 11, borderRight: '2px solid var(--border)' }}>Teacher</th>
-                  <th style={{ textAlign: 'center', borderRight: '2px solid var(--border)', background: '#f8fafc', color: '#0f172a' }}>Total Load</th>
-                  {DAYS.map(day => (
-                    <th key={day} style={{ textAlign: 'center', borderRight: day !== 'Sat' ? '1px solid var(--border)' : 'none' }}>
-                      {day} Load
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {teachers.map(teacher => {
-                  let totalLoad = 0;
-                  const dayLoads = {};
-                  DAYS.forEach(day => {
-                    let dayLoad = 0;
-                    PERIODS.forEach(p => {
-                      if (slotUsage[teacher] && slotUsage[teacher][day] && slotUsage[teacher][day][p] > 0) {
-                        dayLoad += slotUsage[teacher][day][p];
-                      }
-                    });
-                    dayLoads[day] = dayLoad;
-                    totalLoad += dayLoad;
-                  });
-
-                  return (
-                    <tr key={teacher}>
-                      <td style={{ position: 'sticky', left: 0, background: 'var(--bg-primary)', fontWeight: 600, borderRight: '2px solid var(--border)' }}>
-                        {teacher}
-                      </td>
-                      <td style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.1rem', borderRight: '2px solid var(--border)', color: totalLoad > 35 ? 'var(--danger)' : 'var(--text-primary)' }}>
-                        {totalLoad}
-                      </td>
-                      {DAYS.map(day => (
-                        <td key={`${teacher}-${day}`} style={{ textAlign: 'center', borderRight: day !== 'Sat' ? '1px solid var(--border)' : 'none' }}>
-                          <span style={{ 
-                            display: 'inline-block', minWidth: '30px', padding: '2px 8px', borderRadius: '4px',
-                            background: dayLoads[day] >= 7 ? '#fef2f2' : (dayLoads[day] > 0 ? '#f0fdf4' : 'transparent'),
-                            color: dayLoads[day] >= 7 ? '#991b1b' : (dayLoads[day] > 0 ? '#166534' : 'var(--text-secondary)'),
-                            fontWeight: dayLoads[day] > 0 ? '600' : 'normal'
-                          }}>
-                            {dayLoads[day] > 0 ? dayLoads[day] : '-'}
-                          </span>
-                        </td>
-                      ))}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+      {/* Relief Tab */}
+      {activeTab === 'relief' && (
+        <div className="shift-queue-container">
+          <TeacherLoadHeatmap
+            shiftQueue={shiftQueue}
+            onAddShift={handleAddShift}
+            onRemoveShift={handleRemoveShift}
+            onClearQueue={handleClearQueue}
+            onApplyAll={handleApplyAll}
+            onShowRecommendations={handleShowRecommendations}
+          />
+          <ShiftQueueSidebar
+            shiftQueue={shiftQueue}
+            onRemoveShift={handleRemoveShift}
+            onClearQueue={handleClearQueue}
+            onApplyAll={handleApplyAll}
+          />
         </div>
       )}
 
-      {/* MULTI-TEACHER PRINT CONTAINER */}
-      <div className={printMode === 'all' ? 'printable-area' : 'no-print'} style={{ display: printMode === 'all' ? 'block' : 'none' }}>
-        {teachers.map((t, idx) => (
-          <div key={t} className="timetable-wrapper" style={{ pageBreakAfter: idx < teachers.length - 1 ? 'always' : 'auto' }}>
-            <h1 style={{ textAlign: 'center', marginBottom: '20px', fontSize: '24px' }}>
-              Doon Scholars - Teacher Schedule ({t})
-            </h1>
-            <div className="timetable-grid" style={{ minWidth: '100%', border: '1px solid #000' }}>
-              <div className="grid-cell grid-header">Day</div>
-              {PERIODS.map(p => (
-                <div key={`p${p}`} className="grid-cell grid-header">Period {p}</div>
-              ))}
-
-              {DAYS.map(day => (
-                <React.Fragment key={day}>
-                  <div className="grid-cell day-header">{day}</div>
-                  {PERIODS.map(p => {
-                    const slot = allSchedules[t][day][p];
-                    return (
-                      <div key={`${day}-p${p}`} className="grid-cell" style={slot ? { backgroundColor: 'rgba(79, 70, 229, 0.05)' } : {}}>
-                        {slot ? (
-                          <>
-                            <div className="slot-subject">{slot.classId.toUpperCase()}</div>
-                            <div className="slot-teacher">{slot.subject}</div>
-                          </>
-                        ) : (
-                          <div className="slot-teacher" style={{opacity: 0.3}}>- Free -</div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Recommendation Panel */}
+      {showRecommendations && recommendationTeacher && recommendationDay && (
+        <RecommendationPanel
+          teacher={recommendationTeacher}
+          overloadedDay={recommendationDay}
+          onApplySwap={handleApplyRecommendation}
+          onClose={handleCloseRecommendations}
+        />
+      )}
     </div>
   );
 };
