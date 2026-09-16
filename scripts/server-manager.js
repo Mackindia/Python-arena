@@ -1,51 +1,30 @@
+/**
+ * Server Manager — Standalone HTTP server on port 7777
+ *
+ * Start with: npm run servers
+ * The ServerConsole frontend component talks to this.
+ */
+
 const http = require("http");
 const { spawn } = require("child_process");
-const path = require("path");
 const fs = require("fs");
+const { SERVERS } = require("./server-config");
 
 const PORT = 7777;
-const BASE = "C:\\Users\\Doon Scholars\\Downloads\\data\\.vscode\\Python arena";
-
-const SERVERS = {
-  nextjs: {
-    name: "Next.js (Main App)",
-    port: 3000,
-    cmd: "npm",
-    args: ["run", "dev"],
-    cwd: BASE,
-  },
-  "ai-teacher": {
-    name: "Educational AI (FastAPI)",
-    port: 8000,
-    cmd: path.join(BASE, "ai-teacher", ".venv", "Scripts", "python.exe"),
-    args: ["-m", "uvicorn", "main:app", "--port", "8000"],
-    cwd: path.join(BASE, "ai-teacher"),
-  },
-  "claude-proxy": {
-    name: "Claude Proxy (Node)",
-    port: 8080,
-    cmd: "node",
-    args: ["src/index.js"],
-    cwd: "C:\\Users\\Doon Scholars\\Downloads\\antigravity-claude-proxy-main\\antigravity-claude-proxy-main",
-  },
-  timetable: {
-    name: "Timetable Engine",
-    port: 5173,
-    cmd: "npm",
-    args: ["run", "dev"],
-    cwd: path.join(BASE, "VS CODE Final TT project Doon Scholars", "timetable-web-app"),
-  },
-  "ebook-proxy": {
-    name: "Ebook Proxy Server",
-    port: 9090,
-    cmd: "C:\\Python314\\python.exe",
-    args: ["C:\\Users\\Doon Scholars\\Downloads\\data\\ebook-extractor\\proxy_server.py"],
-    cwd: "C:\\Users\\Doon Scholars\\Downloads\\data\\ebook-extractor",
-  },
-};
-
-// Store running processes
 const processes = {};
+
+// ── Validate paths on startup ──
+console.log("[Manager] Validating server paths...");
+for (const [id, config] of Object.entries(SERVERS)) {
+  if (config.port === null) continue; // skip opencode (no port)
+  const exists = fs.existsSync(config.cwd);
+  const status = exists ? "OK" : "MISSING";
+  console.log(`  ${id.padEnd(14)} ${status.padEnd(8)} ${config.cwd}`);
+  if (!exists && id !== "opencode") {
+    console.warn(`  WARNING: ${config.name} CWD does not exist!`);
+  }
+}
+console.log("");
 
 function startServer(id) {
   const config = SERVERS[id];
@@ -57,16 +36,30 @@ function startServer(id) {
     return { error: `Directory not found: ${config.cwd}` };
   }
 
-  // On Windows, npm/cmd need shell:true, but we must not wrap in extra quotes
-  const isWin = process.platform === 'win32';
-  const cmd = (isWin && config.cmd === 'npm') ? 'npm.cmd' : config.cmd;
+  // Windows fix: shell:true breaks paths with spaces (like "D:\downloads data\data")
+  // npm needs shell:true to resolve npm.cmd, but python/node work with shell:false
+  const isWin = process.platform === "win32";
+  const needsShell = config.cmd === "npm" || config.cmd === "npm.cmd";
+  const cmd = isWin && config.cmd === "npm" ? "npm.cmd" : config.cmd;
 
-  const proc = spawn(cmd, config.args, {
-    cwd: config.cwd,
-    shell: isWin,
-    stdio: ["ignore", "pipe", "pipe"],
-    env: { ...process.env, FORCE_COLOR: "1" },
-  });
+  let proc;
+  if (needsShell) {
+    // npm: use shell:true so npm.cmd resolves
+    proc = spawn(cmd, config.args, {
+      cwd: config.cwd,
+      shell: true,
+      stdio: ["ignore", "pipe", "pipe"],
+      env: { ...process.env, FORCE_COLOR: "1" },
+    });
+  } else {
+    // python, node: use shell:false to avoid space-splitting in paths
+    proc = spawn(cmd, config.args, {
+      cwd: config.cwd,
+      shell: false,
+      stdio: ["ignore", "pipe", "pipe"],
+      env: { ...process.env, FORCE_COLOR: "1" },
+    });
+  }
 
   processes[id] = proc;
   proc._logs = [];
@@ -89,23 +82,22 @@ function startServer(id) {
     pushLog(`[Process exited with code ${code}]`);
     proc._listeners.forEach((fn) => fn("__EXIT__"));
     processes[id] = null;
-    console.log(`[Manager] ${config.name} exited (code ${code}) — cleared tracking`);
+    console.log(`[Manager] ${config.name} exited (code ${code})`);
   });
   proc.on("error", (err) => {
     pushLog(`[Error: ${err.message}]`);
     proc._listeners.forEach((fn) => fn("__EXIT__"));
     processes[id] = null;
-    console.log(`[Manager] ${config.name} error: ${err.message} — cleared tracking`);
+    console.log(`[Manager] ${config.name} error: ${err.message}`);
   });
 
-  console.log(`[Manager] Started ${config.name} (PID: ${proc.pid}) on port ${config.port}`);
+  console.log(`[Manager] Started ${config.name} (PID: ${proc.pid}) on port ${config.port || "N/A"}`);
   return { ok: true, id, name: config.name, port: config.port, pid: proc.pid };
 }
 
 function killByPort(port) {
   try {
     const { execSync } = require("child_process");
-    // Find PIDs listening on this port
     const output = execSync(`netstat -ano | findstr ":${port}" | findstr "LISTENING"`, {
       encoding: "utf-8",
       stdio: ["pipe", "pipe", "pipe"],
@@ -132,12 +124,11 @@ function stopServer(id) {
   const config = SERVERS[id];
 
   if (!proc) {
-    // Process not tracked — try killing by port as fallback
-    if (config) {
+    if (config && config.port) {
       const killed = killByPort(config.port);
       if (killed > 0) {
         processes[id] = null;
-        console.log(`[Manager] Stopped ${config.name} via port kill (${killed} processes)`);
+        console.log(`[Manager] Stopped ${config.name} via port kill`);
         return { ok: true, stopped: id };
       }
     }
@@ -145,15 +136,12 @@ function stopServer(id) {
   }
 
   try {
-    // On Windows, SIGTERM doesn't kill the process tree.
-    // Use taskkill /F /T to force-kill the entire tree, then fallback to port kill.
     if (process.platform === "win32" && proc.pid) {
       const { execSync } = require("child_process");
       try {
         execSync(`taskkill /F /T /PID ${proc.pid}`, { stdio: "ignore" });
       } catch {
-        // Fallback: kill by port
-        if (config) killByPort(config.port);
+        if (config && config.port) killByPort(config.port);
       }
     } else {
       proc.kill("SIGTERM");
@@ -163,27 +151,24 @@ function stopServer(id) {
     }
   } catch {}
   processes[id] = null;
-  console.log(`[Manager] Stopped ${SERVERS[id]?.name || id}`);
+  console.log(`[Manager] Stopped ${config?.name || id}`);
   return { ok: true, stopped: id };
 }
 
 function getStatus() {
-  return Object.entries(SERVERS).map(([id, config]) => {
-    const proc = processes[id];
-    const running = proc && !proc.killed;
-    return { id, name: config.name, port: config.port, running, pid: proc?.pid || null };
-  });
+  return Object.entries(SERVERS)
+    .filter(([, c]) => c.port !== null) // exclude opencode from port-based status
+    .map(([id, config]) => {
+      const proc = processes[id];
+      const running = proc && !proc.killed;
+      return { id, name: config.name, port: config.port, running, pid: proc?.pid || null };
+    });
 }
 
-function getLogs(id) {
-  return processes[id]?._logs || [];
-}
-
-// HTTP Server
+// ── HTTP Server ──
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
-  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -204,7 +189,6 @@ const server = http.createServer((req, res) => {
     const id = url.searchParams.get("id");
     if (!id) return json({ error: "Missing id" }, 400);
 
-    // SSE stream
     res.writeHead(200, {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
@@ -218,10 +202,8 @@ const server = http.createServer((req, res) => {
       return res.end();
     }
 
-    // Send existing logs
     proc._logs.forEach((line) => res.write(`data: ${line}\n\n`));
 
-    // Listen for new logs
     const listener = (line) => {
       res.write(`data: ${line}\n\n`);
       if (line === "__EXIT__") {
@@ -230,10 +212,7 @@ const server = http.createServer((req, res) => {
       }
     };
     proc._listeners.add(listener);
-
-    req.on("close", () => {
-      proc._listeners.delete(listener);
-    });
+    req.on("close", () => proc._listeners.delete(listener));
     return;
   }
 
@@ -272,26 +251,26 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`
-╔══════════════════════════════════════════════════╗
-║         SERVER MANAGER running on :${PORT}          ║
-╠══════════════════════════════════════════════════╣
-║  API:                                           ║
-║    GET  /status          → server status        ║
-║    POST /start  { id }   → start a server       ║
-║    POST /stop   { id }   → stop a server        ║
-║    GET  /logs?id=xxx     → SSE log stream       ║
-╠══════════════════════════════════════════════════╣
-║  Servers:                                       ║
-║    nextjs      → :3000  Next.js                 ║
-║    ai-teacher  → :8000  FastAPI                 ║
-║    claude-proxy→ :8080  Claude Proxy            ║
-║    timetable   → :5173  Timetable Engine        ║
-║    ebook-proxy → :9090  Ebook Proxy             ║
-╚══════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════╗
+║           SERVER MANAGER running on :${PORT}            ║
+╠══════════════════════════════════════════════════════╣
+║  API:                                               ║
+║    GET  /status            → server status          ║
+║    POST /start  { id }     → start a server         ║
+║    POST /stop   { id }     → stop a server          ║
+║    GET  /logs?id=xxx       → SSE log stream         ║
+╠══════════════════════════════════════════════════════╣
+║  Servers:                                           ║
+║    nextjs       → :3000   Next.js                   ║
+║    ai-teacher   → :8000   FastAPI                   ║
+║    claude-proxy → :8080   Antigravity Proxy         ║
+║    timetable    → :5173   Vite Timetable            ║
+║    ebook-proxy  → :9090   Ebook Proxy               ║
+║    opencode     → CLI     OpenCode                  ║
+╚══════════════════════════════════════════════════════╝
 `);
 });
 
-// Cleanup on exit
 process.on("SIGINT", () => {
   console.log("\n[Manager] Shutting down, killing all servers...");
   Object.keys(processes).forEach((id) => stopServer(id));
