@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from typing import Any
 
-from app.core.llm import get_model
+from app.core.llm import get_model, smart_generate, get_backoff_delay
 from app.educational_ai.question_paper.prompts import build_extraction_prompt
 
 
@@ -34,12 +35,9 @@ def extract_questions_from_text(
 ) -> dict[str, Any]:
     """
     Parse raw exam paper text into structured questions using LLM.
-
-    Returns dict with keys: total_marks, duration, sections, questions.
+    Uses smart_generate for caching and quota efficiency.
     """
-    model = get_model("fast")
     prompt = build_extraction_prompt(class_level, subject, raw_text)
-
     issues: list[str] = []
     last_error: Exception | None = None
 
@@ -53,8 +51,12 @@ def extract_questions_from_text(
                     + "\n".join(f"- {i}" for i in issues)
                 )
 
-            response = model.generate_content(full_prompt)
-            result = _extract_json(response.text or "")
+            # Use smart_generate with caching (same paper = same extraction)
+            response_text = smart_generate(
+                full_prompt, task="fast", cache_ttl=3600, max_retries=1,
+                use_cache=not issues,
+            )
+            result = _extract_json(response_text)
 
             # Validate basic structure
             questions = result.get("questions", [])
@@ -72,7 +74,6 @@ def extract_questions_from_text(
                 q.setdefault("optional_part", None)
                 q.setdefault("chapter_hint", "")
                 q.setdefault("diagram_reference", None)
-                # Ensure marks is int
                 try:
                     q["marks"] = int(q["marks"])
                 except (ValueError, TypeError):
@@ -88,6 +89,8 @@ def extract_questions_from_text(
         except (json.JSONDecodeError, ValueError) as e:
             last_error = e
             issues.append(f"JSON parse error: {e}")
+            if attempt < max_attempts - 1:
+                time.sleep(get_backoff_delay(attempt, base_delay=0.5))
 
     raise ValueError(
         f"Failed to extract questions after {max_attempts} attempts: {last_error}"

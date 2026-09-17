@@ -66,10 +66,101 @@ def build_question_bank_prompt(topic: str, class_level: str, subject: str, count
 def build_worksheet_prompt(topic: str, class_level: str, subject: str, context: str) -> str:
     return dedent(
         f"""
-        Create a printable worksheet for class {class_level} subject {subject} topic {topic}.
-        Include learning objectives, MCQs, fill in the blanks, match the following, short answers, and long answers.
-        Return valid JSON object only.
-        Use only the retrieved context.
+        You are an expert educational content designer.
+        Create a printable worksheet for class {class_level} subject {subject} topic "{topic}".
+        Use ONLY the retrieved context. Do not invent facts.
+
+        Return STRICTLY valid JSON matching this EXACT schema (no extra keys, no deviations):
+
+        {{
+          "worksheet_title": "string — title of the worksheet",
+          "class": "{class_level}",
+          "subject": "{subject}",
+          "topic": "{topic}",
+          "learning_focus": ["string — 3-5 key focus areas"],
+          "learning_objectives": ["string — 3-5 objectives starting with 'Students will...'"],
+          "sections": [
+            {{
+              "type": "MCQs",
+              "title": "Section A — Multiple Choice Questions",
+              "instructions": "string — instructions for students",
+              "questions": [
+                {{
+                  "question_number": "Q1",
+                  "question_text": "string — the question",
+                  "options": {{"A": "string", "B": "string", "C": "string", "D": "string"}},
+                  "correct_option": "A"
+                }}
+              ]
+            }},
+            {{
+              "type": "Fill in the Blanks",
+              "title": "Section B — Fill in the Blanks",
+              "instructions": "string — instructions for students",
+              "questions": [
+                {{
+                  "question_number": "Q1",
+                  "question_text": "string with ________ for the blank",
+                  "correct_answer": "string — the word/phrase that fills the blank"
+                }}
+              ]
+            }},
+            {{
+              "type": "Match the Following",
+              "title": "Section C — Match the Following",
+              "instructions": "string — instructions for students",
+              "columns": {{
+                "Column A": ["string — item 1", "string — item 2", "string — item 3", "string — item 4", "string — item 5"],
+                "Column B": ["string — match 1", "string — match 2", "string — match 3", "string — match 4", "string — match 5"]
+              }},
+              "correct_matches": {{"1": "string — matching option text from Column B", "2": "string", "3": "string", "4": "string", "5": "string"}}
+            }},
+            {{
+              "type": "Short Answer Questions",
+              "title": "Section D — Short Answer Questions",
+              "instructions": "string — instructions for students",
+              "questions": [
+                {{
+                  "question_number": "Q1",
+                  "question_text": "string — the question",
+                  "expected_answer_elements": ["string — key point 1", "string — key point 2", "string — key point 3"]
+                }}
+              ]
+            }},
+            {{
+              "type": "Long Answer Questions",
+              "title": "Section E — Long Answer Questions",
+              "instructions": "string — instructions for students",
+              "questions": [
+                {{
+                  "question_number": "Q1",
+                  "question_text": "string — the question",
+                  "expected_answer_elements": ["string — paragraph 1", "string — paragraph 2", "string — paragraph 3"]
+                }}
+              ]
+            }}
+          ]
+        }}
+
+        DIVERSITY RULES (MANDATORY — failure to follow = invalid worksheet):
+        - Each question MUST test a DIFFERENT concept, fact, or subtopic. No two questions may assess the same piece of knowledge.
+        - Spread questions across these cognitive levels: at least 1 Remember, 1 Understand, 1 Apply, 1 Analyze, 1 Evaluate per section where applicable.
+        - Vary question phrasing: mix definitions, comparisons, "which is correct", cause-effect, real-world scenarios, true/false reasoning, fill-from-context.
+        - NEVER rephrase the same fact into two different questions. If you find yourself writing a similar question, pick a completely different concept from the context.
+        - For MCQs: each option must be plausible but only one clearly correct. Distractors should be common misconceptions, not obviously wrong.
+        - For Fill in the Blanks: test different facts — definitions, formulas, properties, examples — not the same concept repeated.
+        - For Match the Following: pair related but distinct items (e.g., property-name pairs, term-definitions, example-classifications). No redundant matches.
+        - For Short/Long Answers: each must require explaining a different concept or solving a different problem.
+
+        STRUCTURAL RULES:
+        - "sections" MUST be an ARRAY of exactly 5 objects in this order: MCQs, Fill in the Blanks, Match the Following, Short Answer Questions, Long Answer Questions.
+        - Each section MUST have "type" matching EXACTLY: "MCQs", "Fill in the Blanks", "Match the Following", "Short Answer Questions", "Long Answer Questions".
+        - MCQ questions MUST have "correct_option" as a single letter "A", "B", "C", or "D".
+        - Fill in the blanks MUST have "correct_answer" (the word that fills the blank).
+        - Match the Following MUST have "columns" with "Column A" and "Column B" arrays, and "correct_matches" object mapping "1"-"5" to Column B values.
+        - Short and Long answers MUST have "expected_answer_elements" as an array of strings.
+        - Generate exactly 5 MCQs, 5 fill-in-the-blanks, 5 match items, 3 short answers, and 2 long answers.
+        - Every question must be answerable from the retrieved context only.
 
         Retrieved Context:
         {context}

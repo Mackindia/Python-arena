@@ -172,7 +172,7 @@ export async function solveQuestionPaperUpload(formData: FormData) {
   return requestJSON<any>("/exam/solve-paper", {
     method: "POST",
     body: formData,
-  }, 300_000);
+  }, 600_000);
 }
 
 export async function solveQuestionPaperTopic(payload: {
@@ -185,7 +185,7 @@ export async function solveQuestionPaperTopic(payload: {
   return requestJSON<any>("/exam/solve-topic", {
     method: "POST",
     body: JSON.stringify(payload),
-  }, 300_000);
+  }, 600_000);
 }
 
 export async function generateExamPaper(payload: {

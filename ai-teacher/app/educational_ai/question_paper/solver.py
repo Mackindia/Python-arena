@@ -181,8 +181,8 @@ def generate_answer_key(
     book_id: str | None = None,
 ) -> list[dict[str, Any]]:
     """
-    Generate answers for all questions in batch (faster than one-by-one).
-    Uses a single LLM call for the entire paper.
+    Generate answers for all questions in small batches to avoid timeout.
+    Splits questions into chunks of 5 and processes each chunk separately.
     """
     if not questions:
         return []
@@ -200,53 +200,69 @@ def generate_answer_key(
     context = context_result["context"]
 
     model = get_model("fast")
-    prompt = build_generate_answers_prompt(
-        questions=questions,
-        class_level=class_level,
-        subject=subject,
-        context=context,
-    )
+    all_answers: list[dict[str, Any]] = []
 
-    issues: list[str] = []
-    for attempt in range(3):
-        try:
-            full_prompt = prompt
-            if issues:
-                full_prompt = (
-                    prompt
-                    + "\n\nPrevious issues:\n"
-                    + "\n".join(f"- {i}" for i in issues)
-                )
+    # Split into chunks of 5 to avoid timeout
+    CHUNK_SIZE = 5
+    for chunk_start in range(0, len(questions), CHUNK_SIZE):
+        chunk = questions[chunk_start:chunk_start + CHUNK_SIZE]
+        chunk_num = (chunk_start // CHUNK_SIZE) + 1
+        total_chunks = (len(questions) + CHUNK_SIZE - 1) // CHUNK_SIZE
 
-            response = model.generate_content(full_prompt)
-            result = _extract_json(response.text or "")
+        prompt = build_generate_answers_prompt(
+            questions=chunk,
+            class_level=class_level,
+            subject=subject,
+            context=context,
+        )
 
-            if isinstance(result, list) and len(result) > 0:
-                answers = []
-                for ans in result:
-                    answers.append({
-                        "question_number": ans.get("question_number", ""),
-                        "question_text": ans.get("question_text", ""),
-                        "marks": ans.get("marks", 1),
-                        "section": "",
-                        "chapter": "",
-                        "difficulty": _estimate_difficulty(ans.get("marks", 1), ""),
-                        "bloom_level": "",
-                        "repeat_likelihood": "",
-                        "answer": {
-                            "direct_answer": ans.get("direct_answer", ""),
-                            "key_points": ans.get("key_points", []),
-                            "common_mistakes": ans.get("common_mistakes", []),
-                            "exam_tips": ans.get("exam_tips", ""),
-                            "word_count": _word_count(ans.get("direct_answer", "")),
-                        },
-                    })
-                return answers
+        issues: list[str] = []
+        chunk_answers: list[dict[str, Any]] = []
 
-            issues.append("Response was not a list of answers")
+        for attempt in range(3):
+            try:
+                full_prompt = prompt
+                if issues:
+                    full_prompt = (
+                        prompt
+                        + f"\n\nThis is batch {chunk_num}/{total_chunks}. "
+                        + "Previous issues:\n"
+                        + "\n".join(f"- {i}" for i in issues)
+                    )
 
-        except (json.JSONDecodeError, ValueError) as e:
-            issues.append(f"Parse error: {e}")
+                response = model.generate_content(full_prompt)
+                result = _extract_json(response.text or "")
 
-    # Fallback to one-by-one solving
-    return solve_all_questions(questions, class_level, subject, book_id)
+                if isinstance(result, list) and len(result) > 0:
+                    for ans in result:
+                        chunk_answers.append({
+                            "question_number": ans.get("question_number", ""),
+                            "question_text": ans.get("question_text", ""),
+                            "marks": ans.get("marks", 1),
+                            "section": ans.get("section", ""),
+                            "chapter": ans.get("chapter", ""),
+                            "difficulty": _estimate_difficulty(ans.get("marks", 1), ""),
+                            "bloom_level": "",
+                            "repeat_likelihood": "",
+                            "answer": {
+                                "direct_answer": ans.get("direct_answer", ""),
+                                "key_points": ans.get("key_points", []),
+                                "common_mistakes": ans.get("common_mistakes", []),
+                                "exam_tips": ans.get("exam_tips", ""),
+                                "word_count": _word_count(ans.get("direct_answer", "")),
+                            },
+                        })
+                    break
+
+                issues.append("Response was not a list of answers")
+
+            except (json.JSONDecodeError, ValueError) as e:
+                issues.append(f"Parse error: {e}")
+
+        # Fallback for failed chunk: solve one-by-one
+        if not chunk_answers:
+            chunk_answers = solve_all_questions(chunk, class_level, subject, book_id)
+
+        all_answers.extend(chunk_answers)
+
+    return all_answers

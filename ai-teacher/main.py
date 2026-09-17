@@ -101,6 +101,27 @@ def token_budget(task: str):
     return get_token_budget(task)
 
 
+@app.get("/quota/stats")
+def quota_stats():
+    """
+    Shows quota usage statistics: cache hits, model tiers, and efficiency metrics.
+    """
+    from app.core.llm import get_quota_stats
+    from app.core.quota_manager import cache_stats as _cs, cache_clear
+    return {
+        "status": "ok",
+        "stats": get_quota_stats(),
+    }
+
+
+@app.post("/quota/clear-cache")
+def clear_cache():
+    """Clear the response cache to free memory."""
+    from app.core.quota_manager import cache_clear
+    cleared = cache_clear()
+    return {"status": "ok", "cleared": cleared}
+
+
 @app.post("/ask")
 def ask(request: QuestionRequest):
     """

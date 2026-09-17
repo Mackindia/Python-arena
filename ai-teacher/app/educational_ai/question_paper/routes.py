@@ -23,20 +23,21 @@ router = APIRouter(prefix="/exam", tags=["exam-intelligence"])
 @router.post("/solve-paper")
 async def solve_paper(
     file: UploadFile = File(None),
-    class_level: str = Form("Class 10"),
-    subject: str = Form("Science"),
-    topic: str = Form("General"),
+    class_level: str = Form(""),
+    subject: str = Form(""),
+    topic: str = Form(""),
     book_id: str | None = Form(None),
     total_marks: int = Form(80),
 ) -> dict[str, Any]:
     """
     Upload a question paper (PDF/image) and get it solved with mark-wise answers.
     If no file is uploaded, generates questions from the book library.
+    Class, subject, and topic are auto-detected from the paper if not provided.
     """
     from app.educational_ai.question_paper.extractor import (
         extract_questions_from_text,
     )
-    from app.educational_ai.question_paper.ocr import extract_text_from_file
+    from app.educational_ai.question_paper.ocr import extract_text_from_file, detect_paper_metadata
     from app.educational_ai.question_paper.solver import generate_answer_key
     from app.educational_ai.question_paper.analyzer import analyze_pattern
     from app.educational_ai.question_paper.validators import validate_solved_paper
@@ -73,6 +74,12 @@ async def solve_paper(
                     detail="Could not extract text from the uploaded file. Try a clearer image or typed PDF.",
                 )
 
+        # Auto-detect metadata from paper if not provided
+        detected = detect_paper_metadata(raw_text) if raw_text else {}
+        class_level = class_level or detected.get("class_level", "") or "Class 10"
+        subject = subject or detected.get("subject", "") or "General"
+        topic = topic or detected.get("topic", "") or "General"
+
         # Extract questions
         extraction = extract_questions_from_text(raw_text, class_level, subject)
         questions = extraction["questions"]
@@ -102,6 +109,7 @@ async def solve_paper(
             "pattern_analysis": pattern,
             "source": "uploaded_file",
             "validation": validation,
+            "detected_metadata": detected,
         }
 
     except HTTPException:

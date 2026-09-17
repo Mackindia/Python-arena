@@ -140,18 +140,26 @@ export default function QuestionPaperSolverPage() {
                 </p>
               )}
             </div>
-            <BookSelector selectedBookId={bookId} onSelectBook={handleSelectBook} />
+            <div className="sm:col-span-3 rounded-xl border border-cyan-400/20 bg-cyan-400/5 p-3 text-xs text-cyan-300">
+              Class, subject, and topic will be auto-detected from the uploaded paper. Optionally override below.
+            </div>
             <input
               value={classLevel}
               onChange={(e) => setClassLevel(e.target.value)}
               className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5"
-              placeholder="Class (auto-filled)"
+              placeholder="Class (auto-detected)"
             />
             <input
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5"
-              placeholder="Subject (auto-filled)"
+              placeholder="Subject (auto-detected)"
+            />
+            <input
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5"
+              placeholder="Topic (auto-detected)"
             />
           </>
         ) : (
@@ -186,7 +194,7 @@ export default function QuestionPaperSolverPage() {
           value={totalMarks}
           onChange={(e) => setTotalMarks(Number(e.target.value))}
           className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5"
-          placeholder="Total Marks"
+          placeholder={mode === "upload" ? "Total Marks (auto-detected)" : "Total Marks"}
         />
 
         <button
