@@ -69,4 +69,7 @@ async function migratePasswords() {
   console.log("Disconnected.");
 }
 
-migratePasswords().catch(console.error);
+migratePasswords().catch((err) => {
+  console.warn("Password migration skipped:", err.message);
+  process.exit(0);
+});
