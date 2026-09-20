@@ -8,7 +8,7 @@ import { jsPDF } from "jspdf";
 const CLASS_CONFIG = {
   "9": { name: "Class 9 - AI (Code 417)", totalPages: 450 },
   "10": { name: "Class 10 - AI (Code 417)", totalPages: 518 },
-  "11": { name: "Class 11 - AI (Code 841)", totalPages: 480 },
+  "11": { name: "Class 11 - AI (Code 841)", totalPages: 462 },
   "12": { name: "Class 12 - AI (Code 842)", totalPages: 500 },
 };
 

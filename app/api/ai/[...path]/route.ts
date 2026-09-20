@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdminApi } from "@/lib/admin-api";
+import { requireAuthApi } from "@/lib/admin-api";
 
 const AI_BACKEND_URL = process.env.AI_BACKEND_URL || "http://127.0.0.1:8000";
 
 async function proxyRequest(request: NextRequest, { params }: { params: Promise<{ path: string[] }> | { path: string[] } }) {
-  const auth = await requireAdminApi();
+  const auth = await requireAuthApi();
   if (!auth.ok) {
     return auth.response;
   }

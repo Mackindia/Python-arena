@@ -75,7 +75,7 @@ export function getCorsHeaders(request: Request): Record<string, string> {
   };
 }
 
-const PRIVATE_IPS = /^((10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|127\.|localhost|0\.0\.0\.0|169\.254\.)/i);
+const PRIVATE_IPS = new RegExp("^((10\\.|172\\.(1[6-9]|2[0-9]|3[01])\\.|192\\.168\\.|127\\.|localhost|0\\.0\\.0\\.0|169\\.254\\.))", "i");
 
 export function isPrivateUrl(url: string): boolean {
   try {

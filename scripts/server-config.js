@@ -51,6 +51,7 @@ const SERVERS = {
     cmd: "npm",
     args: ["run", "dev"],
     cwd: ROOT,
+    healthPath: "/",
   },
   "ai-teacher": {
     name: "Educational AI (FastAPI)",
@@ -58,6 +59,7 @@ const SERVERS = {
     cmd: PYTHON,
     args: ["-m", "uvicorn", "main:app", "--reload", "--port", "8000"],
     cwd: path.join(ROOT, "ai-teacher"),
+    healthPath: "/docs",
   },
   "claude-proxy": {
     name: "Antigravity Claude Proxy",
@@ -65,6 +67,7 @@ const SERVERS = {
     cmd: "node",
     args: ["src/index.js"],
     cwd: ANTIGRAVITY_CWD || path.join(ROOT, "..", "antigravity-claude-proxy-main"),
+    healthPath: "/",
   },
   timetable: {
     name: "Vite Timetable",
@@ -72,6 +75,7 @@ const SERVERS = {
     cmd: "npm",
     args: ["run", "dev"],
     cwd: path.join(ROOT, "VS CODE Final TT project Doon Scholars", "timetable-web-app"),
+    healthPath: "/",
   },
   "ebook-proxy": {
     name: "Ebook Proxy Server",
@@ -79,6 +83,7 @@ const SERVERS = {
     cmd: PYTHON,
     args: [path.join(ROOT, "ebook-extractor", "proxy_server.py")],
     cwd: path.join(ROOT, "ebook-extractor"),
+    healthPath: "/",
   },
   opencode: {
     name: "OpenCode CLI",
@@ -86,6 +91,7 @@ const SERVERS = {
     cmd: "opencode",
     args: [],
     cwd: ROOT,
+    healthPath: null, // process-only, no HTTP
   },
 };
 

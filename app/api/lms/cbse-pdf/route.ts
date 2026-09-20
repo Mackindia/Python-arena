@@ -38,10 +38,10 @@ export async function GET(request: NextRequest) {
       subject: subjectDoc._id,
       class: classDoc._id,
       published: true,
-      pdfUrl: { $ne: "" },
+      pdfUrl: { $exists: true, $ne: "" },
     })
       .select("title slug description pdfUrl thumbnailUrl thumbnail")
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .lean();
 
     const data = lessons.map((l) => {

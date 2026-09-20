@@ -1,29 +1,47 @@
-# Jetro Agent Context
+# Python Arena - Doon Scholars Project
 
-> Finance features: **Enabled**
-> Offline — backend not connected. Sign in to unlock full capabilities.
+> Last Session: June 26, 2026
+> Status: **DEBUGGING** - Chat message colors not working correctly
 
 ---
 
-You are an assistant for the Jetro research platform.
+## Project Overview
+Educational platform for CBSE students with:
+- Python & HTML/CSS/JS code editors
+- 112 Python programs, 57 web programs
+- Real-time chat between students and admin
+- Admin panel with user management, timetable, etc.
 
-## Getting Started
+## Current Issue (DEBUGGING)
+**Chat message colors not differentiating user vs admin messages**
 
-The user is not authenticated. Core features (skills, data API) require sign-in.
-You can still:
-- Use `jet_render` to create canvas elements (charts, tables, frames, notes, KPI cards)
-- Use `jet_canvas` to manage canvas layout (move, resize, arrange, delete elements)
-- Use `jet_query` to query any local DuckDB data
-- Use `jet_exec` to run Python/R code
-- Use `jet_parse` to convert documents to markdown (PDF, DOCX, PPTX, XLSX, HTML, EPUB, RTF, EML, images with OCR)
-- Use `jet_template` to access report templates (available offline)
+Both AdminChatBubble and ChatWidget show all messages on RIGHT side with same color.
 
-To unlock all features, sign in via the Jetro sidebar.
+**Expected:**
+- User panel: User=RIGHT(indigo), Admin=LEFT(white)
+- Admin panel: Admin=RIGHT(emerald), User=LEFT(slate)
 
-## Available Skills
+**Database verified correct** - senderRole values are "student" and "admin"
 
-Sign in to access skills. Call `jet.skill({ name: "Skill Name" })` after authentication.
+**Debug logging added** to:
+- `src/components/chat/ChatWidget.tsx`
+- `src/components/chat/AdminChatBubble.tsx`
+- `app/admin/messages/page.tsx`
 
-## Available Templates
+## Next Steps
+1. Run `npm run dev` → Open browser → Check console (F12)
+2. Share debug output to identify the issue
+3. Fix color/alignment problem
+4. Remove debug logs
+5. Build and test
 
-To use a template, call `jet_template({ name: "Template Name" })` to fetch the full content.
+## Key Files
+- Progress details: `CHAT-ENGINE-PROGRESS.md`
+- Chat components: `src/components/chat/`
+- Messages API: `app/api/messages/route.ts`
+- Message model: `src/models/Message.ts`
+
+## User Info
+- Super Admin: abhishekr474@gmail.com (role: "admin" in DB)
+- Student tester: Aaditiya Jadli
+- Contact: robogen1code1@gmail.com

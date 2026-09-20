@@ -8,6 +8,7 @@ type LessonData = {
   thumbnail: string;
   progress?: number;
   published: boolean;
+  createdAt?: string;
 };
 
 type ClassLessonsLayoutProps = {

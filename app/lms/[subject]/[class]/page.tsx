@@ -31,6 +31,7 @@ type LessonCardData = {
   thumbnail?: string;
   thumbnailUrl?: string;
   published?: boolean;
+  createdAt?: string | Date;
 };
 
 async function getClassLessonsData(subjectSlug: string, classSlug: string) {
@@ -56,8 +57,8 @@ async function getClassLessonsData(subjectSlug: string, classSlug: string) {
     const classData = classRecord as ClassPageData;
 
     const lessons = await LessonModel.find({ class: classData._id, published: true })
-      .select("slug title description thumbnail thumbnailUrl published createdAt")
-      .sort({ createdAt: 1 })
+      .select("slug title description thumbnail thumbnailUrl published createdAt updatedAt")
+      .sort({ createdAt: -1 })
       .lean();
 
     return {
@@ -78,6 +79,10 @@ async function getClassLessonsData(subjectSlug: string, classSlug: string) {
           description: lessonData.description || "",
           thumbnail: lessonData.thumbnailUrl || lessonData.thumbnail || "",
           published: lessonData.published || false,
+          createdAt: (lessonData.createdAt || (lessonData as { updatedAt?: string | Date }).updatedAt)
+            ? new Date(lessonData.createdAt || (lessonData as { updatedAt?: string | Date }).updatedAt as string | Date)
+              .toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+            : "",
         };
       }),
     };

@@ -264,6 +264,7 @@ export default function AdminUsersPage() {
               <thead className="bg-slate-950/60 text-xs font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-800">
                 <tr>
                   <th className="px-6 py-4">Name / Username</th>
+                  <th className="px-6 py-4">Password</th>
                   <th className="px-6 py-4">Role</th>
                   <th className="px-6 py-4">Details</th>
                   <th className="px-6 py-4">Status</th>
@@ -273,7 +274,7 @@ export default function AdminUsersPage() {
               <tbody className="divide-y divide-slate-800/60">
                 {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-10 text-center text-slate-500">
+                    <td colSpan={6} className="px-6 py-10 text-center text-slate-500">
                       {searchQuery ? "No users match your search." : "No users found. Create one by clicking the \"Add User\" button."}
                     </td>
                   </tr>
@@ -283,6 +284,11 @@ export default function AdminUsersPage() {
                       <td className="px-6 py-4">
                         <div className="font-semibold text-white">{u.fullName}</div>
                         <div className="text-xs text-slate-500">@{u.username || "clerk-sync"}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="font-mono text-xs text-amber-300 bg-amber-950/30 px-2 py-1 rounded">
+                          {u.password || "—"}
+                        </span>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${

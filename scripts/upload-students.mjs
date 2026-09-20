@@ -106,7 +106,6 @@ async function uploadStudents() {
           password: password,
           first_name: firstName,
           last_name: lastName,
-          email_address: [`${username}@doonscholars.com`],
           public_metadata: {
             class: studentClass
           }

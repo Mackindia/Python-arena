@@ -19,8 +19,8 @@ type PdfItem = {
   description: string;
   pdfUrl: string;
   thumbnailUrl: string;
+  createdAt: string;
   source: "lms" | "course";
-  createdAt?: string;
 };
 
 function formatLabel(value: string) {
@@ -55,7 +55,7 @@ async function fetchAllPdfContent(
       published: true,
       pdfUrl: { $exists: true, $ne: "" },
     })
-      .select("title slug description pdfUrl thumbnailUrl thumbnail createdAt")
+      .select("title slug description pdfUrl thumbnailUrl thumbnail createdAt updatedAt")
       .sort({ createdAt: -1 })
       .lean();
 
@@ -67,16 +67,20 @@ async function fetchAllPdfContent(
         pdfUrl?: string;
         thumbnailUrl?: string;
         thumbnail?: string;
-        createdAt?: Date;
+        createdAt?: string | Date;
+        updatedAt?: string | Date;
       };
+      const dateVal = lesson.createdAt || lesson.updatedAt;
       return {
         title: lesson.title || "",
         slug: lesson.slug || "",
         description: lesson.description ?? "",
         pdfUrl: lesson.pdfUrl ?? "",
         thumbnailUrl: (lesson.thumbnailUrl || lesson.thumbnail) ?? "",
+        createdAt: dateVal
+          ? new Date(dateVal).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+          : "",
         source: "lms" as const,
-        createdAt: lesson.createdAt ? new Date(lesson.createdAt).toISOString() : undefined,
       };
     });
 
@@ -112,6 +116,7 @@ async function fetchAllPdfContent(
         description: course.description ?? "",
         pdfUrl: "", // Courses don't have a direct pdfUrl
         thumbnailUrl: course.thumbnail ?? "",
+        createdAt: "",
         source: "course" as const,
       };
     });

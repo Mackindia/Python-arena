@@ -7,9 +7,21 @@
         "code_review_graph",
         "serve"
       ],
-      "cwd": "C:\\Users\\Doon Scholars\\Downloads\\data\\.vscode\\Python arena",
+      "cwd": "D:\\downloads data\\data\\.vscode\\Python arena",
       "type": "stdio",
-      "env": []
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    "jcodemunch": {
+      "command": "C:\\Users\\Doon Scholars\\AppData\\Roaming\\Python\\Python314\\Scripts\\jcodemunch-mcp.exe",
+      "args": [],
+      "type": "stdio",
+      "env": {
+        "UV_NO_PROGRESS": "1",
+        "UV_QUIET": "1",
+        "JCODEMUNCH_HANDSHAKE_TIMEOUT": "0"
+      }
     }
   }
 }

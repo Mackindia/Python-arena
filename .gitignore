@@ -43,5 +43,8 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+# auto-heal logs
+logs/auto-heal-*.log
+
 # Added by code-review-graph
 .code-review-graph/

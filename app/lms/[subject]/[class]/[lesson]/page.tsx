@@ -30,6 +30,7 @@ type LessonPageData = {
   pdfUrl?: string;
   thumbnail?: string;
   thumbnailUrl?: string;
+  createdAt?: string | Date;
 };
 
 async function getCurrentUserSafe() {
@@ -58,7 +59,7 @@ async function getLmsLessonData(subjectSlug: string, classSlug: string, lessonSl
     }
 
     const lesson = await LessonModel.findOne({ slug: lessonSlug, class: classRecord._id, published: true })
-      .select("title slug description content pdfUrl thumbnail thumbnailUrl")
+      .select("title slug description content pdfUrl thumbnail thumbnailUrl createdAt")
       .lean();
 
     if (!lesson) {
@@ -110,6 +111,10 @@ async function getLmsLessonData(subjectSlug: string, classSlug: string, lessonSl
 
     return {
       lesson: lessonData,
+      createdAt: (lessonData.createdAt || (lessonData as { updatedAt?: string | Date }).updatedAt)
+        ? new Date(lessonData.createdAt || (lessonData as { updatedAt?: string | Date }).updatedAt as string | Date)
+          .toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+        : "",
       previousLesson,
       nextLesson,
     };
@@ -166,6 +171,7 @@ export default async function LmsLessonViewerPage({ params }: { params: Promise<
         content: lessonData.lesson.content || "",
         pdfUrl: lessonData.lesson.pdfUrl || "",
         thumbnail: lessonData.lesson.thumbnailUrl || lessonData.lesson.thumbnail || "",
+        createdAt: lessonData.createdAt || "",
       }}
       completionState={{
         completed: completionState.completed,

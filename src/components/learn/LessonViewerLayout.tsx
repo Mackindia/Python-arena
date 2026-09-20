@@ -18,6 +18,7 @@ type LessonViewerLayoutProps = {
     content: string;
     pdfUrl: string;
     thumbnail: string;
+    createdAt?: string;
   };
   completionState?: {
     completed: boolean;
@@ -61,6 +62,9 @@ export default function LessonViewerLayout({
               <header>
                 <h1 className="text-2xl font-bold leading-tight text-white sm:text-3xl">{lesson.title}</h1>
                 <p className="mt-3 text-sm leading-relaxed text-slate-300 sm:text-base">{lesson.description}</p>
+                {lesson.createdAt && (
+                  <p className="mt-2 text-xs text-slate-500">Published on {lesson.createdAt}</p>
+                )}
               </header>
 
               <div className="mt-6 flex flex-wrap items-center gap-3">

@@ -115,8 +115,6 @@ async function uploadTeachers() {
           password: password,
           first_name: firstName,
           last_name: lastName,
-          // We provide a dummy email to ensure Clerk accepts it if emails are required
-          email_address: [`${username}@doonscholars.com`],
           public_metadata: {
             role: "teacher",
             teacher_id: teacherId
@@ -146,7 +144,7 @@ async function uploadTeachers() {
             $set: {
               fullName: fullName,
               username: username,
-              email: `${username}@doonscholars.com`,
+              email: "dsinternal684@gmail.com",
               role: "teacher",
               teacher_id: teacherId,
               meet_link: teacher.meetlink || teacher["meet link"] || "https://meet.google.com/test"

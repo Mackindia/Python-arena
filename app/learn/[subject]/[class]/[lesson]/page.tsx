@@ -44,7 +44,7 @@ async function getLessonData(subjectSlug: string, classSlug: string, lessonSlug:
     published: true,
     content: { $exists: true, $ne: "" },
   })
-    .select("_id title slug description content createdAt")
+    .select("_id title slug description content createdAt updatedAt")
     .sort({ createdAt: 1 })
     .lean();
 
@@ -65,7 +65,12 @@ async function getLessonData(subjectSlug: string, classSlug: string, lessonSlug:
     content: String(current.content || ""),
     subjectName: String(subject.name || ""),
     className: String(classDoc.name || ""),
-    createdAt: (current as any).createdAt ? new Date((current as any).createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "",
+    createdAt: (() => {
+      const dateValue = (current as any).createdAt || (current as any).updatedAt;
+      return dateValue
+        ? new Date(dateValue).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+        : "";
+    })(),
     previous: previous ? { slug: String(previous.slug || ""), title: String(previous.title || "") } : null,
     next: next ? { slug: String(next.slug || ""), title: String(next.title || "") } : null,
   };

@@ -10,6 +10,7 @@ type LessonCardProps = {
     thumbnail: string;
     progress?: number;
     published: boolean;
+    createdAt?: string;
   };
 };
 
@@ -81,6 +82,9 @@ export default function LessonCard({
             <p className="mt-1 text-xs text-slate-400 line-clamp-2">
               {lesson.description}
             </p>
+          )}
+          {lesson.createdAt && (
+            <p className="mt-1 text-[11px] text-slate-500">{lesson.createdAt}</p>
           )}
         </div>
 

@@ -119,7 +119,6 @@ export async function POST(req: Request) {
         firstName: firstName,
         lastName: lastName,
         username: username,
-        emailAddress: [`${username}@doonscholars.com`], // Changed .internal to .com as Clerk often rejects invalid TLDs
         password: password,
         publicMetadata: { role: role },
         skipPasswordChecks: true
@@ -144,6 +143,7 @@ export async function POST(req: Request) {
       clerkId: clerkId,
       fullName,
       username,
+      email: "dsinternal684@gmail.com",
       password,
       role,
       class: cls,
@@ -153,6 +153,7 @@ export async function POST(req: Request) {
       meet_link,
       teacher_id: normalizedTeacherId, // Links to timetable shortcode
       is_active: is_active !== undefined ? is_active : true,
+      status: "approved",
     });
 
     // Auto-map timetable rows created from CSV initials once a teacher account is created.

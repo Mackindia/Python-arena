@@ -61,6 +61,9 @@ export default function CbsePdfCard({ title, description, thumbnailUrl, pdfUrl, 
       {/* Content */}
       <div className="flex flex-1 flex-col gap-3 p-4">
         <h3 className="text-sm font-semibold leading-snug text-white">{title}</h3>
+        {createdAt && (
+          <p className="text-[11px] text-slate-500">{createdAt}</p>
+        )}
         {description && (
           <p className="line-clamp-2 text-xs leading-relaxed text-slate-400">{description}</p>
         )}

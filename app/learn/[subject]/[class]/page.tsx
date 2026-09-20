@@ -29,7 +29,8 @@ type NoteItem = {
   slug: string;
   description: string;
   preview: string;
-  createdAt?: string;
+  createdAt: string;
+  hasPdf: boolean;
 };
 
 type PdfItem = {
@@ -38,7 +39,7 @@ type PdfItem = {
   description: string;
   pdfUrl: string;
   thumbnailUrl: string;
-  createdAt?: string;
+  createdAt: string;
 };
 
 type CourseItem = {
@@ -64,14 +65,17 @@ async function getClassContent(subjectSlug: string, classSlug: string) {
     .lean() as { _id: unknown; name?: string; slug?: string } | null;
   if (!classDoc?._id) return null;
 
-  // ── Notes: lessons with text content ──
+  // ── Notes: lessons with text content or PDF lessons ──
   const notesRaw = await LessonModel.find({
     subject: subject._id,
     class: classDoc._id,
     published: true,
-    content: { $exists: true, $ne: "" },
+    $or: [
+      { content: { $exists: true, $ne: "" } },
+      { pdfUrl: { $exists: true, $ne: "" } },
+    ],
   })
-    .select("_id title slug description content createdAt")
+    .select("_id title slug description content pdfUrl createdAt updatedAt")
     .sort({ createdAt: -1 })
     .lean();
 
@@ -81,7 +85,13 @@ async function getClassContent(subjectSlug: string, classSlug: string) {
     slug: String(l.slug || ""),
     description: String(l.description || ""),
     preview: String(l.content || "").slice(0, 120).trim(),
-    createdAt: (l as any).createdAt ? new Date((l as any).createdAt).toISOString() : undefined,
+    createdAt: (() => {
+      const dateValue = (l as any).createdAt || (l as any).updatedAt;
+      return dateValue
+        ? new Date(dateValue).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+        : "";
+    })(),
+    hasPdf: Boolean((l as any).pdfUrl && (l as any).pdfUrl.trim()),
   }));
 
   // ── PDFs: lessons with pdfUrl ──
@@ -91,7 +101,7 @@ async function getClassContent(subjectSlug: string, classSlug: string) {
     published: true,
     pdfUrl: { $exists: true, $ne: "" },
   })
-    .select("title slug description pdfUrl thumbnailUrl thumbnail createdAt")
+    .select("title slug description pdfUrl thumbnailUrl thumbnail createdAt updatedAt")
     .sort({ createdAt: -1 })
     .lean();
 
@@ -103,15 +113,19 @@ async function getClassContent(subjectSlug: string, classSlug: string) {
       pdfUrl?: string;
       thumbnailUrl?: string;
       thumbnail?: string;
-      createdAt?: Date;
+      createdAt?: string | Date;
+      updatedAt?: string | Date;
     };
+    const dateVal = lesson.createdAt || lesson.updatedAt;
     return {
       title: lesson.title || "",
       slug: lesson.slug || "",
       description: lesson.description ?? "",
       pdfUrl: lesson.pdfUrl ?? "",
       thumbnailUrl: (lesson.thumbnailUrl || lesson.thumbnail) ?? "",
-      createdAt: lesson.createdAt ? new Date(lesson.createdAt).toISOString() : undefined,
+      createdAt: dateVal
+        ? new Date(dateVal).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+        : "",
     };
   });
 
@@ -305,10 +319,15 @@ export default async function ClassPage({ params }: { params: Promise<Params> })
               {data.notes.map((note) => (
                 <Link
                   key={note.id}
-                  href={`/lms/${subject}/${classSlug}/${note.slug}`}
+                  href={note.hasPdf ? `/lms/${subject}/${classSlug}/${note.slug}` : `/learn/${subject}/${classSlug}/${note.slug}`}
                   className="group block rounded-xl border border-white/10 bg-slate-950 p-4 transition hover:border-cyan-400/30 hover:shadow-lg hover:shadow-cyan-900/10"
                 >
-                  <h3 className="font-semibold text-white group-hover:text-cyan-200">{note.title}</h3>
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-semibold text-white group-hover:text-cyan-200">{note.title}</h3>
+                    {note.createdAt && (
+                      <span className="shrink-0 text-xs text-slate-500">{note.createdAt}</span>
+                    )}
+                  </div>
                   {note.description ? (
                     <p className="mt-1 text-sm text-slate-400">{note.description}</p>
                   ) : note.preview ? (
@@ -316,11 +335,6 @@ export default async function ClassPage({ params }: { params: Promise<Params> })
                       {note.preview}…
                     </p>
                   ) : null}
-                  {note.createdAt && (
-                    <p className="mt-2 text-[11px] text-slate-500">
-                      {new Date(note.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                    </p>
-                  )}
                 </Link>
               ))}
             </div>

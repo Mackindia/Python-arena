@@ -21,6 +21,7 @@ type NotesData = {
     description: string;
     preview: string;
     createdAt: string;
+    hasPdf: boolean;
   }>;
 };
 
@@ -37,9 +38,12 @@ async function getNotesData(subjectSlug: string, classSlug: string): Promise<Not
     subject: subject._id,
     class: classDoc._id,
     published: true,
-    content: { $exists: true, $ne: "" },
+    $or: [
+      { content: { $exists: true, $ne: "" } },
+      { pdfUrl: { $exists: true, $ne: "" } },
+    ],
   })
-    .select("_id title slug description content createdAt")
+    .select("_id title slug description content pdfUrl createdAt updatedAt")
     .sort({ createdAt: -1 })
     .lean();
 
@@ -52,7 +56,13 @@ async function getNotesData(subjectSlug: string, classSlug: string): Promise<Not
       slug: String(lesson.slug || ""),
       description: String(lesson.description || ""),
       preview: String((lesson.content || "").slice(0, 180)),
-      createdAt: (lesson as any).createdAt ? new Date((lesson as any).createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "",
+      createdAt: (() => {
+        const dateValue = (lesson as any).createdAt || (lesson as any).updatedAt;
+        return dateValue
+          ? new Date(dateValue).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+          : "";
+      })(),
+      hasPdf: Boolean((lesson as any).pdfUrl && (lesson as any).pdfUrl.trim()),
     })),
   };
 }
@@ -91,7 +101,7 @@ export default async function NotesPage({ params }: { params: Promise<Params> })
             data.lessons.map((lesson) => (
               <Link
                 key={lesson.id}
-                href={`/learn/${subject}/${classSlug}/${lesson.slug}`}
+                href={lesson.hasPdf ? `/lms/${subject}/${classSlug}/${lesson.slug}` : `/learn/${subject}/${classSlug}/${lesson.slug}`}
                 className="rounded-2xl border border-cyan-400/20 bg-slate-950 p-5 transition hover:border-cyan-300/40 hover:bg-slate-900"
               >
                 <h2 className="text-lg font-semibold text-white">{lesson.title}</h2>
