@@ -10,9 +10,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "db:migrate": "node scripts/hash-existing-passwords.mjs",
+    "postinstall": "node scripts/hash-existing-passwords.mjs",
     "seed:learn-nav": "node scripts/seed-learn-navigation.mjs",
     "sync:timetable": "node scripts/sync-timetable.mjs",
-    "servers": "node scripts/server-manager.js"
+    "servers": "node scripts/server-manager.js",
+    "health": "node scripts/auto-heal.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.3.3",
@@ -36,6 +39,8 @@
     "@tiptap/extension-underline": "^3.23.4",
     "@tiptap/react": "^3.23.4",
     "@tiptap/starter-kit": "^3.23.4",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
