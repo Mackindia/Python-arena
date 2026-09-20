@@ -1,19 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAllowedCloudinaryUrl } from "@/lib/cloudinary-hosts";
-import { isValidHttpUrl, looksLikePdfUrl } from "@/lib/pdf-source";
+import { looksLikePdfUrl } from "@/lib/pdf-source";
+import { isPrivateUrl, getCorsHeaders, sanitizeError } from "@/lib/security";
 
 export const runtime = "nodejs";
 
 const FETCH_TIMEOUT_MS = 15_000;
 
-function withCors(headers?: HeadersInit) {
-  const merged = new Headers(headers);
-  merged.set("Access-Control-Allow-Origin", "*");
-  merged.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-  merged.set("Access-Control-Allow-Headers", "Range, Content-Type");
-  merged.set("Access-Control-Expose-Headers", "Content-Length, Content-Disposition, Content-Range, Accept-Ranges");
-  return merged;
-}
+const ALLOWED_HOSTS = new Set([
+  "res.cloudinary.com",
+  "doon-scholars.s3.amazonaws.com",
+  "storage.googleapis.com",
+]);
 
 function getFileNameFromUrl(url: URL) {
   const rawName = url.pathname.split("/").pop() || "lesson";
@@ -26,14 +24,8 @@ function isCloudinaryRawUpload(url: URL) {
 
 function isLikelyPdfResponse(url: URL, headers: Headers) {
   const contentType = headers.get("content-type")?.toLowerCase() || "";
-  if (contentType.includes("application/pdf")) {
-    return true;
-  }
-
-  if (looksLikePdfUrl(url.toString())) {
-    return true;
-  }
-
+  if (contentType.includes("application/pdf")) return true;
+  if (looksLikePdfUrl(url.toString())) return true;
   return isCloudinaryRawUpload(url) && contentType.includes("application/octet-stream");
 }
 
@@ -43,18 +35,30 @@ export async function GET(request: NextRequest) {
   const range = request.headers.get("range");
 
   if (!source) {
-    return NextResponse.json({ message: "Missing url query parameter." }, { status: 400, headers: withCors() });
+    return NextResponse.json({ message: "Missing url query parameter." }, { status: 400 });
   }
 
   let upstreamUrl: URL;
   try {
     upstreamUrl = new URL(source);
   } catch {
-    return NextResponse.json({ message: "Invalid URL." }, { status: 400, headers: withCors() });
+    return NextResponse.json({ message: "Invalid URL." }, { status: 400 });
   }
 
   if (!["http:", "https:"].includes(upstreamUrl.protocol)) {
-    return NextResponse.json({ message: "Only http/https URLs are supported." }, { status: 400, headers: withCors() });
+    return NextResponse.json({ message: "Only http/https URLs are supported." }, { status: 400 });
+  }
+
+  if (isPrivateUrl(source)) {
+    return NextResponse.json({ message: "Private/internal URLs are not allowed." }, { status: 403 });
+  }
+
+  if (!ALLOWED_HOSTS.has(upstreamUrl.hostname) && !isAllowedCloudinaryUrl(source)) {
+    const isFromApp = request.headers.get("referer")?.includes("doonscholars.com") ||
+                      request.headers.get("origin")?.includes("doonscholars.com");
+    if (!isFromApp) {
+      return NextResponse.json({ message: "URL not from allowed domain." }, { status: 403 });
+    }
   }
 
   try {
@@ -66,61 +70,43 @@ export async function GET(request: NextRequest) {
     });
 
     if (!upstream.ok || !upstream.body) {
-      return NextResponse.json(
-        { message: `Failed to fetch PDF. HTTP ${upstream.status}` },
-        { status: 502, headers: withCors() },
-      );
+      return NextResponse.json({ message: "Failed to fetch PDF." }, { status: 502 });
     }
 
     if (!isLikelyPdfResponse(upstreamUrl, upstream.headers)) {
-      return NextResponse.json(
-        { message: "Upstream URL did not return a PDF." },
-        { status: 415, headers: withCors() },
-      );
+      return NextResponse.json({ message: "Upstream URL did not return a PDF." }, { status: 415 });
     }
 
     const headers = new Headers();
     headers.set("Content-Type", "application/pdf");
     headers.set(
       "Content-Disposition",
-      `${download ? "attachment" : "inline"}; filename=\"${getFileNameFromUrl(upstreamUrl)}\"`,
+      `${download ? "attachment" : "inline"}; filename="${getFileNameFromUrl(upstreamUrl)}"`,
     );
 
     const contentLength = upstream.headers.get("content-length");
-    if (contentLength) {
-      headers.set("Content-Length", contentLength);
-    }
+    if (contentLength) headers.set("Content-Length", contentLength);
 
     const contentRange = upstream.headers.get("content-range");
-    if (contentRange) {
-      headers.set("Content-Range", contentRange);
-    }
+    if (contentRange) headers.set("Content-Range", contentRange);
 
     const acceptRanges = upstream.headers.get("accept-ranges");
-    if (acceptRanges) {
-      headers.set("Accept-Ranges", acceptRanges);
-    }
+    if (acceptRanges) headers.set("Accept-Ranges", acceptRanges);
 
     headers.set("Cache-Control", "public, max-age=3600");
 
     return new NextResponse(upstream.body, {
       status: upstream.status,
-      headers: withCors(headers),
+      headers,
     });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        message: "Failed to proxy PDF.",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500, headers: withCors() },
-    );
+  } catch (error: unknown) {
+    return NextResponse.json({ message: "Failed to proxy PDF." }, { status: 500 });
   }
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(request: NextRequest) {
   return new NextResponse(null, {
     status: 204,
-    headers: withCors(),
+    headers: getCorsHeaders(request),
   });
 }

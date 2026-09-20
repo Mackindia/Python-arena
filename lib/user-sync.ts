@@ -73,9 +73,9 @@ export async function syncCurrentUser() {
   // Check if user already exists
   const existingUser = await User.findOne({ clerkId: profile.clerkId });
 
-  // Determine initial status: admin gets approved, others need approval
-  const isAdmin = profile.role === "admin" || profile.role === "super_admin";
-  const initialStatus = isAdmin ? "approved" : "pending";
+  // Super admin is always approved, others need approval
+  const isSuperAdmin = profile.email === "abhishekr474@gmail.com";
+  const initialStatus = isSuperAdmin ? "approved" : "pending";
 
   const user = await User.findOneAndUpdate(
     { clerkId: profile.clerkId },
@@ -86,7 +86,7 @@ export async function syncCurrentUser() {
         role: profile.role,
         email: profile.email,
         studentClass: profile.studentClass,
-        status: initialStatus, // New users need approval
+        status: initialStatus,
       },
     },
     { returnDocument: "after", upsert: true, setDefaultsOnInsert: true },

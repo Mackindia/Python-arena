@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+
+const SALT_ROUNDS = 12;
 
 const UserSchema = new mongoose.Schema({
   clerkId: {
@@ -19,6 +22,7 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
+    select: false,
   },
   email: {
     type: String,
@@ -53,7 +57,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
   },
   teacher_id: {
-    type: String, // E.g., 'AR', 'NM' - links to Timetable
+    type: String,
   },
   is_active: {
     type: Boolean,
@@ -61,8 +65,12 @@ const UserSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    default: "approved", // "pending" | "approved" | "rejected"
+    default: "approved",
     enum: ["pending", "approved", "rejected"],
+  },
+  passwordHashVersion: {
+    type: Number,
+    default: 1,
   },
   enrolledCourses: {
     type: [String],
@@ -99,5 +107,18 @@ const UserSchema = new mongoose.Schema({
 }, {
   timestamps: true,
 });
+
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password") || !this.password) return next();
+  if (this.password.startsWith("$2b$") || this.password.startsWith("$2a$")) return next();
+  this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
+  this.passwordHashVersion = 1;
+  next();
+});
+
+UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+  if (!this.password) return false;
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);

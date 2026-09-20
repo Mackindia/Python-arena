@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { execSync, exec } from "child_process";
 import { existsSync } from "fs";
 import { join } from "path";
+import { requireSuperAdminApi } from "@/lib/admin-api";
+import { sanitizeError } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +18,6 @@ type ServerConfig = {
 
 const ROOT = process.cwd();
 
-// ── Find python with FastAPI installed ──
 function findPython(): string {
   const candidates = [
     join(ROOT, ".vscode", "Python arena", "ai-teacher", ".venv", "Scripts", "python.exe"),
@@ -29,7 +30,6 @@ function findPython(): string {
   return "python";
 }
 
-// ── Find antigravity proxy ──
 function findAntigravity(): string {
   const candidates = [
     join(ROOT, "..", "antigravity-claude-proxy-main", "antigravity-claude-proxy-main"),
@@ -125,16 +125,16 @@ function killPort(port: number): boolean {
 
 function startServer(config: ServerConfig): { success: boolean; message: string } {
   if (!config.command) {
-    return { success: false, message: `${config.name} has no start command configured` };
+    return { success: false, message: "Server has no start command configured" };
   }
 
   if (!existsSync(config.cwd)) {
-    return { success: false, message: `Directory not found: ${config.cwd}` };
+    return { success: false, message: "Directory not found" };
   }
 
   const { running } = isPortInUse(config.port);
   if (running) {
-    return { success: false, message: `${config.name} already running on :${config.port}` };
+    return { success: false, message: "Server already running" };
   }
 
   try {
@@ -142,47 +142,61 @@ function startServer(config: ServerConfig): { success: boolean; message: string 
       cwd: config.cwd,
       windowsHide: true,
     });
-    return { success: true, message: `Starting ${config.name}...` };
-  } catch (e: any) {
-    return { success: false, message: e.message };
+    return { success: true, message: "Starting server..." };
+  } catch {
+    return { success: false, message: "Failed to start server" };
   }
 }
 
 function stopServer(config: ServerConfig): { success: boolean; message: string } {
   if (config.port === 0) {
-    return { success: false, message: `${config.name} is a CLI tool, cannot be stopped by port` };
+    return { success: false, message: "Server cannot be stopped by port" };
   }
   const killed = killPort(config.port);
   return killed
-    ? { success: true, message: `Stopped ${config.name}` }
-    : { success: false, message: `${config.name} was not running` };
+    ? { success: true, message: "Server stopped" }
+    : { success: false, message: "Server was not running" };
 }
 
 export async function GET() {
-  const servers = SERVERS.map((s) => {
-    if (s.port === 0) {
-      return { id: s.id, name: s.name, port: s.port, running: false, color: s.color };
-    }
-    const { running, pid } = isPortInUse(s.port);
-    return { id: s.id, name: s.name, port: s.port, running, pid, color: s.color };
-  });
-  return NextResponse.json({ servers });
+  try {
+    const auth = await requireSuperAdminApi();
+    if (!auth.ok) return auth.response;
+
+    const servers = SERVERS.map((s) => {
+      if (s.port === 0) {
+        return { id: s.id, name: s.name, port: s.port, running: false, color: s.color };
+      }
+      const { running, pid } = isPortInUse(s.port);
+      return { id: s.id, name: s.name, port: s.port, running, pid, color: s.color };
+    });
+    return NextResponse.json({ servers });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: sanitizeError(error) }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {
-  const { action, serverId } = await req.json();
+  try {
+    const auth = await requireSuperAdminApi();
+    if (!auth.ok) return auth.response;
 
-  const config = SERVERS.find((s) => s.id === serverId);
-  if (!config) {
-    return NextResponse.json({ error: "Unknown server" }, { status: 400 });
-  }
+    const { action, serverId } = await req.json();
 
-  if (action === "start") {
-    return NextResponse.json(startServer(config));
-  }
-  if (action === "stop") {
-    return NextResponse.json(stopServer(config));
-  }
+    const config = SERVERS.find((s) => s.id === serverId);
+    if (!config) {
+      return NextResponse.json({ error: "Unknown server" }, { status: 400 });
+    }
 
-  return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+    if (action === "start") {
+      return NextResponse.json(startServer(config));
+    }
+    if (action === "stop") {
+      return NextResponse.json(stopServer(config));
+    }
+
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: sanitizeError(error) }, { status: 500 });
+  }
 }

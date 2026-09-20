@@ -4,8 +4,8 @@ import path from "path";
 import { connectDB } from "../../../../../lib/mongodb";
 import User from "../../../../../models/User";
 import Timetable from "../../../../../models/Timetable";
-import { auth } from "@clerk/nextjs/server";
-import { cookies } from "next/headers";
+import { requireAdminApi } from "@/lib/admin-api";
+import { sanitizeError } from "@/lib/security";
 
 function splitCsvLine(line: string): string[] {
   const out: string[] = [];
@@ -75,7 +75,6 @@ function makeUniqueTeacherId(base: string, used: Set<string>) {
     }
   }
 
-  // Last fallback
   let fallback = cleanBase;
   while (used.has(fallback)) {
     fallback = `T${Math.random().toString(36).slice(2, 6).toUpperCase()}`.slice(0, 6);
@@ -84,30 +83,16 @@ function makeUniqueTeacherId(base: string, used: Set<string>) {
   return fallback;
 }
 
-async function isAdmin() {
-  await connectDB();
-
-  const { userId } = await auth();
-  if (userId) {
-    const user = await User.findOne({ clerkId: userId });
-    return user?.role === "admin" || user?.role === "super_admin";
-  }
-
-  const cookieStore = await cookies();
-  const localUserId = cookieStore.get("local_user_id")?.value;
-  if (localUserId) {
-    const user = await User.findById(localUserId);
-    return user?.role === "admin" || user?.role === "super_admin";
-  }
-
-  return false;
-}
+const ALLOWED_CSV_FILES = new Set([
+  "teachers id and passwords.csv",
+  "teachers.csv",
+  "staff.csv",
+]);
 
 export async function POST(req: Request) {
   try {
-    if (!(await isAdmin())) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const auth = await requireAdminApi();
+    if (!auth.ok) return auth.response;
 
     await connectDB();
     const body = await req.json().catch(() => ({}));
@@ -115,9 +100,20 @@ export async function POST(req: Request) {
       ? body.fileName.trim()
       : "teachers id and passwords.csv";
 
-    const csvPath = path.join(process.cwd(), fileName);
+    const normalizedFileName = path.basename(fileName);
+    if (!ALLOWED_CSV_FILES.has(normalizedFileName)) {
+      return NextResponse.json({ error: "File not allowed" }, { status: 400 });
+    }
+
+    const csvPath = path.join(process.cwd(), normalizedFileName);
+    const resolvedPath = path.resolve(csvPath);
+    const cwdResolved = path.resolve(process.cwd());
+    if (!resolvedPath.startsWith(cwdResolved)) {
+      return NextResponse.json({ error: "Invalid file path" }, { status: 400 });
+    }
+
     if (!fs.existsSync(csvPath)) {
-      return NextResponse.json({ error: `CSV file not found: ${fileName}` }, { status: 404 });
+      return NextResponse.json({ error: "CSV file not found" }, { status: 404 });
     }
 
     const csvContent = fs.readFileSync(csvPath, "utf-8");
@@ -145,19 +141,19 @@ export async function POST(req: Request) {
     const existingUsers = await User.find({}, { username: 1, teacher_id: 1 }).lean();
     const usedTeacherIds = new Set(
       existingUsers
-        .map((u: any) => String(u.teacher_id || "").trim().toUpperCase())
+        .map((u: Record<string, unknown>) => String((u as Record<string, unknown>).teacher_id || "").trim().toUpperCase())
         .filter(Boolean)
     );
 
     const existingUsernames = new Set(
       existingUsers
-        .map((u: any) => String(u.username || "").trim().toLowerCase())
+        .map((u: Record<string, unknown>) => String((u as Record<string, unknown>).username || "").trim().toLowerCase())
         .filter(Boolean)
     );
 
-    const created: any[] = [];
-    const skipped: any[] = [];
-    const failed: any[] = [];
+    const created: Array<Record<string, unknown>> = [];
+    const skipped: Array<Record<string, unknown>> = [];
+    const failed: Array<Record<string, unknown>> = [];
 
     for (let i = 1; i < lines.length; i += 1) {
       const cols = splitCsvLine(lines[i]);
@@ -193,15 +189,14 @@ export async function POST(req: Request) {
           firstName,
           lastName,
           username,
-          emailAddress: [`${username.replace(/[^a-zA-Z0-9._-]/g, "") || username}@doonscholars.com`],
           password,
           publicMetadata: { role: "teacher" },
           skipPasswordChecks: true,
         });
 
         clerkId = newClerkUser.id;
-      } catch (err: any) {
-        clerkSyncError = err?.errors?.[0]?.message || err?.message || "Clerk create failed";
+      } catch (err: unknown) {
+        clerkSyncError = "Clerk create failed";
       }
 
       try {
@@ -214,6 +209,7 @@ export async function POST(req: Request) {
           group: "MAIN",
           teacher_id: teacherId,
           is_active: true,
+          status: "approved",
         });
 
         await Timetable.updateMany(
@@ -232,14 +228,14 @@ export async function POST(req: Request) {
         });
 
         existingUsernames.add(username.toLowerCase());
-      } catch (dbErr: any) {
-        failed.push({ row: rowNo, username, reason: dbErr?.message || "Failed to create user" });
+      } catch (dbErr: unknown) {
+        failed.push({ row: rowNo, username, reason: "Failed to create user" });
       }
     }
 
     return NextResponse.json({
       success: true,
-      fileName,
+      fileName: normalizedFileName,
       totalRows: lines.length - 1,
       createdCount: created.length,
       skippedCount: skipped.length,
@@ -248,7 +244,7 @@ export async function POST(req: Request) {
       skipped,
       failed,
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: sanitizeError(error) }, { status: 500 });
   }
 }

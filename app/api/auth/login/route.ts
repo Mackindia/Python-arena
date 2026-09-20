@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { connectDB } from "../../../../lib/mongodb";
 import User from "../../../../models/User";
+import { sanitizeError, escapeRegex } from "../../../../lib/security";
 
 export async function POST(req: Request) {
   try {
@@ -15,40 +16,27 @@ export async function POST(req: Request) {
     const sanitizedUsername = username.trim().toLowerCase();
     const sanitizedPassword = password.trim();
 
-    if (sanitizedUsername === "debug") {
-       const anshika = await User.find({ fullName: { $regex: 'Anshika', $options: 'i' } }).lean();
-       const sample = await User.find().limit(5).lean();
-       const totalCount = await User.countDocuments();
-       
-       return NextResponse.json({ 
-         error: "DEBUG MODE", 
-         totalUsers: totalCount,
-         anshika_record: anshika,
-         sample_users: sample.map(u => ({ name: u.fullName, user: u.username, pass: u.password }))
-       }, { status: 401 });
-    }
-
-    // Strip out "s" and "@doon" to get the "core" parts
     const coreId = sanitizedUsername.startsWith('s') ? sanitizedUsername.substring(1) : sanitizedUsername;
-    const corePass = sanitizedPassword.toLowerCase().endsWith('@doon') ? sanitizedPassword.substring(0, sanitizedPassword.length - 5) : sanitizedPassword;
 
-    // We will find ALL users that might possibly match so we can see what's actually in the DB
-    const allMatchingUsers = await User.find({ 
-      username: { $regex: new RegExp(`^s?${coreId}$`, 'i') } 
-    }).lean();
+    const escapedCoreId = escapeRegex(coreId);
+    const allMatchingUsers = await User.find({
+      username: { $regex: new RegExp(`^s?${escapedCoreId}$`, 'i') }
+    }).select("+password").lean();
 
     const validUser = allMatchingUsers.find(u => {
-       const uName = (u.username || "").toLowerCase();
-       return uName === coreId || uName === `s${coreId}`;
+      const uName = (u.username || "").toLowerCase();
+      return uName === coreId || uName === `s${coreId}`;
     });
 
-    if (!validUser) {
+    if (!validUser || !validUser.password) {
       return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
     }
 
-    // Verify password against core pass or @doon appended version
-    const dbPassword = validUser.password?.trim() || "";
-    if (dbPassword !== corePass && dbPassword !== `${corePass}@doon`) {
+    const bcrypt = await import("bcrypt");
+    const passwordMatch = await bcrypt.compare(sanitizedPassword, validUser.password);
+    const passwordMatchDoon = await bcrypt.compare(`${sanitizedPassword}@doon`, validUser.password);
+
+    if (!passwordMatch && !passwordMatchDoon) {
       return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
     }
 
@@ -57,15 +45,33 @@ export async function POST(req: Request) {
     }
 
     const cookieStore = await cookies();
-    cookieStore.set("local_user_id", validUser._id.toString(), {
+    const SESSION_SECRET = process.env.SESSION_SECRET || "doon-scholars-default-secret-change-in-production";
+    const sessionToken = Buffer.from(JSON.stringify({
+      uid: validUser._id.toString(),
+      ts: Date.now(),
+    })).toString("base64");
+    const signature = await import("crypto").then(c =>
+      c.createHmac("sha256", SESSION_SECRET).update(sessionToken).digest("hex")
+    );
+    const signedToken = `${sessionToken}.${signature}`;
+
+    cookieStore.set("local_user_id", signedToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 7, // 1 week
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
       path: "/",
     });
 
-    return NextResponse.json({ success: true, user: { id: validUser._id, fullName: validUser.fullName || validUser.username, role: validUser.role } });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      user: {
+        id: validUser._id,
+        fullName: validUser.fullName || validUser.username,
+        role: validUser.role,
+      },
+    });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: sanitizeError(error) }, { status: 500 });
   }
 }
