@@ -5,9 +5,10 @@ import TeacherLoadHeatmap from './relief/TeacherLoadHeatmap';
 import ShiftQueueSidebar from './relief/ShiftQueueSidebar';
 import RecommendationPanel from './relief/RecommendationPanel';
 import './relief/reliefStyles.css';
+import { getPeriods } from '../config/periods';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
+const PERIODS = getPeriods();
 
 const TeacherView = () => {
   const { timetables, teachers, updateSlot } = useTimetable();
@@ -207,7 +208,7 @@ const TeacherView = () => {
               <div className="timetable-grid">
                 <div className="grid-cell grid-header">Day</div>
                 {PERIODS.map(p => (
-                  <div key={`p${p}`} className="grid-cell grid-header">Period {p}</div>
+                  <div key={`p${p}`} className="grid-cell grid-header">P{p}</div>
                 ))}
 
                 {DAYS.map(day => (

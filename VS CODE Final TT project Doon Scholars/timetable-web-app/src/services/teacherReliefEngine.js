@@ -1,5 +1,7 @@
+import { getPeriods } from '../config/periods';
+
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
+const PERIODS = getPeriods();
 const TARGET_LOAD = 6;
 
 /**
@@ -42,7 +44,7 @@ export const getTeacherDayLoads = (timetables, teacher) => {
       if (result[day][p]) load++;
     });
     result[day].load = load;
-    result[day].free = 8 - load;
+    result[day].free = PERIODS.length - load;
     result[day].periods.sort((a, b) => a.period - b.period);
   });
 

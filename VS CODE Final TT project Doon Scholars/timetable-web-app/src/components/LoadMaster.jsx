@@ -76,17 +76,32 @@ const LoadMaster = () => {
     }
   };
 
+  const handlePrintFullSheet = () => {
+    if (filterClass) setFilterClass('');
+    setTimeout(() => window.print(), 150);
+  };
+
   return (
     <div>
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 className="page-title">Load Master</h1>
-        <button 
-          className="btn btn-primary" 
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem' }}
-          onClick={() => setShowAddSubject(true)}
-        >
-          <Plus size={16} /> Add Subject Mapping
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            className="btn btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem', background: '#3b82f6', border: 'none' }}
+            onClick={handlePrintFullSheet}
+            title="Print the full Load Master sheet or save it as PDF"
+          >
+            🖨️ Print / Download PDF
+          </button>
+          <button
+            className="btn btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem' }}
+            onClick={() => setShowAddSubject(true)}
+          >
+            <Plus size={16} /> Add Subject Mapping
+          </button>
+        </div>
       </div>
 
       <div className="filter-bar">
@@ -105,8 +120,56 @@ const LoadMaster = () => {
         </div>
       </div>
 
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{ overflowX: 'auto' }}>
+      <div className="card printable-area" style={{ padding: 0, overflow: 'hidden' }}>
+        <style>{`
+          @media print {
+            @page { size: landscape; margin: 8mm; }
+            body { background: white !important; }
+            body * { visibility: hidden !important; }
+            .printable-area, .printable-area * { visibility: visible !important; }
+            .printable-area {
+              position: absolute !important;
+              left: 0 !important; top: 0 !important;
+              width: 100% !important;
+              overflow: visible !important;
+              border: none !important; box-shadow: none !important; padding: 0 !important;
+            }
+            .print-only-title { display: block !important; }
+            .no-print, .sidebar, .page-header, .filter-bar, button, select, input { display: none !important; }
+            .load-master-table-wrap { overflow: visible !important; }
+            .data-table {
+              width: 100% !important; min-width: 100% !important;
+              border-collapse: collapse !important;
+              font-size: 11px !important; color: #000 !important;
+            }
+            .data-table thead { display: table-header-group; }
+            .data-table tr { page-break-inside: avoid; }
+            .data-table th, .data-table td {
+              border: 1px solid #94a3b8 !important;
+              padding: 4px 6px !important;
+              color: #000 !important;
+              background: #fff !important;
+              -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+            .data-table th {
+              background: #e2e8f0 !important;
+              font-size: 10px !important; text-transform: uppercase !important;
+              -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+            .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          }
+        `}</style>
+
+        <div className="print-only-title" style={{ display: 'none', padding: '10px 12px', borderBottom: '2px solid #1e3a8a', color: '#000' }}>
+          <div style={{ fontSize: '16px', fontWeight: 700, textAlign: 'center', color: '#1e3a8a' }}>
+            Doon Scholars — Full Load Master Sheet
+          </div>
+          <div style={{ fontSize: '11px', textAlign: 'center', color: '#334155', marginTop: '4px' }}>
+            {filteredData.length} subject mappings · Printed {new Date().toLocaleString()}
+          </div>
+        </div>
+
+        <div className="load-master-table-wrap" style={{ overflowX: 'auto' }}>
           <table className="data-table">
             <thead>
               <tr>
@@ -117,7 +180,7 @@ const LoadMaster = () => {
                 <th>Actual Used Load</th>
                 <th>Remaining Load</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th className="no-print">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -127,7 +190,8 @@ const LoadMaster = () => {
                   <td>{row.class_val}</td>
                   <td>{row.section}</td>
                   <td style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <button 
+                    <button
+                      className="no-print"
                       onClick={() => updateTotalLoad(row.class_id, row.subject, -1)}
                       style={{ padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', cursor: 'pointer' }}
                       disabled={row.total_load <= 0}
@@ -135,7 +199,8 @@ const LoadMaster = () => {
                       -
                     </button>
                     <span style={{ minWidth: '20px', textAlign: 'center' }}>{row.total_load}</span>
-                    <button 
+                    <button
+                      className="no-print"
                       onClick={() => updateTotalLoad(row.class_id, row.subject, 1)}
                       style={{ padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', background: 'var(--bg-secondary)', cursor: 'pointer' }}
                     >
@@ -151,13 +216,13 @@ const LoadMaster = () => {
                     {row.actual_remaining > 0 && <span className="badge badge-warning" style={{ background: '#fffbeb', color: '#b45309', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>Underloaded</span>}
                     {row.actual_remaining < 0 && <span className="badge badge-danger" style={{ background: '#fef2f2', color: '#991b1b', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>Overloaded</span>}
                   </td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button 
+                  <td className="no-print" style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button
                       onClick={() => handleRename(row.class_id, row.subject)}
                       style={{ padding: '4px 8px', borderRadius: '4px', border: 'none', background: '#3b82f6', color: 'white', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}
                       title="Rename this subject in Load Master and Timetable"
                     >Rename</button>
-                    <button 
+                    <button
                       onClick={() => handleDelete(row.class_id, row.subject)}
                       style={{ padding: '4px 8px', borderRadius: '4px', border: 'none', background: '#ef4444', color: 'white', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}
                       title="Delete this subject mapping entirely"
@@ -171,9 +236,9 @@ const LoadMaster = () => {
       </div>
 
       {showAddSubject && (
-        <div style={{ 
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-          background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 
+        <div className="no-print" style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
         }}>
           <div style={{ background: '#1e293b', color: '#f8fafc', padding: '2rem', borderRadius: '12px', maxWidth: '400px', width: '90%', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', border: '1px solid #334155' }}>
             <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1.25rem', color: '#f8fafc' }}>Add Subject Mapping</h3>

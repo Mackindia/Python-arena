@@ -1,5 +1,6 @@
 export const calculateTeacherScore = (teacher, subjectToSubstitute, period, dayName, teacherUsage, currentSubs) => {
   const { normalizeTeacherId, normalizePeriod } = require('./normalization');
+  const { getPeriodCount } = require('../../config/periods');
   const normalizedTeacher = normalizeTeacherId(teacher);
   const normalizedPeriod = normalizePeriod(period);
   
@@ -17,7 +18,7 @@ export const calculateTeacherScore = (teacher, subjectToSubstitute, period, dayN
   score += (currentLoad * -10);
   
   // 2. Free periods preservation: small boost for remaining free periods
-  const freePeriods = 8 - currentLoad;
+  const freePeriods = getPeriodCount() - currentLoad;
   score += (freePeriods * 2);
   
   // Note: Subject matching preference and consecutive overload can be added here

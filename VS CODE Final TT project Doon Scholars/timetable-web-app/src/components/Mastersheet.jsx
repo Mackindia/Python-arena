@@ -3,16 +3,73 @@ import { useTimetable } from '../context/TimetableContext';
 import { useNavigate } from 'react-router-dom';
 import { Plus, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { autoAssignTeacher } from '../services/allocationEngine';
+import { getPeriods, getPeriodCount, setPeriodCount } from '../config/periods';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
+const PERIODS = getPeriods();
 const ALL_DAYS_VALUE = 'ALL';
 
 const Mastersheet = () => {
-  const { timetables, classes, checkTeacherCollision, updateSlot, teachers, loadMaster, teacherSubjectMap, getAllowedSubjectsForClass, importBackup } = useTimetable();
+  const { timetables, classes, checkTeacherCollision, updateSlot, teachers, loadMaster, teacherSubjectMap, getAllowedSubjectsForClass, importBackup, clearAllTimetables, isTimetableLocked, lockStatus } = useTimetable();
   const [selectedDay, setSelectedDay] = useState('Mon');
   const [editMode, setEditMode] = useState(false);
   const [adminOverride, setAdminOverride] = useState(false);
+  const [periodCount, setPeriodCountState] = useState(() => getPeriodCount());
+
+  const handleTogglePeriodCount = () => {
+    const next = periodCount === 9 ? 8 : 9;
+    const label = next === 8
+      ? 'Revert to 8-period timetable? P9 column will be hidden (data stays saved).'
+      : 'Switch to 9-period timetable? Empty P9 column will appear.';
+    if (!window.confirm(label)) return;
+    setPeriodCount(next);
+    setPeriodCountState(next);
+    window.location.reload();
+  };
+
+  const handleClearTimetable = () => {
+    if (isTimetableLocked || lockStatus === 'frozen') {
+      setNotification({
+        type: 'error',
+        message: 'Timetable is FROZEN. Unfreeze it first, then clear.'
+      });
+      setTimeout(() => setNotification(null), 4000);
+      return;
+    }
+
+    const slotCount = Object.values(timetables).reduce(
+      (sum, schedule) => sum + (Array.isArray(schedule) ? schedule.length : 0),
+      0
+    );
+
+    if (!window.confirm(
+      `CLEAR entire timetable?\n\n` +
+      `• Mastersheet slots: EMPTIED\n` +
+      `• Class Timetable slots: EMPTIED\n` +
+      `• Assigned periods: EMPTIED (${slotCount} slots)\n\n` +
+      `KEPT (not touched):\n` +
+      `• Teacher ↔ Subject mapping\n` +
+      `• Load Master\n` +
+      `• Class list\n\n` +
+      `This cannot be undone unless you have a backup. Continue?`
+    )) return;
+
+    if (!window.confirm('FINAL CONFIRM: Erase all scheduled periods now?')) return;
+
+    const ok = clearAllTimetables();
+    if (ok) {
+      setNotification({
+        type: 'success',
+        message: 'Timetable cleared. Teacher mapping and Load Master preserved.'
+      });
+    } else {
+      setNotification({
+        type: 'error',
+        message: 'Clear cancelled (lock or engine rejected the change).'
+      });
+    }
+    setTimeout(() => setNotification(null), 5000);
+  };
   const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
 
@@ -143,6 +200,43 @@ const Mastersheet = () => {
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 className="page-title">Mastersheet</h1>
         <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            className="btn btn-primary"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              borderRadius: '4px',
+              padding: '0.5rem 1rem',
+              background: periodCount === 9 ? '#dc2626' : '#2563eb',
+              border: 'none',
+              fontWeight: 600
+            }}
+            onClick={handleTogglePeriodCount}
+            title={periodCount === 9
+              ? 'One-click revert: show only P1–P8'
+              : 'Enable the 9th period column (P9)'}
+          >
+            {periodCount === 9 ? '⏮ Revert to 8 Periods' : '⏭ Enable 9 Periods'}
+          </button>
+          <button
+            className="btn btn-primary"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              borderRadius: '4px',
+              padding: '0.5rem 1rem',
+              background: '#b91c1c',
+              border: 'none',
+              fontWeight: 700,
+              color: '#fff'
+            }}
+            onClick={handleClearTimetable}
+            title="Empty Mastersheet + Class Timetable + assigned slots. Keeps teacher mapping and Load Master."
+          >
+            🗑️ Clear Timetable
+          </button>
           <button
             className="btn btn-primary"
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem', background: '#3b82f6', border: 'none' }}
@@ -293,7 +387,7 @@ const Mastersheet = () => {
               {/* Header Row */}
               <div className="grid-cell grid-header">Class</div>
               {PERIODS.map(p => (
-                <div key={`p${p}`} className="grid-cell grid-header">Period {p}</div>
+                <div key={`p${p}`} className="grid-cell grid-header">P{p}</div>
               ))}
 
               {/* Data Rows */}

@@ -3,9 +3,10 @@ import { useTimetable } from '../context/TimetableContext';
 import { AlertTriangle, CheckCircle2, Zap, Search, Wrench } from 'lucide-react';
 import { autoAssignTeacher } from '../services/allocationEngine';
 import { autoArrangeClass, detectClashes, resolveClashes, resolveSingleClash, resolveClashDeep } from '../services/autoArrangeEngine';
+import { getPeriods } from '../config/periods';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
+const PERIODS = getPeriods();
 
 const ClassTimetable = () => {
   const { timetables, classes, updateSlot, checkTeacherCollision, loadMaster, teachers, teacherSubjectMap, getAllowedSubjectsForClass } = useTimetable();
@@ -402,7 +403,7 @@ const ClassTimetable = () => {
         {/* Header Row */}
         <div className="grid-cell grid-header">Day</div>
         {PERIODS.map(p => (
-          <div key={`p${p}`} className="grid-cell grid-header">Period {p}</div>
+          <div key={`p${p}`} className="grid-cell grid-header">P{p}</div>
         ))}
 
         {/* Data Rows */}

@@ -2,9 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { useTimetable } from '../../context/TimetableContext';
 import { getFreeSlots, validateShift, getShiftPreview } from '../../services/teacherReliefEngine';
 import './reliefStyles.css';
+import { getPeriods } from '../../config/periods';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
+const PERIODS = getPeriods();
 
 const ShiftPickerModal = ({ teacher, fromDay, fromPeriod, onClose, onConfirm, onShowRecommendations }) => {
   const { timetables } = useTimetable();

@@ -1064,6 +1064,45 @@ export const TimetableProvider = ({ children }) => {
     return timetableLockService.getStatusText();
   }, []);
 
+  // Clear ALL timetable slots (Mastersheet + Class Timetable + assignments).
+  // DOES NOT touch teacherSubjectMap or loadMaster.
+  const clearAllTimetables = useCallback(() => {
+    if (!timetableLockService.canEdit()) return false;
+
+    // Keep teachers list alive after slots are emptied (rebuild scans slots)
+    try {
+      const saved = JSON.parse(localStorage.getItem('addedTeachers') || '[]');
+      const set = new Set(
+        saved.map(t => String(t || '').trim().toUpperCase()).filter(Boolean)
+      );
+      teachers.forEach(t => {
+        const n = String(t || '').trim().toUpperCase();
+        if (n && n !== 'NAN' && n !== '0') set.add(n);
+      });
+      localStorage.setItem('addedTeachers', JSON.stringify(Array.from(set).sort()));
+    } catch {
+      // ignore parse errors
+    }
+
+    setTimetables(prev => {
+      const next = {};
+      const classIds = new Set([...Object.keys(prev || {}), ...classes]);
+      classIds.forEach(id => {
+        next[id] = [];
+      });
+      return next;
+    });
+
+    setTeacherSlotUsage({});
+    localStorage.setItem('teacherSlotUsage', JSON.stringify({}));
+    setSubstitutions({});
+    localStorage.setItem('substitutions', JSON.stringify({}));
+    setAbsentTeachers({});
+    localStorage.setItem('absentTeachers', JSON.stringify({}));
+
+    return true;
+  }, [teachers, classes]);
+
   const importBackup = useCallback(async (backupData) => {
     try {
       const parseVal = (val) => {
@@ -1281,6 +1320,7 @@ export const TimetableProvider = ({ children }) => {
       addNewTeacher,
       deleteTeacher,
       importBackup,
+      clearAllTimetables,
       forcePushAllToServer,
       syncStatus,
       teachersSynced,

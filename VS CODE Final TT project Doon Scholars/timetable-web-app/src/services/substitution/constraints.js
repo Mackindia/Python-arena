@@ -1,5 +1,6 @@
 export const isTeacherEligible = (teacher, period, dayName, dailyAbsent, teacherUsage, currentSubs) => {
   const { normalizeTeacherId, normalizePeriod } = require('./normalization');
+  const { getPeriodCount } = require('../../config/periods');
   const normalizedTeacher = normalizeTeacherId(teacher);
   const normalizedPeriod = normalizePeriod(period);
 
@@ -20,8 +21,8 @@ export const isTeacherEligible = (teacher, period, dayName, dailyAbsent, teacher
   const extraLoad = currentSubs.filter(s => normalizeTeacherId(s.substituteTeacher) === normalizedTeacher).length;
   const totalLoad = baseLoad + extraLoad;
   
-  // 5. Already 7 periods -> blocked
-  if (totalLoad >= 7) return false;
+  // 5. Already at period cap for the day -> blocked
+  if (totalLoad >= getPeriodCount()) return false;
   
   return true; // Eligible
 };

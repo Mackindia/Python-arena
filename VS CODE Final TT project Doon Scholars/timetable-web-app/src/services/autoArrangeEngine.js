@@ -5,16 +5,18 @@
 // Strategy:
 //   1. Read subjects + loads from loadMaster for a given class
 //   2. Read teachers from teacherSubjectMap for that class
-//   3. Fill a 6-day × 8-period grid using the subject loads
+//   3. Fill a 6-day × N-period grid using the subject loads
 //   4. Assign teachers from the mapping (strictly from THIS class only)
 //   5. Detect clashes against the FULL master timetable
 //   6. Resolve clashes by SWAPPING periods within the SAME class
 //      (never pull teachers from another class)
 // ====================================================================
 
+import { getPeriods } from '../config/periods';
+
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
-const TOTAL_SLOTS = DAYS.length * PERIODS.length; // 48
+const PERIODS = getPeriods();
+const TOTAL_SLOTS = DAYS.length * PERIODS.length;
 
 // ========================
 // 1. GET SUBJECTS + LOADS

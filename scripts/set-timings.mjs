@@ -39,7 +39,8 @@ const periodTimings = [
   { period_no: 5, start_time: "11:00", end_time: "11:40" }, // After Break
   { period_no: 6, start_time: "11:40", end_time: "12:20" },
   { period_no: 7, start_time: "12:20", end_time: "13:00" },
-  { period_no: 8, start_time: "13:00", end_time: "13:40" }
+  { period_no: 8, start_time: "13:00", end_time: "13:40" },
+  { period_no: 9, start_time: "13:40", end_time: "14:20" }
 ];
 
 async function updateTimings() {

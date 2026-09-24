@@ -16,6 +16,7 @@ import {
 
 import { buildTeacherScheduleMap } from "../services/timetable/buildTeacherScheduleMap";
 import { buildTeacherUsageMap } from "../services/timetable/buildTeacherUsageMap";
+import { getPeriodCount } from "../config/periods";
 
 const SubstitutionEngineUI = ({
   timetables,
@@ -129,8 +130,8 @@ const SubstitutionEngineUI = ({
         ).length;
         return { name: t, baseLoad, extraLoad, load: baseLoad + extraLoad };
       })
-      // strictly enforce max 3 arrangements AND total periods < 8
-      .filter(t => t.extraLoad < 3 && t.load < 8)
+      // strictly enforce max 3 arrangements AND total periods < period count
+      .filter(t => t.extraLoad < 3 && t.load < getPeriodCount())
       .sort((a, b) => {
         if (a.extraLoad !== b.extraLoad) {
           return a.extraLoad - b.extraLoad;

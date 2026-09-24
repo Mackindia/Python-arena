@@ -3,8 +3,9 @@ import { useTimetable } from '../../context/TimetableContext';
 import { getDayDetail, getTeacherDayLoads, pickBestPeriod } from '../../services/teacherReliefEngine';
 import ShiftPickerModal from './ShiftPickerModal';
 import './reliefStyles.css';
+import { getPeriods } from '../../config/periods';
 
-const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
+const PERIODS = getPeriods();
 
 const DayDetailPanel = ({ teacher, day, onClose, onAddShift, shiftQueue, onShowRecommendations }) => {
   const { timetables } = useTimetable();

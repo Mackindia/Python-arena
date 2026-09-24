@@ -1,3 +1,5 @@
+import { getPeriodCount } from '../config/periods';
+
 export const generateTeacherUsageGrid = (masterTimetable, teachersList) => {
   const usage = {};
   
@@ -6,7 +8,7 @@ export const generateTeacherUsageGrid = (masterTimetable, teachersList) => {
     usage[teacher] = {};
     ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
       usage[teacher][day] = {};
-      for (let period = 1; period <= 8; period++) {
+      for (let period = 1; period <= getPeriodCount(); period++) {
         usage[teacher][day][period] = 0;
       }
     });

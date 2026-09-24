@@ -1,9 +1,7 @@
 {
-  "status": "frozen",
-  "isLocked": true,
-  "frozenAt": "2026-07-15T07:01:42.700Z",
-  "frozenBy": "admin",
-  "unfrozenAt": null,
-  "unfrozenBy": null,
-  "version": 3
+  "status": "draft",
+  "isLocked": false,
+  "unfrozenAt": "2026-09-24T07:25:12.070Z",
+  "unfrozenBy": "admin",
+  "version": 12
 }

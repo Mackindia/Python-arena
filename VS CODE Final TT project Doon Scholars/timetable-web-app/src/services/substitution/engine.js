@@ -6,6 +6,7 @@ import {
   normalizeClassId,
   generateSlotId
 } from "./normalization"
+import { getPeriodCount } from "../../config/periods"
 
 export const generateAllSubstitutions = (
 
@@ -139,7 +140,7 @@ export const generateAllSubstitutions = (
           // exempt from substitution duty
           .filter(t => !['AN', 'P', 'RN'].includes(t.id))
 
-          // max 3 arrangements AND total periods < 8
+          // max 3 arrangements AND total periods < period count
           .filter(t => {
             const usage =
               teacherUsage?.[
@@ -157,7 +158,7 @@ export const generateAllSubstitutions = (
             const extraLoad =
               (assignedMap[t.id] || []).length
 
-            return extraLoad < 3 && (baseLoad + extraLoad) < 8;
+            return extraLoad < 3 && (baseLoad + extraLoad) < getPeriodCount();
           })
 
           // fairness
