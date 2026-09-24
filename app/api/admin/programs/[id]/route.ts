@@ -16,7 +16,7 @@ async function verifyAdmin() {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const ctx = await verifyAdmin();
@@ -26,6 +26,7 @@ export async function GET(
 
     await connectDB();
 
+    const { id } = await params;
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type"); // "web" or "python"
 
@@ -35,9 +36,9 @@ export async function GET(
 
     let program;
     if (type === "web") {
-      program = await Program.findById(params.id).lean();
+      program = await Program.findById(id).lean();
     } else {
-      program = await PythonProgram.findById(params.id).lean();
+      program = await PythonProgram.findById(id).lean();
     }
 
     if (!program) {
