@@ -247,6 +247,15 @@ export const TimetableProvider = ({ children }) => {
       localStorage.setItem('syncedTeachers', JSON.stringify(payload.teachers));
       setTeachersSynced(true);
     }
+    // Keep the custom/deleted teacher lists in step with the server too -
+    // otherwise departed codes in stale localStorage come back on reload
+    // (init rebuilds the teacher list from addedTeachers - deletedTeachers).
+    if (Array.isArray(payload.addedTeachers)) {
+      localStorage.setItem('addedTeachers', JSON.stringify(payload.addedTeachers));
+    }
+    if (Array.isArray(payload.deletedTeachers)) {
+      localStorage.setItem('deletedTeachers', JSON.stringify(payload.deletedTeachers));
+    }
     if (payload.teacherSubjectMap && typeof payload.teacherSubjectMap === 'object') {
       setTeacherSubjectMap(payload.teacherSubjectMap);
       localStorage.setItem('teacherSubjectMap', JSON.stringify(payload.teacherSubjectMap));
