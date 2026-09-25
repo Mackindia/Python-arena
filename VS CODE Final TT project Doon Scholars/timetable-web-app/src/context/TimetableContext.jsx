@@ -11,7 +11,12 @@ import { generateTeacherUsageGrid } from '../services/derivedViewEngine';
 import { rawCsvData } from '../data/csvData';
 import { syncService } from '../services/syncService';
 import { timetableLockService } from '../services/timetableLockService';
-import { parseGridTimetableCsv, applyImportedPeriodCount } from '../utils/csvTimetableImport';
+import {
+  parseGridTimetableCsv,
+  applyImportedPeriodCount,
+  knownTeachers as knownTeacherCodes,
+  rosterCodes,
+} from '../utils/csvTimetableImport';
 
 const parseCSVInitialData = () => {
   try {
@@ -23,7 +28,10 @@ const parseCSVInitialData = () => {
       const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
       if (!matches || matches.length < 4) return;
       
-      let [rawSubject, cls, section, rawTeacher] = matches.map(m => m.replace(/^"|"$/g, '').trim());
+      const cleanedRow = matches.map(m => m.replace(/^"|"$/g, '').trim());
+      const [rawSubject, cls, section] = cleanedRow;
+      // Keep every teacher token (rows can carry 3+ teachers: SB,RD,DV)
+      const rawTeacher = cleanedRow.slice(3).join(',');
       const classId = `${cls}${section}`.toUpperCase();
       
       const subjectTokens = (rawSubject.toUpperCase() === 'A/C' || rawSubject.toUpperCase() === 'F/S')
@@ -1287,11 +1295,19 @@ export const TimetableProvider = ({ children }) => {
       applyImportedPeriodCount(parsed.periodCount);
 
       const teacherSet = new Set(parsed.teachers);
+      // Keep every current staff member visible (even with 0 periods) so
+      // substitutes can be picked and unassigned staff is easy to spot.
+      rosterCodes.forEach(c => teacherSet.add(c));
       try {
         const savedAdded = JSON.parse(localStorage.getItem('addedTeachers') || '[]');
         savedAdded.forEach(t => {
           const n = String(t || '').trim().toUpperCase();
-          if (n && n !== 'NAN' && n !== '0') teacherSet.add(n);
+          // Only keep additions that are still on the current staff roster —
+          // otherwise departed codes saved earlier (NM, SZ, TP, AG …) come back
+          // on every import and show up with 0 periods ("free").
+          if (n && n !== 'NAN' && n !== '0' && knownTeacherCodes.has(n)) {
+            teacherSet.add(n);
+          }
         });
       } catch {
         // ignore
@@ -1382,6 +1398,7 @@ export const TimetableProvider = ({ children }) => {
         `• Teachers: ${teachersList.length}\n` +
         `• Kept from CSV (source of truth): ${stats.fromCsv || 0}\n` +
         `• Filled from subject-teacher map: ${stats.filledFromOfficial || 0}\n` +
+        `• Composite cells re-paired by subject: ${stats.compositeRepaired || 0}\n` +
         `• Server: ${serverOk ? 'updated' : 'skipped (using local only)'}\n\n` +
         `Old teacher initials will not reappear for 30s while sync catches up.`
       );

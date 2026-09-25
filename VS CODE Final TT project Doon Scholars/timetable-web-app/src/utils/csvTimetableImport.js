@@ -35,10 +35,10 @@ const SUBJECT_ALIASES = {
   bst: ['BSt'],
   hsc: ['HSC', 'Computer/HSC'],
   copm: ['Computer', 'Computer/HSC'],
-  hsc: ['HSC', 'Computer/HSC'],
   'phy edu': ['Phy_Edu'],
+  phy_edu: ['Phy_Edu'],
   'pol sc': ['Pol_Sc'],
-  'pol sc': ['Pol_Sc'],
+  history: ['HIST'],
   music: ['Music'],
   gk: ['GK'],
 };
@@ -86,10 +86,20 @@ const parseClassCell = (raw) => {
   return { className, section, classId };
 };
 
-const toTeachers = (parts) =>
+const toTeachers = (parts) => {
+  const seen = new Set();
+  const out = [];
   parts
     .map((p) => String(p || '').trim().toUpperCase())
-    .filter((t) => t && t !== 'NAN' && t !== '0');
+    .filter((t) => t && t !== 'NAN' && t !== '0')
+    .forEach((t) => {
+      if (!seen.has(t)) {
+        seen.add(t);
+        out.push(t);
+      }
+    });
+  return out;
+};
 
 const splitSlashList = (s) =>
   String(s || '')
@@ -118,9 +128,12 @@ const buildOfficialMap = () => {
   rows.forEach((row) => {
     const matches = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
     if (!matches || matches.length < 4) return;
-    const [rawSubject, cls, section, rawTeacher] = matches.map((m) =>
-      m.replace(/^"|"$/g, '').trim()
-    );
+    const cleaned = matches.map((m) => m.replace(/^"|"$/g, '').trim());
+    const [rawSubject, cls, section] = cleaned;
+    // Keep EVERY teacher token — rows like "Bio/Eco/Phy_Edu,11,A,SB,RD,DV"
+    // produce 6 match groups; destructuring only the first 4 silently
+    // dropped RD/DV (and MS/DP, AR/SP) from the map.
+    const rawTeacher = cleaned.slice(3).join(',');
     const classKey = `${cls}${section}`.toUpperCase();
     const subjectTokens =
       rawSubject.toUpperCase() === 'A/C' || rawSubject.toUpperCase() === 'F/S'
@@ -143,11 +156,16 @@ const buildOfficialMap = () => {
 };
 
 const officialMap = buildOfficialMap();
-const knownTeachers = new Set(
+// Current-staff roster straight from teacher_mapping.json (35 codes).
+export const rosterCodes = new Set(
   (Array.isArray(teacherMapping) ? teacherMapping : [])
     .map((t) => String(t?.Teacher || '').trim().toUpperCase())
     .filter(Boolean)
 );
+
+// Current-staff roster (teacher_mapping.json + every code the official map uses).
+// Exported so the importer can drop departed codes saved in localStorage.
+export const knownTeachers = new Set(rosterCodes);
 // Official subject-teacher map may include initials not in teacher_mapping.json (e.g. P)
 Object.values(officialMap).forEach((byClass) => {
   Object.values(byClass || {}).forEach((raw) => {
@@ -157,47 +175,6 @@ Object.values(officialMap).forEach((byClass) => {
 
 const normalizeSubjectKey = (subject) =>
   String(subject || '').replace(/\s+/g, ' ').trim().toLowerCase();
-
-/** Resolve a CSV subject to official subject name(s) present in the map */
-const resolveOfficialSubjects = (subject, depth = 0) => {
-  if (depth > 5) return [];
-  const s = String(subject || '').replace(/\s+/g, ' ').trim();
-  if (!s) return [];
-  if (officialMap[s]) return [s];
-
-  const lower = normalizeSubjectKey(s);
-  if (SUBJECT_ALIASES[lower]) {
-    for (const cand of SUBJECT_ALIASES[lower]) {
-      if (officialMap[cand]) return [cand];
-    }
-  }
-
-  // Try alias prefix (e.g. "sst oc" already split; "phy_edu")
-  for (const [alias, candidates] of Object.entries(SUBJECT_ALIASES)) {
-    if (lower === alias) {
-      for (const cand of candidates) {
-        if (officialMap[cand]) return [cand];
-      }
-    }
-  }
-
-  if (s.includes('/')) {
-    const parts = s.split('/').map((p) => p.trim()).filter(Boolean);
-    const resolved = [];
-    parts.forEach((p) => {
-      resolveOfficialSubjects(p, depth + 1).forEach((r) => {
-        if (!resolved.includes(r)) resolved.push(r);
-      });
-    });
-    if (resolved.length) return resolved;
-  }
-
-  // Case-insensitive exact match against official subjects
-  const hit = Object.keys(officialMap).find(
-    (k) => normalizeSubjectKey(k) === lower
-  );
-  return hit ? [hit] : [];
-};
 
 /** Collect official subject candidates for a CSV subject name */
 const collectOfficialCandidates = (subject, depth = 0) => {
@@ -280,9 +257,106 @@ const lookupOfficialTeacher = (subject, classId) => {
   };
 };
 
+/**
+ * Resolve a composite cell such as "Bio/Eco/Phy_Edu" or "Maths/Hindi/Music".
+ *
+ * Each stream subject is looked up on its own against the official map so the
+ * teacher follows the SUBJECT (Eco → RD, Phy_Edu → DV, Hindi → MS …) instead of
+ * the position of the token inside the cell, which is what used to put MG on
+ * Hindi and drop RD/DV entirely. Streams the map does not know fall back to the
+ * CSV's positional teachers.
+ */
+const resolveCompositeCell = (subject, classId, csvTeachers) => {
+  const streams = String(subject || '')
+    .split('/')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const positional = (csvTeachers || []).length === streams.length;
+
+  const infos = streams.map((stream) => lookupOfficialTeacher(stream, classId));
+  const officialClaims = new Set(infos.flatMap((i) => i.assignedTeachers));
+
+  const streamTeachers = {};
+  const streamSubjects = {};
+  const officialSubjects = [];
+  let officialStreams = 0;
+
+  streams.forEach((stream, idx) => {
+    const info = infos[idx];
+    const official = info.assignedTeachers;
+    let list;
+    if (official.length) {
+      officialStreams += 1;
+      list = [...official];
+      info.subjects.forEach((s) => {
+        if (!officialSubjects.includes(s)) officialSubjects.push(s);
+      });
+      streamSubjects[stream] = info.subjects.length ? info.subjects : [stream];
+      // Keep a CSV teacher the map doesn't cover (e.g. AD co-teaching HSC
+      // alongside GA) unless another stream in this cell already claims them.
+      const csvTeacher = positional ? csvTeachers[idx] : '';
+      if (
+        csvTeacher &&
+        !list.includes(csvTeacher) &&
+        !officialClaims.has(csvTeacher)
+      ) {
+        list.push(csvTeacher);
+      }
+    } else if (positional) {
+      list = [csvTeachers[idx]];
+      streamSubjects[stream] = [stream];
+    } else if (csvTeachers.length) {
+      list = csvTeachers;
+      streamSubjects[stream] = [stream];
+    } else {
+      list = [];
+      streamSubjects[stream] = [stream];
+    }
+    streamTeachers[stream] = toTeachers(list);
+  });
+
+  const assigned = toTeachers(streams.flatMap((s) => streamTeachers[s] || []));
+  return {
+    streams,
+    streamTeachers,
+    streamSubjects,
+    officialSubjects,
+    assigned,
+    officialStreams,
+  };
+};
+
 const pickTeacher = (subject, classId, csvAssigned) => {
-  const official = lookupOfficialTeacher(subject, classId);
   const csv = (csvAssigned || []).filter((t) => knownTeachers.has(t));
+  const csvKey = (csvAssigned || []).join(',');
+
+  // Composite cells (Bio/Eco/Phy_Edu, Maths/Hindi/Music, Acct/History …)
+  if (String(subject || '').includes('/')) {
+    const comp = resolveCompositeCell(subject, classId, csvAssigned || []);
+    if (comp.assigned.length) {
+      const teacher = comp.assigned.join(',');
+      return {
+        teacher,
+        assignedTeachers: comp.assigned,
+        officialSubjects: comp.officialSubjects,
+        streamTeachers: comp.streamTeachers,
+        streamSubjects: comp.streamSubjects,
+        fromOfficial: comp.officialStreams > 0 && teacher !== csvKey,
+        fromCsv: teacher === csvKey,
+      };
+    }
+    return {
+      teacher: '',
+      assignedTeachers: [],
+      officialSubjects: comp.officialSubjects,
+      streamTeachers: comp.streamTeachers,
+      streamSubjects: comp.streamSubjects,
+      fromOfficial: false,
+      fromCsv: false,
+    };
+  }
+
+  const official = lookupOfficialTeacher(subject, classId);
 
   // 1) The imported CSV is the source of truth for the 9-period timetable.
   //    Whenever the cell itself names teacher(s), keep them as-is.
@@ -454,6 +528,7 @@ export const parseGridTimetableCsv = (csvText) => {
   let currentDay = normalizeDay(header[0]);
   let filledFromOfficial = 0;
   let correctedFromOfficial = 0;
+  let compositeRepaired = 0;
   let fromCsv = 0;
 
   for (let r = 1; r < lines.length; r++) {
@@ -491,10 +566,21 @@ export const parseGridTimetableCsv = (csvText) => {
       ) {
         correctedFromOfficial += 1;
       }
+      if (
+        resolved.streamTeachers &&
+        cell.assignedTeachers.length &&
+        resolved.teacher !== cell.assignedTeachers.join(',')
+      ) {
+        compositeRepaired += 1;
+      }
 
-      // Display subject: prefer official canonical name when available
-      const displaySubject =
-        resolved.officialSubjects[0] || cell.subject;
+      // Display subject: keep the composite cell name intact
+      // ("Bio/Eco/Phy_Edu", "Maths/Hindi/Music") so the grid, load master and
+      // teacher map all talk about the same key. Only plain subjects are
+      // normalised to the official canonical name.
+      const displaySubject = String(cell.subject).includes('/')
+        ? cell.subject
+        : resolved.officialSubjects[0] || cell.subject;
 
       const assigned = resolved.assignedTeachers;
       const teacher = resolved.teacher;
@@ -516,9 +602,24 @@ export const parseGridTimetableCsv = (csvText) => {
       if (cell.subject && cell.subject !== displaySubject) {
         setTeacherSubject(teacherSubjectMap, cell.subject, classId, teacher);
       }
-      resolved.officialSubjects.forEach((sub) => {
-        setTeacherSubject(teacherSubjectMap, sub, classId, teacher);
-      });
+      if (resolved.streamTeachers) {
+        // Composite cell: map EVERY stream subject to its own teacher
+        // (Bio → SB, Eco → RD, Phy_Edu → DV) instead of the whole union,
+        // so auto-assign and clash checks stay per-subject.
+        Object.entries(resolved.streamTeachers).forEach(([stream, list]) => {
+          const streamTeacher = (list || []).join(',');
+          if (!streamTeacher) return;
+          const names = resolved.streamSubjects?.[stream] || [stream];
+          names.forEach((name) =>
+            setTeacherSubject(teacherSubjectMap, name, classId, streamTeacher)
+          );
+          setTeacherSubject(teacherSubjectMap, stream, classId, streamTeacher);
+        });
+      } else {
+        resolved.officialSubjects.forEach((sub) => {
+          setTeacherSubject(teacherSubjectMap, sub, classId, teacher);
+        });
+      }
 
       assigned.forEach((t) => teacherSet.add(t));
     }
@@ -580,6 +681,7 @@ export const parseGridTimetableCsv = (csvText) => {
       fromCsv,
       filledFromOfficial,
       correctedFromOfficial,
+      compositeRepaired,
       teacherSubjectMapKeys: Object.keys(teacherSubjectMap).length,
     },
   };
