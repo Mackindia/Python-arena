@@ -14,6 +14,9 @@
     "postinstall": "node scripts/hash-existing-passwords.mjs",
     "seed:learn-nav": "node scripts/seed-learn-navigation.mjs",
     "sync:timetable": "node scripts/sync-timetable.mjs",
+    "sync:timetable-9p": "node scripts/sync-9period-timetable.mjs",
+    "sync:timetable-live": "node scripts/sync-timetable-live.mjs",
+    "sync:timetable-live:watch": "node scripts/sync-timetable-live.mjs --watch",
     "servers": "node scripts/server-manager.js",
     "health": "node scripts/auto-heal.js"
   },

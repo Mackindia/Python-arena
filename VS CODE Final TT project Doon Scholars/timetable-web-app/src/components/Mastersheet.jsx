@@ -10,7 +10,7 @@ const PERIODS = getPeriods();
 const ALL_DAYS_VALUE = 'ALL';
 
 const Mastersheet = () => {
-  const { timetables, classes, checkTeacherCollision, updateSlot, teachers, loadMaster, teacherSubjectMap, getAllowedSubjectsForClass, importBackup, clearAllTimetables, isTimetableLocked, lockStatus } = useTimetable();
+  const { timetables, classes, checkTeacherCollision, updateSlot, teachers, loadMaster, teacherSubjectMap, getAllowedSubjectsForClass, importBackup, importCsvTimetable, clearAllTimetables, isTimetableLocked, lockStatus } = useTimetable();
   const [selectedDay, setSelectedDay] = useState('Mon');
   const [editMode, setEditMode] = useState(false);
   const [adminOverride, setAdminOverride] = useState(false);
@@ -307,6 +307,53 @@ const Mastersheet = () => {
             />
           </label>
 
+          <label
+            className="btn btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem', background: '#2563eb', border: 'none', cursor: 'pointer' }}
+            title="Import a P1–P9 weekly grid CSV (day blocks × class rows). Replaces timetable slots, classes, load, and teacher mapping."
+          >
+            📥 Import CSV
+            <input
+              type="file"
+              accept=".csv,text/csv"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                if (isTimetableLocked || lockStatus === 'frozen') {
+                  setNotification({
+                    type: 'error',
+                    message: 'Timetable is FROZEN. Unfreeze it first, then import CSV.'
+                  });
+                  setTimeout(() => setNotification(null), 4000);
+                  e.target.value = '';
+                  return;
+                }
+                if (!window.confirm(
+                  'Import CSV and REPLACE the current timetable?\n\n' +
+                  '• All period slots rebuilt from CSV\n' +
+                  '• Classes / Load Master / Teacher mapping rebuilt\n' +
+                  '• Periods/day set from CSV (P1–P9)\n\n' +
+                  'Unfreeze the timetable first if it is locked. Continue?'
+                )) {
+                  e.target.value = '';
+                  return;
+                }
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                  try {
+                    await importCsvTimetable(event.target.result);
+                  } catch (err) {
+                    alert('Error reading CSV: ' + err.message);
+                  } finally {
+                    e.target.value = '';
+                  }
+                };
+                reader.readAsText(file);
+              }}
+            />
+          </label>
+
           <button 
             className={adminOverride ? "btn btn-primary" : "btn"}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem' }}
@@ -395,28 +442,31 @@ const Mastersheet = () => {
                 <React.Fragment key={cls}>
                   <div className="grid-cell day-header">{cls.toUpperCase()}</div>
                   {PERIODS.map(p => {
-                    const slot = timetables[cls]?.find(s => s.day === day && parseInt(s.period) === p);
+                    const slot = timetables[cls]?.find(s => s.day === day && parseInt(s.period, 10) === parseInt(p, 10));
                     const mappingStatus = getMappingStatus(cls, slot?.subject);
-                    const collisionClass = slot?.teacher && mappingStatus.status === 'valid' ? checkTeacherCollision(slot.teacher, day, p, cls) : false;
+                    // Live clash check — same engine as Class Timetable so both views match
+                    const collisionClass = slot?.teacher ? checkTeacherCollision(slot.teacher, day, p, cls) : false;
                     
-                    // Determine cell CSS class: missing mapping takes priority, then collision
+                    // Clash takes priority so resolve/edit results match Class Timetable
                     let cellClassName = 'grid-cell';
-                    if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
-                      cellClassName += ' missing-mapping';
-                    } else if (mappingStatus.status === 'no_teacher') {
-                      cellClassName += ' missing-mapping';
-                    } else if (collisionClass) {
+                    if (collisionClass) {
                       cellClassName += ' collision-warning';
+                    } else if (
+                      mappingStatus.status === 'no_subject' ||
+                      mappingStatus.status === 'empty' ||
+                      mappingStatus.status === 'no_teacher'
+                    ) {
+                      cellClassName += ' missing-mapping';
                     }
                     
                     // Determine title tooltip
                     let cellTitle = '';
-                    if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
+                    if (collisionClass) {
+                      cellTitle = `Clash Detected: ${slot.teacher} is also teaching Class ${collisionClass.toUpperCase()} in Period ${p}`;
+                    } else if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
                       cellTitle = 'No valid subject mapping exists - subject may be deleted';
                     } else if (mappingStatus.status === 'no_teacher') {
                       cellTitle = 'Subject exists but teacher is not assigned';
-                    } else if (collisionClass) {
-                      cellTitle = `Clash Detected: ${slot.teacher} is also teaching Class ${collisionClass.toUpperCase()} in Period ${p}`;
                     }
                     
                     return (

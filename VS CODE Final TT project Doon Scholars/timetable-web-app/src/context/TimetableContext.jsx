@@ -11,6 +11,7 @@ import { generateTeacherUsageGrid } from '../services/derivedViewEngine';
 import { rawCsvData } from '../data/csvData';
 import { syncService } from '../services/syncService';
 import { timetableLockService } from '../services/timetableLockService';
+import { parseGridTimetableCsv, applyImportedPeriodCount } from '../utils/csvTimetableImport';
 
 const parseCSVInitialData = () => {
   try {
@@ -203,6 +204,24 @@ export const TimetableProvider = ({ children }) => {
 
   // ── Sync Service: receive remote changes ──────────────────────────────────
   const onRemoteChange = useCallback((payload) => {
+    // After CSV/import, ignore remote for a short window so other tabs/devices
+    // cannot immediately overwrite the new teachers with stale data.
+    try {
+      const ignoreUntil = parseInt(localStorage.getItem('ignoreRemoteUntil') || '0', 10);
+      if (ignoreUntil && Date.now() < ignoreUntil) {
+        console.warn('[sync] Ignoring remote update (import grace period)');
+        return;
+      }
+      const localEpoch = parseInt(localStorage.getItem('dataEpoch') || '0', 10);
+      const remoteEpoch = Number(payload.dataEpoch || 0);
+      if (localEpoch && remoteEpoch && remoteEpoch < localEpoch) {
+        console.warn('[sync] Ignoring stale remote payload (older dataEpoch)');
+        return;
+      }
+    } catch {
+      // ignore storage errors
+    }
+
     isRemoteUpdate.current = true;
     setSyncStatus('receiving');
 
@@ -244,6 +263,13 @@ export const TimetableProvider = ({ children }) => {
     if (payload.absentTeachers && typeof payload.absentTeachers === 'object') {
       setAbsentTeachers(payload.absentTeachers);
       localStorage.setItem('absentTeachers', JSON.stringify(payload.absentTeachers));
+    }
+    if (payload.dataEpoch) {
+      try {
+        localStorage.setItem('dataEpoch', String(payload.dataEpoch));
+      } catch {
+        // ignore
+      }
     }
     if (Array.isArray(payload.addedTeachers)) {
       localStorage.setItem('addedTeachers', JSON.stringify(payload.addedTeachers));
@@ -287,7 +313,15 @@ export const TimetableProvider = ({ children }) => {
 
     clearTimeout(syncPushTimers.current[fieldName]);
     syncPushTimers.current[fieldName] = setTimeout(() => {
-      syncService.push({ [fieldName]: fieldData });
+      // Carry dataEpoch so server can reject truly stale full-state overwrites
+      let payload = { [fieldName]: fieldData };
+      try {
+        const epoch = parseInt(localStorage.getItem('dataEpoch') || '0', 10);
+        if (epoch) payload.dataEpoch = epoch;
+      } catch {
+        // ignore
+      }
+      syncService.push(payload);
       setSyncStatus('synced');
       setTimeout(() => setSyncStatus('idle'), 2000);
     }, 800);
@@ -572,36 +606,46 @@ export const TimetableProvider = ({ children }) => {
   // Update a specific slot in a class timetable
   const updateSlot = (classId, day, period, subject, teacher, assignedTeachers = null, clashes = []) => {
     // Check if timetable is locked
-    if (!timetableLockService.canEdit()) return;
+    if (!timetableLockService.canEdit()) return false;
+
+    const dayKey = String(day || '').trim();
+    const periodNum = parseInt(period, 10);
 
     setTimetables(prev => {
-      const classSchedule = [...(prev[classId] || [])];
-      
-      // Find if slot exists
-      const slotIndex = classSchedule.findIndex(s => s.day === day && s.period === period);
-      
+      const existing = Array.isArray(prev[classId]) ? prev[classId] : [];
+      // Normalize period types (string vs number) so lookups never miss and duplicate slots
+      const classSchedule = existing.filter(
+        s => !(s.day === dayKey && parseInt(s.period, 10) === periodNum)
+      );
+
       let finalAssigned = assignedTeachers;
       if (finalAssigned === null) {
         finalAssigned = teacher ? teacher.split(',').map(t => t.trim()).filter(Boolean) : [];
       }
-      
-      if (!subject && !teacher) {
-        // Remove the slot if both are empty
-        if (slotIndex >= 0) {
-          classSchedule.splice(slotIndex, 1);
-        }
-      } else {
-        if (slotIndex >= 0) {
-          // Update existing
-          classSchedule[slotIndex] = { ...classSchedule[slotIndex], subject, teacher, assignedTeachers: finalAssigned, clashes };
-        } else {
-          // Add new
-          classSchedule.push({ day, period, subject, teacher, assignedTeachers: finalAssigned, clashes });
-        }
+
+      if (subject || teacher) {
+        classSchedule.push({
+          day: dayKey,
+          period: periodNum,
+          subject,
+          teacher,
+          assignedTeachers: finalAssigned,
+          clashes: clashes || [],
+        });
       }
-      
+
+      // Sort for stable order
+      const dayOrder = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+      classSchedule.sort((a, b) => {
+        const d = (dayOrder[a.day] ?? 9) - (dayOrder[b.day] ?? 9);
+        if (d !== 0) return d;
+        return parseInt(a.period, 10) - parseInt(b.period, 10);
+      });
+
       return { ...prev, [classId]: classSchedule };
     });
+
+    return true;
   };
 
   // Update teacher for a specific subject in a class
@@ -1235,6 +1279,120 @@ export const TimetableProvider = ({ children }) => {
     }
   }, []);
 
+  const importCsvTimetable = useCallback(async (csvText) => {
+    if (!timetableLockService.canEdit()) return false;
+
+    try {
+      const parsed = parseGridTimetableCsv(csvText);
+      applyImportedPeriodCount(parsed.periodCount);
+
+      const teacherSet = new Set(parsed.teachers);
+      try {
+        const savedAdded = JSON.parse(localStorage.getItem('addedTeachers') || '[]');
+        savedAdded.forEach(t => {
+          const n = String(t || '').trim().toUpperCase();
+          if (n && n !== 'NAN' && n !== '0') teacherSet.add(n);
+        });
+      } catch {
+        // ignore
+      }
+      const teachersList = Array.from(teacherSet).sort();
+
+      const dataEpoch = Date.now();
+      const payload = {
+        dataEpoch,
+        timetables: parsed.timetables,
+        teachers: teachersList,
+        teacherSubjectMap: parsed.teacherSubjectMap,
+        loadMaster: parsed.loadMaster,
+        masterClasses: parsed.masterClasses,
+        substitutions: {},
+        absentTeachers: {},
+        addedTeachers: teachersList,
+        deletedTeachers: [],
+      };
+
+      // Block remote overwrite of this fresh import for 30s
+      localStorage.setItem('dataEpoch', String(dataEpoch));
+      localStorage.setItem('ignoreRemoteUntil', String(dataEpoch + 30000));
+      localStorage.setItem('timetables', JSON.stringify(parsed.timetables));
+      localStorage.setItem('teacherSubjectMap', JSON.stringify(parsed.teacherSubjectMap));
+      localStorage.setItem('loadMaster', JSON.stringify(parsed.loadMaster));
+      localStorage.setItem('masterClasses', JSON.stringify(parsed.masterClasses));
+      localStorage.setItem('teachers', JSON.stringify(teachersList));
+      localStorage.setItem('addedTeachers', JSON.stringify(teachersList));
+      localStorage.setItem('teacherSlotUsage', JSON.stringify({}));
+      localStorage.setItem('substitutions', JSON.stringify({}));
+      localStorage.setItem('absentTeachers', JSON.stringify({}));
+      localStorage.removeItem('deletedTeachers');
+      localStorage.removeItem('syncedTeachers');
+
+      // Full replace push — bump knownVersion from response
+      let serverOk = false;
+      try {
+        const response = await fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientId: syncService._clientId,
+            payload,
+            fullReplace: true,
+          }),
+        });
+        if (response.ok) {
+          const resJson = await response.json();
+          if (resJson.success) {
+            syncService._knownVersion = resJson.version;
+            serverOk = true;
+          }
+        } else {
+          console.warn('[CSV Import] Sync server rejected push', response.status);
+        }
+      } catch {
+        console.warn('[CSV Import] Sync server not available, localStorage only');
+      }
+
+      // Update live state (skip remote until grace ends)
+      isRemoteUpdate.current = true;
+      setTimetables(parsed.timetables);
+      setTeachers(teachersList);
+      setTeacherSubjectMap(parsed.teacherSubjectMap);
+      setLoadMaster(parsed.loadMaster);
+      setMasterClasses(parsed.masterClasses);
+      setClasses(parsed.classes);
+      setTeacherSlotUsage({});
+      setSubstitutions({});
+      setAbsentTeachers({});
+
+      // Push local fields as well (debounced services will skip remote while flag set)
+      try {
+        syncService.push(payload);
+      } catch {
+        // ignore
+      }
+
+      const slotCount = Object.values(parsed.timetables)
+        .reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
+      const stats = parsed.stats || {};
+      alert(
+        `CSV imported successfully!\n\n` +
+        `• Classes: ${parsed.classes.length}\n` +
+        `• Slots assigned: ${slotCount}\n` +
+        `• Periods/day: ${parsed.periodCount}\n` +
+        `• Teachers: ${teachersList.length}\n` +
+        `• Kept from CSV (source of truth): ${stats.fromCsv || 0}\n` +
+        `• Filled from subject-teacher map: ${stats.filledFromOfficial || 0}\n` +
+        `• Server: ${serverOk ? 'updated' : 'skipped (using local only)'}\n\n` +
+        `Old teacher initials will not reappear for 30s while sync catches up.`
+      );
+      window.location.reload();
+      return true;
+    } catch (err) {
+      alert('CSV import failed: ' + err.message);
+      return false;
+    }
+  }, []);
+
   const forcePushAllToServer = useCallback(async () => {
     // Check if timetable is locked
     if (!timetableLockService.canEdit()) return false;
@@ -1320,6 +1478,7 @@ export const TimetableProvider = ({ children }) => {
       addNewTeacher,
       deleteTeacher,
       importBackup,
+      importCsvTimetable,
       clearAllTimetables,
       forcePushAllToServer,
       syncStatus,

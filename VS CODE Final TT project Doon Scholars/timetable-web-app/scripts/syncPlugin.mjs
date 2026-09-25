@@ -215,7 +215,7 @@ export function createSyncPlugin() {
         if (req.method === 'POST' && url.pathname === '/api/sync') {
           try {
             const raw = await readBody(req);
-            const { clientId, payload, action } = JSON.parse(raw);
+            const { clientId, payload, action, fullReplace } = JSON.parse(raw);
 
             // Handle lock actions via /api/sync (legacy support)
             if (action === "freeze" || action === "unfreeze") {
@@ -299,28 +299,74 @@ export function createSyncPlugin() {
               return;
             }
 
-            // Check for empty timetables (prevent data loss)
+            // Check for empty timetables (prevent data loss) — allowed on fullReplace only
             if (payload.timetables && typeof payload.timetables === 'object' && 
-                Object.keys(payload.timetables).length === 0) {
+                Object.keys(payload.timetables).length === 0 && !fullReplace) {
               console.warn(`[sync-server] BLOCKED empty timetables from "${clientId}"`);
               res.statusCode = 400;
               res.end(JSON.stringify({ error: 'Cannot sync empty timetables' }));
               return;
             }
 
+            // Reject older CSV import epochs unless this is a fullReplace.
+            // Missing/0 remoteEpoch is treated as stale if server already has an epoch
+            // only when the payload is a full-state replace (timetables present without epoch).
+            const remoteEpoch = Number(payload.dataEpoch || 0);
+            const serverEpoch = Number(syncStore.dataEpoch || 0);
+            const isFullState = payload.timetables && typeof payload.timetables === 'object';
+            if (serverEpoch && !fullReplace) {
+              if (remoteEpoch < serverEpoch && remoteEpoch > 0) {
+                res.statusCode = 409;
+                res.end(JSON.stringify({
+                  error: 'Stale payload (older dataEpoch)',
+                  version: syncStore.version,
+                  dataEpoch: serverEpoch,
+                }));
+                return;
+              }
+              // Full timetable replace without epoch after a CSV import → likely stale old tab
+              if (isFullState && !remoteEpoch) {
+                res.statusCode = 409;
+                res.end(JSON.stringify({
+                  error: 'Stale full-state payload (missing dataEpoch after import)',
+                  version: syncStore.version,
+                  dataEpoch: serverEpoch,
+                }));
+                return;
+              }
+            }
+
             // Apply the update
-            syncStore = {
-              ...syncStore,
-              version: syncStore.version + 1,
-              updatedAt: Date.now(),
-              updatedBy: clientId || 'unknown',
-              ...payload,
-            };
+            if (fullReplace) {
+              syncStore = {
+                ...syncStore,
+                version: syncStore.version + 1,
+                updatedAt: Date.now(),
+                updatedBy: clientId || 'unknown',
+                dataEpoch: remoteEpoch || Date.now(),
+                timetables: payload.timetables ?? syncStore.timetables,
+                teachers: payload.teachers ?? syncStore.teachers,
+                teacherSubjectMap: payload.teacherSubjectMap ?? syncStore.teacherSubjectMap,
+                loadMaster: payload.loadMaster ?? syncStore.loadMaster,
+                masterClasses: payload.masterClasses ?? syncStore.masterClasses,
+                substitutions: payload.substitutions ?? null,
+                absentTeachers: payload.absentTeachers ?? null,
+              };
+            } else {
+              syncStore = {
+                ...syncStore,
+                version: syncStore.version + 1,
+                updatedAt: Date.now(),
+                updatedBy: clientId || 'unknown',
+                ...payload,
+                dataEpoch: Math.max(serverEpoch, remoteEpoch),
+              };
+            }
 
             persist();
-            console.log(`[sync-server] State updated by "${clientId}" → version ${syncStore.version}`);
+            console.log(`[sync-server] State updated by "${clientId}" → version ${syncStore.version}${fullReplace ? ' (fullReplace)' : ''}`);
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ success: true, version: syncStore.version }));
+            res.end(JSON.stringify({ success: true, version: syncStore.version, dataEpoch: syncStore.dataEpoch }));
           } catch (err) {
             res.statusCode = 500;
             res.end(JSON.stringify({ error: err.message }));

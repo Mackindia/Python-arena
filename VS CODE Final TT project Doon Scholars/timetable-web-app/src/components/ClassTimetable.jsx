@@ -411,31 +411,31 @@ const ClassTimetable = () => {
           <React.Fragment key={day}>
             <div className="grid-cell day-header">{day}</div>
             {PERIODS.map(p => {
-              const slot = timetables[targetClass]?.find(s => s.day === day && parseInt(s.period) === p);
+              const slot = timetables[targetClass]?.find(s => s.day === day && parseInt(s.period, 10) === parseInt(p, 10));
               const mappingStatus = getMappingStatus(targetClass, slot?.subject);
-              const isCollision = slot?.teacher && mappingStatus.status === 'valid' && checkTeacherCollision(slot.teacher, day, p, targetClass);
+              // Live clash check — same engine as Mastersheet so both views match
+              const isCollision = slot?.teacher ? checkTeacherCollision(slot.teacher, day, p, targetClass) : false;
               
-              // Determine cell CSS class: missing mapping takes priority, then collision
+              // Clash takes priority so resolve/edit results match Mastersheet
               let cellClassName = 'grid-cell';
-              if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
-                // Deleted subject or empty slot - show blue
-                cellClassName += ' missing-mapping';
-              } else if (mappingStatus.status === 'no_teacher') {
-                // Subject exists but no teacher - show blue
-                cellClassName += ' missing-mapping';
-              } else if (isCollision) {
-                // Only show red for actual clashes when mapping is valid
+              if (isCollision) {
                 cellClassName += ' collision-warning';
+              } else if (
+                mappingStatus.status === 'no_subject' ||
+                mappingStatus.status === 'empty' ||
+                mappingStatus.status === 'no_teacher'
+              ) {
+                cellClassName += ' missing-mapping';
               }
               
               // Determine title tooltip
               let cellTitle = '';
-              if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
+              if (isCollision) {
+                cellTitle = `Clash Detected: ${slot.teacher} is also teaching Class ${isCollision.toUpperCase()} in Period ${p}`;
+              } else if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
                 cellTitle = 'No valid subject mapping exists - subject may be deleted';
               } else if (mappingStatus.status === 'no_teacher') {
                 cellTitle = 'Subject exists but teacher is not assigned';
-              } else if (isCollision) {
-                cellTitle = `Clash Detected: ${slot.teacher} is also teaching Class ${isCollision.toUpperCase()} in Period ${p}`;
               }
               
               return (
