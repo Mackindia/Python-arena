@@ -237,6 +237,11 @@ export const TimetableProvider = ({ children }) => {
       setTimetables(payload.timetables);
       localStorage.setItem('timetables', JSON.stringify(payload.timetables));
     }
+    // Period count travels with the data so a device that still has 8 stored
+    // renders all 9 columns after a sync (otherwise P9 looks "missing").
+    if (payload.periodCount) {
+      applyImportedPeriodCount(payload.periodCount);
+    }
     if (Array.isArray(payload.teachers) && payload.teachers.length > 0) {
       setTeachers(payload.teachers);
       localStorage.setItem('syncedTeachers', JSON.stringify(payload.teachers));
@@ -1317,6 +1322,7 @@ export const TimetableProvider = ({ children }) => {
       const dataEpoch = Date.now();
       const payload = {
         dataEpoch,
+        periodCount: parsed.periodCount,
         timetables: parsed.timetables,
         teachers: teachersList,
         teacherSubjectMap: parsed.teacherSubjectMap,

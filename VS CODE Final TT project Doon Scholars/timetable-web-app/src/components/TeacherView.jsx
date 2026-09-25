@@ -30,14 +30,26 @@ const TeacherView = () => {
 
     Object.entries(timetables).forEach(([classId, classSchedule]) => {
       classSchedule.forEach(slot => {
-        // Handle comma-separated teachers (e.g., "GA,SA,HSC")
-        const teachers = slot.teacher ? slot.teacher.split(',').map(t => t.trim()) : [];
-        if (teachers.includes(selectedTeacher)) {
-          schedule[slot.day][parseInt(slot.period)] = {
-            classId,
-            subject: slot.subject
+        // Handle comma-separated teachers (e.g., "SB,RD,DV")
+        const slotTeachers = slot.teacher ? slot.teacher.split(',').map(t => t.trim()) : [];
+        if (!slotTeachers.includes(selectedTeacher)) return;
+        const p = parseInt(slot.period);
+        const cell = schedule[slot.day][p];
+        if (cell) {
+          // Combined class: the teacher is with 2+ sections in this period.
+          // Keep every section instead of overwriting (11a used to vanish
+          // behind 11b, so the teacher view disagreed with the class grid).
+          if (!cell.classIds.includes(classId)) cell.classIds.push(classId);
+          if (!cell.subjects.includes(slot.subject)) cell.subjects.push(slot.subject);
+        } else {
+          schedule[slot.day][p] = {
+            classIds: [classId],
+            subjects: [slot.subject],
+            combined: false,
           };
         }
+        const now = schedule[slot.day][p];
+        now.combined = now.classIds.length > 1;
       });
     });
 
@@ -220,8 +232,17 @@ const TeacherView = () => {
                         <div key={`${day}-p${p}`} className="grid-cell" style={slot ? { backgroundColor: 'rgba(79, 70, 229, 0.05)' } : {}}>
                           {slot ? (
                             <>
-                              <div className="slot-subject">{slot.classId.toUpperCase()}</div>
-                              <div className="slot-teacher">{slot.subject}</div>
+                              <div
+                                className="slot-subject"
+                                title={
+                                  slot.combined
+                                    ? `Combined class: ${slot.classIds.map(c => c.toUpperCase()).join(' + ')}`
+                                    : undefined
+                                }
+                              >
+                                {slot.classIds.map(c => c.toUpperCase()).join(' + ')}
+                              </div>
+                              <div className="slot-teacher">{slot.subjects.join(' / ')}</div>
                             </>
                           ) : (
                             <div className="slot-teacher" style={{ opacity: 0.3 }}>- Free -</div>

@@ -25,9 +25,12 @@ const APP_DIR = resolve(rootDir, "VS CODE Final TT project Doon Scholars", "time
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes("--dry-run");
+const SHOW_CLASHES = args.includes("--show-clashes");
 const csvArg = args.find((a) => !a.startsWith("--"));
 const csvPath = csvArg ? resolve(rootDir, csvArg) : resolve(rootDir, "9 periods timetable csv file.csv");
 const envPath = resolve(rootDir, ".env.local");
+
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 const DAY_MAP = {
   Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday",
@@ -35,6 +38,35 @@ const DAY_MAP = {
   Monday: "Monday", Tuesday: "Tuesday", Wednesday: "Wednesday",
   Thursday: "Thursday", Friday: "Friday", Saturday: "Saturday", Sunday: "Sunday",
 };
+
+// Same teacher booked in two classes at the same day/period.
+// Same subject across classes = joint/combined session (reported separately);
+// different subjects = a genuine clash worth checking.
+function findTeacherClashes(rows) {
+  const bySlot = new Map();
+  rows.forEach((r) => {
+    if (!r.teacher_id || r.teacher_id === "UNASSIGNED") return;
+    const key = `${r.day}|${r.period_no}|${r.teacher_id}`;
+    if (!bySlot.has(key)) bySlot.set(key, []);
+    bySlot.get(key).push(r);
+  });
+
+  const conflicts = [];
+  const joint = [];
+  bySlot.forEach((slots, key) => {
+    if (slots.length < 2) return;
+    const cells = [...new Set(slots.map((s) => `${s.class}-${s.section}:${s.subject}`))];
+    if (cells.length < 2) return;
+    const subjects = new Set(slots.map((s) => String(s.subject).toLowerCase()));
+    const [day, period, teacher] = key.split("|");
+    const entry = { day, period: Number(period), teacher, slots: cells };
+    (subjects.size > 1 ? conflicts : joint).push(entry);
+  });
+
+  const byTime = (a, b) =>
+    DAYS.indexOf(a.day) - DAYS.indexOf(b.day) || a.period - b.period || a.teacher.localeCompare(b.teacher);
+  return { conflicts: conflicts.sort(byTime), joint: joint.sort(byTime) };
+}
 
 function loadEnv() {
   const env = {};
@@ -126,6 +158,25 @@ async function main() {
   if (incomplete.length) {
     console.log(`\nIncomplete class/day rows (${incomplete.length}):`);
     incomplete.forEach((m) => console.log("  " + m));
+  }
+
+  const { conflicts, joint } = findTeacherClashes(rows);
+  if (conflicts.length) {
+    console.log(`\nTeacher clashes - same teacher, different subjects (${conflicts.length}):`);
+    conflicts.forEach((c) =>
+      console.log(`  ${c.day} P${c.period} ${c.teacher}: ${c.slots.join("  |  ")}`)
+    );
+  }
+  if (joint.length) {
+    console.log(
+      `\nJoint sessions - same teacher, same subject in 2 classes (${joint.length}). ` +
+        "These are usually combined classes; verify before editing."
+    );
+    if (SHOW_CLASHES) {
+      joint.forEach((c) => console.log(`  ${c.day} P${c.period} ${c.teacher}: ${c.slots.join("  |  ")}`));
+    } else {
+      console.log("  (re-run with --show-clashes to list them)");
+    }
   }
 
   if (DRY_RUN) {

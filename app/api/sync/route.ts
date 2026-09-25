@@ -45,6 +45,7 @@ export async function GET(req: Request) {
       absentTeachers: syncStore.absentTeachers,
       addedTeachers: syncStore.addedTeachers,
       deletedTeachers: syncStore.deletedTeachers,
+      periodCount: syncStore.periodCount ?? null,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -118,6 +119,7 @@ export async function POST(req: Request) {
     if (payload.absentTeachers !== undefined) updatedFields.absentTeachers = payload.absentTeachers;
     if (payload.addedTeachers !== undefined) updatedFields.addedTeachers = payload.addedTeachers;
     if (payload.deletedTeachers !== undefined) updatedFields.deletedTeachers = payload.deletedTeachers;
+    if (payload.periodCount !== undefined) updatedFields.periodCount = payload.periodCount;
 
     const result = await SyncStore.findOneAndUpdate(
       {},

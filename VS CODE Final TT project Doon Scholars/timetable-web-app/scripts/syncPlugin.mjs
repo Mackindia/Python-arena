@@ -351,6 +351,7 @@ export function createSyncPlugin() {
                 masterClasses: payload.masterClasses ?? syncStore.masterClasses,
                 substitutions: payload.substitutions ?? null,
                 absentTeachers: payload.absentTeachers ?? null,
+                periodCount: payload.periodCount ?? syncStore.periodCount ?? null,
               };
             } else {
               syncStore = {

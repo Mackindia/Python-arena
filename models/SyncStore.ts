@@ -13,6 +13,7 @@ const SyncStoreSchema = new mongoose.Schema({
   absentTeachers: { type: mongoose.Schema.Types.Mixed, default: null },
   addedTeachers: { type: mongoose.Schema.Types.Mixed, default: null },
   deletedTeachers: { type: mongoose.Schema.Types.Mixed, default: null },
+  periodCount: { type: Number, default: null },
 });
 
 export default mongoose.models.SyncStore || mongoose.model("SyncStore", SyncStoreSchema);
