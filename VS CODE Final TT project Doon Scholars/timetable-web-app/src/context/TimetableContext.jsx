@@ -1194,12 +1194,13 @@ export const TimetableProvider = ({ children }) => {
       }
 
       const payload = {};
-      const syncKeys = ['timetables', 'teachers', 'teacherSubjectMap', 'loadMaster', 'masterClasses', 'substitutions', 'absentTeachers'];
+      const syncKeys = ['timetables', 'teachers', 'teacherSubjectMap', 'loadMaster', 'masterClasses', 'substitutions', 'absentTeachers', 'addedTeachers', 'deletedTeachers', 'periodCount'];
       syncKeys.forEach(key => {
-        if (processedData[key] !== undefined) {
+        if (processedData[key] !== undefined && processedData[key] !== null) {
           payload[key] = parseVal(processedData[key]);
         }
       });
+      if (payload.periodCount !== undefined) payload.periodCount = Number(payload.periodCount) || 0;
 
       // If we only have timetables, derive teachers from the data
       if (payload.timetables && (!payload.teachers || payload.teachers.length === 0)) {
@@ -1244,11 +1245,17 @@ export const TimetableProvider = ({ children }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           clientId: syncService._clientId,
+          // dataEpoch + fullReplace so the server treats this as a fresh
+          // full-state replace (a bare payload is rejected as stale/409 and
+          // the import is then reverted by the next sync pull).
+          dataEpoch: payload.dataEpoch || Date.now(),
+          fullReplace: true,
           payload
         })
       });
 
       let serverSuccess = false;
+      let serverError = null;
       let resJson = {};
 
       if (response.ok) {
@@ -1256,9 +1263,17 @@ export const TimetableProvider = ({ children }) => {
         serverSuccess = resJson.success;
         if (serverSuccess) {
           syncService._knownVersion = resJson.version;
+        } else {
+          serverError = resJson.error || 'unknown server error';
         }
       } else {
-        console.warn('[Import] Sync server not available, saving to localStorage only');
+        try {
+          const errJson = await response.json();
+          serverError = errJson.error || errJson.reason || `HTTP ${response.status}`;
+        } catch {
+          serverError = `HTTP ${response.status}`;
+        }
+        console.warn('[Import] Sync server rejected the import:', serverError);
       }
 
       // Save to localStorage (works with or without server)
@@ -1282,8 +1297,20 @@ export const TimetableProvider = ({ children }) => {
       if (payload.masterClasses) setMasterClasses(payload.masterClasses);
       if (payload.substitutions) setSubstitutions(payload.substitutions);
       if (payload.absentTeachers) setAbsentTeachers(payload.absentTeachers);
+      if (payload.periodCount) applyImportedPeriodCount(payload.periodCount);
 
-      alert('Data imported successfully! The page will now reload.');
+      if (serverSuccess) {
+        alert('Data imported and pushed to the server. The page will now reload.');
+      } else {
+        alert(
+          'Saved in THIS BROWSER ONLY - the server refused the import (' +
+            (serverError || 'no response') +
+            ').' +
+            (serverError && String(serverError).toLowerCase().includes('lock')
+              ? ' Unlock the timetable first, then import again.'
+              : ' If you reload, the server data may come back - check the sync status.')
+        );
+      }
       window.location.reload();
       return true;
     } catch (err) {

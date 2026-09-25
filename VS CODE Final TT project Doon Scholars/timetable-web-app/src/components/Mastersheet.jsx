@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { autoAssignTeacher } from '../services/allocationEngine';
 import { getPeriods, getPeriodCount, setPeriodCount } from '../config/periods';
+import { downloadBackup } from '../utils/backupExport';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = getPeriods();
@@ -256,25 +257,9 @@ const Mastersheet = () => {
           <button 
             className="btn btn-primary" 
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', padding: '0.5rem 1rem', background: '#8b5cf6', border: 'none' }}
-            onClick={() => {
-              const backup = {
-                timetables: localStorage.getItem('timetables'),
-                teacherSubjectMap: localStorage.getItem('teacherSubjectMap'),
-                addedTeachers: localStorage.getItem('addedTeachers'),
-                deletedTeachers: localStorage.getItem('deletedTeachers'),
-                deletedSubjects: localStorage.getItem('deletedSubjects'),
-                loadMaster: localStorage.getItem('loadMaster'),
-                masterClasses: localStorage.getItem('masterClasses'),
-                teacherSlotUsage: localStorage.getItem('teacherSlotUsage'),
-                substitutions: localStorage.getItem('substitutions'),
-                absentTeachers: localStorage.getItem('absentTeachers')
-              };
-              const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-              const a = document.createElement('a');
-              a.href = URL.createObjectURL(blob);
-              a.download = `Timetable_Data_Backup_${new Date().toISOString().split('T')[0]}.json`;
-              a.click();
-            }}
+            onClick={() =>
+              downloadBackup(`Timetable_Data_Backup_${new Date().toISOString().split('T')[0]}.json`)
+            }
             title="Download a hard copy backup of your current timetable data"
           >
             💾 Export Backup

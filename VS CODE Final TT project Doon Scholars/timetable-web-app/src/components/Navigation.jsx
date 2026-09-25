@@ -2,18 +2,13 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Calendar, Users, BookOpen, LayoutGrid, Settings, Layers, UserMinus, FileSpreadsheet, Wifi, WifiOff } from 'lucide-react';
 import { useTimetable } from '../context/TimetableContext';
+import { downloadBackup } from '../utils/backupExport';
 
 const Navigation = () => {
   const { syncStatus, importBackup } = useTimetable();
 
   const handleExport = () => {
-    const data = JSON.stringify(localStorage);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'doon_scholars_timetable_backup.json';
-    a.click();
+    downloadBackup('doon_scholars_timetable_backup.json');
   };
 
   const handleImport = () => {
