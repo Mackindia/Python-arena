@@ -266,7 +266,7 @@ const lookupOfficialTeacher = (subject, classId) => {
  * Hindi and drop RD/DV entirely. Streams the map does not know fall back to the
  * CSV's positional teachers.
  */
-const resolveCompositeCell = (subject, classId, csvTeachers) => {
+export const resolveCompositeCell = (subject, classId, csvTeachers) => {
   const streams = String(subject || '')
     .split('/')
     .map((s) => s.trim())
@@ -324,6 +324,47 @@ const resolveCompositeCell = (subject, classId, csvTeachers) => {
     assigned,
     officialStreams,
   };
+};
+
+/**
+ * Re-resolve every composite (slash) cell in an already-built timetable object.
+ * Backups and sync payloads written before the per-stream fix still carry the
+ * old positional pairing - "SB" alone for Bio/Eco/Phy_Edu, "DP,MG,MG" for
+ * Maths/Hindi/Music - and the JSON import path accepts them as-is, so the
+ * wrong initials come back. Run this on any inbound payload.
+ * Returns the number of cells that changed.
+ */
+export const repairCompositeSlots = (timetables) => {
+  let changed = 0;
+  if (!timetables || typeof timetables !== 'object') return changed;
+
+  Object.entries(timetables).forEach(([classId, slots]) => {
+    if (!Array.isArray(slots)) return;
+    slots.forEach((slot) => {
+      if (!slot || typeof slot !== 'object') return;
+      const subject = String(slot.subject || '');
+      if (!subject.includes('/')) return;
+
+      const csvTeachers = String(slot.teacher || '')
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+      const resolved = resolveCompositeCell(subject, classId, csvTeachers);
+      const assigned = resolved.assigned.filter(Boolean);
+      if (!assigned.length) return;
+
+      const prev = csvTeachers;
+      const same =
+        prev.length === assigned.length && prev.every((t, i) => t === assigned[i]);
+      if (same) return;
+
+      slot.teacher = assigned.join(',');
+      slot.assignedTeachers = assigned;
+      changed += 1;
+    });
+  });
+
+  return changed;
 };
 
 const pickTeacher = (subject, classId, csvAssigned) => {

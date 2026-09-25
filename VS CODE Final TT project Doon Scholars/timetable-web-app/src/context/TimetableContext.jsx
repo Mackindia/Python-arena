@@ -14,6 +14,7 @@ import { timetableLockService } from '../services/timetableLockService';
 import {
   parseGridTimetableCsv,
   applyImportedPeriodCount,
+  repairCompositeSlots,
   knownTeachers as knownTeacherCodes,
   rosterCodes,
 } from '../utils/csvTimetableImport';
@@ -234,6 +235,12 @@ export const TimetableProvider = ({ children }) => {
     setSyncStatus('receiving');
 
     if (payload.timetables && typeof payload.timetables === 'object') {
+      // Inbound payloads can carry the old positional composite pairing
+      // (SB alone for Bio/Eco/Phy_Edu, DP,MG,MG for Maths/Hindi/Music).
+      const repairedRemote = repairCompositeSlots(payload.timetables);
+      if (repairedRemote) {
+        console.warn('[sync] repaired', repairedRemote, 'composite cells from remote payload');
+      }
       setTimetables(payload.timetables);
       localStorage.setItem('timetables', JSON.stringify(payload.timetables));
     }
@@ -1207,6 +1214,13 @@ export const TimetableProvider = ({ children }) => {
         }
       });
       if (payload.periodCount !== undefined) payload.periodCount = Number(payload.periodCount) || 0;
+
+      // A JSON backup written before the composite fix restores wrong pairing
+      // - re-resolve slash cells against the official map before pushing.
+      if (payload.timetables) {
+        const repaired = repairCompositeSlots(payload.timetables);
+        if (repaired) console.warn('[Import] repaired', repaired, 'composite cells');
+      }
 
       // If we only have timetables, derive teachers from the data
       if (payload.timetables && (!payload.teachers || payload.teachers.length === 0)) {
