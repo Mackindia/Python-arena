@@ -9,6 +9,8 @@
 //     - Classes 1-5 : keep P1-P5 only      (P6..periodCount blanked)
 //     - Classes 6-11: keep P6..periodCount only (P1-P5 blanked)
 //   Class 12 is skipped entirely in both modes.
+//   In both modes an in-range cell with no subject (free period) prints
+//   "Practice"; out-of-range cells stay grey and blank.
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -87,7 +89,9 @@ export const buildFilteredPrintHtml = (timetables, opts = {}) => {
           const outside = p < keepFrom || p > keepTo;
           const s = grid.get(`${day}-${p}`);
           if (outside) return '<td class="out"></td>';
-          if (!s || !s.subject) return '<td></td>';
+          const subject = String((s && s.subject) || '').trim();
+          // Free period (inside the kept range, no subject) -> print "Practice".
+          if (!subject) return '<td class="free"><span class="free-txt">Practice</span></td>';
           const teachers = [
             ...new Set(
               (s.assignedTeachers || [])
@@ -96,7 +100,7 @@ export const buildFilteredPrintHtml = (timetables, opts = {}) => {
                 .filter(Boolean)
             ),
           ].join(', ');
-          return `<td><span class="sub">${esc(label(s.subject))}</span>${
+          return `<td><span class="sub">${esc(label(subject))}</span>${
             teachers ? `<span class="tea">${esc(teachers)}</span>` : ''
           }</td>`;
         })
@@ -141,10 +145,13 @@ export const buildFilteredPrintHtml = (timetables, opts = {}) => {
   tbody th { background: #f1f5f9; font-size: 12px; font-weight: 700; }
   tbody td { height: 44px; background: #fff; }
   td.out { background: #e9ecef !important; }
+  td.free { background: #fff; }
+  .free-txt { display: block; font-size: 11px; font-weight: 600; font-style: italic; color: #64748b; letter-spacing: .02em; }
   .sub { display: block; font-size: 12px; font-weight: 700; line-height: 1.2; }
   .tea { display: block; font-size: 10px; color: #64748b; line-height: 1.2; }
   .legend { font-size: 11px; color: #666; margin: 8px 16px 0; }
   .legend .sw { display: inline-block; width: 14px; height: 11px; background: #e9ecef; border: 1px solid #94a3b8; vertical-align: -1px; margin-right: 4px; }
+  .legend .sp { display: inline-block; margin-left: 14px; font-style: italic; font-weight: 600; color: #64748b; }
   @page { size: A4 landscape; margin: 10mm; }
   @media print {
     .toolbar { display: none; }
@@ -161,9 +168,10 @@ export const buildFilteredPrintHtml = (timetables, opts = {}) => {
   <div class="note">
     ${modeNote(mode, periodCount)}
     Grey cells = periods outside the kept range (left blank).
+    Empty cells inside the kept range = <b>free period</b> and are printed as <b>Practice</b>.
     Generated ${esc(updatedAt)} (periods/day: ${periodCount}).
   </div>
-  <div class="legend"><span class="sw"></span>Grey = intentionally blank (out of range)</div>
+  <div class="legend"><span class="sw"></span>Grey = intentionally blank (out of range)<span class="sp">Practice = free period (no class allotted)</span></div>
 ${sections.join('\n')}
 </body>
 </html>`;
