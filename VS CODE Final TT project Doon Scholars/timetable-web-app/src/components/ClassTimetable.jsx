@@ -1,22 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { AlertTriangle, CheckCircle2, Zap, Search, Wrench } from 'lucide-react';
 import { autoAssignTeacher } from '../services/allocationEngine';
-import { autoArrangeClass, detectClashes, resolveClashes, resolveSingleClash, resolveClashDeep } from '../services/autoArrangeEngine';
+import { autoArrangeClass, resolveClashes, resolveClashDeep } from '../services/autoArrangeEngine';
+import {
+  scanAllClashes,
+  getClassClashRows,
+  loadKeptClashes,
+  saveKeptClashes,
+  keepClashes,
+  unkeepClashes,
+} from '../services/clashScanner';
 import { getPeriods } from '../config/periods';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = getPeriods();
 
 const ClassTimetable = () => {
-  const { timetables, classes, updateSlot, checkTeacherCollision, loadMaster, teachers, teacherSubjectMap, getAllowedSubjectsForClass } = useTimetable();
+  const { timetables, classes, updateSlot, loadMaster, teachers, teacherSubjectMap, getAllowedSubjectsForClass } = useTimetable();
   const [selectedClass, setSelectedClass] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [adminOverride, setAdminOverride] = useState(false);
   const [notification, setNotification] = useState(null);
-  const [clashReport, setClashReport] = useState(null);
   const [resolveLog, setResolveLog] = useState(null);
   const [showLoadBalance, setShowLoadBalance] = useState(false);
+
+  // Intentional combined classes kept by the user (persisted across sessions)
+  const [keptClashes, setKeptClashes] = useState(() => loadKeptClashes());
+
+  // ONE global scan over every class timetable — all clashes, all teachers,
+  // reported at once (composite slots included, nothing masked).
+  const allClashes = useMemo(() => scanAllClashes(timetables), [timetables]);
+  const keptSet = useMemo(() => new Set(keptClashes), [keptClashes]);
+
+  // Live clash report for the selected class — recomputed automatically
+  // after every edit/resolve, so a second clash is never hidden behind the first.
+  const clashReport = useMemo(() => {
+    if (!selectedClass) return [];
+    return getClassClashRows(allClashes, timetables, selectedClass).map((row) => {
+      const entries = row.entries.map((e) => ({ ...e, kept: keptSet.has(e.id) }));
+      return {
+        ...row,
+        entries,
+        isKept: entries.every((e) => e.kept),
+        activeIds: entries.filter((e) => !e.kept).map((e) => e.id),
+        keptIds: entries.filter((e) => e.kept).map((e) => e.id),
+      };
+    });
+  }, [allClashes, timetables, selectedClass, keptSet]);
+
+  const activeClashCount = clashReport.filter((r) => !r.isKept).length;
+  const keptClashCount = clashReport.length - activeClashCount;
+
+  const handleKeepClash = (row) => {
+    if (row.activeIds.length === 0) return;
+    setKeptClashes((prev) => {
+      const next = keepClashes(prev, row.activeIds);
+      saveKeptClashes(next);
+      return next;
+    });
+  };
+
+  const handleUnkeepClash = (row) => {
+    if (row.keptIds.length === 0) return;
+    setKeptClashes((prev) => {
+      const next = unkeepClashes(prev, row.keptIds);
+      saveKeptClashes(next);
+      return next;
+    });
+  };
 
   // Calculate load balance for selected class
   const getLoadBalance = (classId) => {
@@ -251,13 +303,22 @@ const ClassTimetable = () => {
     }
     if (field === 'teacher') teacher = value;
 
-    // Check collision if updating teacher
+    // Check collision if updating teacher — lists EVERY clashing class, not just the first
     if (field === 'teacher' && value) {
-      const collisionClass = checkTeacherCollision(value, day, period, selectedClass);
-      if (collisionClass) {
+      const incoming = value.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+      const collisions = allClashes.filter(c =>
+        c.day === day &&
+        c.period === parseInt(period, 10) &&
+        incoming.includes(c.teacherKey) &&
+        !keptSet.has(c.id)
+      );
+      if (collisions.length > 0) {
+        const detail = collisions
+          .map(c => `${c.teacher} already allotted to ${c.classIds.filter(x => x !== selectedClass).join(', ').toUpperCase()}`)
+          .join(' | ');
         setNotification({
           type: 'error',
-          message: `Collision Detected! Teacher ${value} is already assigned to class ${collisionClass.toUpperCase()} on ${day} Period ${period}.`
+          message: `Collision Detected! ${detail} on ${day} Period ${period}.`
         });
         // Still update, but show warning (or we could prevent it)
       } else {
@@ -298,24 +359,32 @@ const ClassTimetable = () => {
     } else {
       setNotification({ type: 'success', message: `Successfully auto-arranged ${result.schedule.length} slots with zero clashes!` });
     }
-    setClashReport(null);
     setResolveLog(null);
     setTimeout(() => setNotification(null), 5000);
   };
 
   // =============================================
-  // DETECT CLASHES
+  // DETECT CLASHES (report is live; this button announces the full picture)
   // =============================================
   const handleDetectClashes = () => {
     if (!selectedClass) return;
-    const clashes = detectClashes(selectedClass, timetables);
-    setClashReport(clashes);
-    if (clashes.length === 0) {
+
+    const otherActive = allClashes.filter(
+      c => !c.classIds.includes(selectedClass) && !keptSet.has(c.id)
+    ).length;
+
+    if (clashReport.length === 0) {
       setNotification({ type: 'success', message: `No clashes found in ${selectedClass.toUpperCase()}!` });
+    } else if (activeClashCount === 0) {
+      setNotification({ type: 'success', message: `All ${clashReport.length} shared periods in ${selectedClass.toUpperCase()} are kept as intentional combined classes.` });
     } else {
-      setNotification({ type: 'error', message: `Found ${clashes.length} clashes in ${selectedClass.toUpperCase()}.` });
+      let message = `Found ${activeClashCount} active clashes in ${selectedClass.toUpperCase()}`;
+      if (otherActive > 0) {
+        message += ` — plus ${otherActive} more in other classes (check Teacher Timetable)`;
+      }
+      setNotification({ type: 'error', message });
     }
-    setTimeout(() => setNotification(null), 5000);
+    setTimeout(() => setNotification(null), 6000);
   };
 
   // =============================================
@@ -330,7 +399,6 @@ const ClassTimetable = () => {
     });
 
     setResolveLog(result.log);
-    setClashReport(null);
 
     if (result.unresolved === 0 && result.totalClashes > 0) {
       setNotification({ type: 'success', message: `All ${result.totalClashes} clashes resolved!` });
@@ -355,43 +423,12 @@ const ClassTimetable = () => {
       });
       setNotification({ type: 'success', message: result.message });
       setResolveLog(prev => prev ? [...prev, result.message] : [result.message]);
-      
-      // Re-detect clashes to refresh the report
-      setTimeout(() => {
-        // Deep copy the timetables and apply the updates locally to run detectClashes
-        const updatedTT = JSON.parse(JSON.stringify(timetables));
-        result.updates.forEach(u => {
-          if (!updatedTT[u.classId]) updatedTT[u.classId] = [];
-          const classSchedule = updatedTT[u.classId];
-          const slotIdx = classSchedule.findIndex(s => s.day === u.day && parseInt(s.period) === parseInt(u.period));
-          if (slotIdx >= 0) {
-            classSchedule[slotIdx] = {
-              ...classSchedule[slotIdx],
-              subject: u.subject,
-              teacher: u.teacher,
-              assignedTeachers: u.assignedTeachers
-            };
-          } else {
-            classSchedule.push({
-              day: u.day,
-              period: u.period,
-              subject: u.subject,
-              teacher: u.teacher,
-              assignedTeachers: u.assignedTeachers
-            });
-          }
-        });
-        setClashReport(detectClashes(selectedClass, updatedTT));
-      }, 150);
+      // clashReport is derived from timetables, so it refreshes automatically
+      // with EVERY remaining clash (no masked follow-up clashes).
     } else {
       setNotification({ type: 'error', message: result.message });
     }
     setTimeout(() => setNotification(null), 5000);
-  };
-
-  // Dismiss a clash (keep it as intentional combined class)
-  const handleDismissClash = (slotKey) => {
-    setClashReport(prev => prev ? prev.filter(c => c.slotKey !== slotKey) : []);
   };
 
   const renderTimetableGrid = (targetClass) => (
@@ -413,9 +450,15 @@ const ClassTimetable = () => {
             {PERIODS.map(p => {
               const slot = timetables[targetClass]?.find(s => s.day === day && parseInt(s.period, 10) === parseInt(p, 10));
               const mappingStatus = getMappingStatus(targetClass, slot?.subject);
-              // Live clash check — same engine as Mastersheet so both views match
-              const isCollision = slot?.teacher ? checkTeacherCollision(slot.teacher, day, p, targetClass) : false;
-              
+              // Live clash check — global scanner: EVERY clashing teacher/class in this cell
+              const cellClashes = allClashes.filter(c =>
+                c.classIds.includes(targetClass) &&
+                c.day === day &&
+                c.period === parseInt(p, 10) &&
+                !keptSet.has(c.id)
+              );
+              const isCollision = cellClashes.length > 0;
+
               // Clash takes priority so resolve/edit results match Mastersheet
               let cellClassName = 'grid-cell';
               if (isCollision) {
@@ -427,11 +470,13 @@ const ClassTimetable = () => {
               ) {
                 cellClassName += ' missing-mapping';
               }
-              
+
               // Determine title tooltip
               let cellTitle = '';
               if (isCollision) {
-                cellTitle = `Clash Detected: ${slot.teacher} is also teaching Class ${isCollision.toUpperCase()} in Period ${p}`;
+                cellTitle = `Clash — ${cellClashes
+                  .map(c => `${c.teacher} is also teaching ${c.classIds.filter(x => x !== targetClass).join(', ').toUpperCase()}`)
+                  .join(' | ')}`;
               } else if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
                 cellTitle = 'No valid subject mapping exists - subject may be deleted';
               } else if (mappingStatus.status === 'no_teacher') {
@@ -593,7 +638,6 @@ const ClassTimetable = () => {
             onChange={(e) => {
               setSelectedClass(e.target.value);
               setResolveLog(null);
-              setClashReport(null);
             }}
             style={{ width: '150px' }}
             disabled={classes.length === 0}
@@ -728,12 +772,14 @@ const ClassTimetable = () => {
         {teachers.map(t => <option key={t} value={t} />)}
       </datalist>
 
-      {/* Clash Report Panel */}
-      {clashReport && clashReport.length > 0 && (
+      {/* Clash Report Panel — every clash in this class, listed at once */}
+      {clashReport.length > 0 && (
         <div className="no-print" style={{ marginBottom: '1rem', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #fca5a5', background: '#fef2f2' }}>
-          <h3 style={{ margin: '0 0 0.75rem 0', color: '#991b1b', fontSize: '1rem', fontWeight: 700 }}>⚠️ Clash Report — {selectedClass.toUpperCase()} ({clashReport.length} clashes)</h3>
+          <h3 style={{ margin: '0 0 0.75rem 0', color: '#991b1b', fontSize: '1rem', fontWeight: 700 }}>
+            ⚠️ Clash Report — {selectedClass.toUpperCase()} ({activeClashCount} active{keptClashCount > 0 ? ` • ${keptClashCount} kept as combined` : ''})
+          </h3>
           <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '0 0 0.75rem 0' }}>
-            Use <strong>Resolve</strong> to auto-fix a clash by swapping within the class. Use <strong>Keep</strong> if it's an intentional combined class.
+            All clashes are shown together (including every teacher of a combination subject). Use <strong>Resolve</strong> to auto-fix by swapping within the class, or <strong>Keep</strong> if it's an intentional combined class.
           </p>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
             <thead><tr style={{ background: '#fee2e2' }}>
@@ -745,37 +791,53 @@ const ClassTimetable = () => {
               <th style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '2px solid #fca5a5' }}>Action</th>
             </tr></thead>
             <tbody>{clashReport.map((c, i) => (
-              <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#fef2f2' }}>
+              <tr key={`${c.day}-${c.period}-${i}`} style={{ background: c.isKept ? '#f0fdf4' : i % 2 === 0 ? '#fff' : '#fef2f2' }}>
                 <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca' }}>{c.day}</td>
                 <td style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '1px solid #fecaca', fontWeight: 700 }}>{c.period}</td>
                 <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca' }}>
                   {c.subject}
-                  {c.isComposite && <span style={{ marginLeft: '6px', fontSize: '0.7rem', background: '#dbeafe', color: '#1e40af', padding: '1px 6px', borderRadius: '4px' }}>Combined</span>}
+                  {c.isComposite && <span style={{ marginLeft: '6px', fontSize: '0.7rem', background: '#dbeafe', color: '#1e40af', padding: '1px 6px', borderRadius: '4px' }}>Combination</span>}
                 </td>
                 <td style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '1px solid #fecaca' }}>
-                  {c.allTeachers ? c.allTeachers.map((t, ti) => (
-                    <span key={ti} style={{ fontWeight: 700, color: t.toUpperCase() === c.teacher ? '#dc2626' : '#166534' }}>
-                      {t}{ti < c.allTeachers.length - 1 ? ', ' : ''}
-                    </span>
-                  )) : <span style={{ fontWeight: 700, color: '#dc2626' }}>{c.teacher}</span>}
+                  {(c.allTeachers.length > 0 ? c.allTeachers : c.entries.map(e => e.teacher)).map((t, ti) => {
+                    const entry = c.entries.find(e => e.teacher.toUpperCase() === t.toUpperCase());
+                    const color = entry ? (entry.kept ? '#166534' : '#dc2626') : '#166534';
+                    return (
+                      <span key={ti} style={{ fontWeight: 700, color }}>
+                        {t}{entry && entry.kept ? ' ✓' : ''}{ti < (c.allTeachers.length || c.entries.length) - 1 ? ', ' : ''}
+                      </span>
+                    );
+                  })}
                 </td>
-                <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca' }}>{c.clashClass.toUpperCase()}</td>
+                <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca' }}>
+                  {c.clashClasses.map(cl => cl.toUpperCase()).join(', ')}
+                </td>
                 <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                  <button
-                    onClick={() => handleResolveSingle(c.day, c.period, false)}
-                    style={{ background: '#0d9488', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem', marginRight: '4px' }}
-                    title="Auto-resolve this specific clash by swapping within the class"
-                  >Resolve</button>
-                  <button
-                    onClick={() => handleResolveSingle(c.day, c.period, true)}
-                    style={{ background: '#7c3aed', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem', marginRight: '4px' }}
-                    title="Try Deep Resolve: Fixes the clash by swapping in other classes if internal swap fails"
-                  >Deep Resolve</button>
-                  <button
-                    onClick={() => handleDismissClash(c.slotKey)}
-                    style={{ background: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem' }}
-                    title="Keep this clash — it's an intentional combined class"
-                  >Keep</button>
+                  {c.isKept ? (
+                    <button
+                      onClick={() => handleUnkeepClash(c)}
+                      style={{ background: '#16a34a', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem' }}
+                      title="This is kept as an intentional combined class — click to mark it as a real clash again"
+                    >Kept ✓ — Unkeep</button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleResolveSingle(c.day, c.period, false)}
+                        style={{ background: '#0d9488', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem', marginRight: '4px' }}
+                        title="Auto-resolve this specific clash by swapping within the class"
+                      >Resolve</button>
+                      <button
+                        onClick={() => handleResolveSingle(c.day, c.period, true)}
+                        style={{ background: '#7c3aed', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem', marginRight: '4px' }}
+                        title="Try Deep Resolve: Fixes the clash by swapping in other classes if internal swap fails"
+                      >Deep Resolve</button>
+                      <button
+                        onClick={() => handleKeepClash(c)}
+                        style={{ background: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem' }}
+                        title="Keep this clash — it's an intentional combined class"
+                      >Keep</button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}</tbody>

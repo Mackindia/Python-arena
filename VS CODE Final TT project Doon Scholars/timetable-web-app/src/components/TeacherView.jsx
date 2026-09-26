@@ -1,6 +1,14 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useTimetable } from '../context/TimetableContext';
 import { getAllTeachersSummary, applyShifts } from '../services/teacherReliefEngine';
+import {
+  scanAllClashes,
+  getTeacherClashes,
+  loadKeptClashes,
+  saveKeptClashes,
+  keepClashes,
+  unkeepClashes,
+} from '../services/clashScanner';
 import TeacherLoadHeatmap from './relief/TeacherLoadHeatmap';
 import ShiftQueueSidebar from './relief/ShiftQueueSidebar';
 import RecommendationPanel from './relief/RecommendationPanel';
@@ -15,6 +23,31 @@ const TeacherView = () => {
   const [selectedTeacher, setSelectedTeacher] = useState(teachers[0] || '');
   const [activeTab, setActiveTab] = useState('schedule');
   const [shiftQueue, setShiftQueue] = useState([]);
+
+  // Intentional combined classes kept by the user (shared with Class Timetable)
+  const [keptClashes, setKeptClashes] = useState(() => loadKeptClashes());
+  const keptSet = useMemo(() => new Set(keptClashes), [keptClashes]);
+
+  // Global scan: EVERY teacher double-booking across all classes, at once.
+  // Catches clashes that the class timetable report might have missed.
+  const allClashes = useMemo(() => scanAllClashes(timetables), [timetables]);
+  const teacherClashes = useMemo(
+    () => getTeacherClashes(allClashes, selectedTeacher),
+    [allClashes, selectedTeacher]
+  );
+  const clashIndex = useMemo(() => {
+    const idx = {};
+    teacherClashes.forEach(c => { idx[`${c.day}|${c.period}`] = c; });
+    return idx;
+  }, [teacherClashes]);
+
+  const handleToggleKeep = useCallback((id, keep) => {
+    setKeptClashes(prev => {
+      const next = keep ? keepClashes(prev, [id]) : unkeepClashes(prev, [id]);
+      saveKeptClashes(next);
+      return next;
+    });
+  }, []);
 
   // Calculate teacher's schedule across all classes (for Schedule tab)
   const getTeacherSchedule = () => {
@@ -34,6 +67,7 @@ const TeacherView = () => {
         const slotTeachers = slot.teacher ? slot.teacher.split(',').map(t => t.trim()) : [];
         if (!slotTeachers.includes(selectedTeacher)) return;
         const p = parseInt(slot.period);
+        const clashRow = clashIndex[`${slot.day}|${p}`] || null;
         const cell = schedule[slot.day][p];
         if (cell) {
           // Combined class: the teacher is with 2+ sections in this period.
@@ -50,6 +84,9 @@ const TeacherView = () => {
         }
         const now = schedule[slot.day][p];
         now.combined = now.classIds.length > 1;
+        // Real double-booking vs. kept (intentional) combined period
+        now.clash = clashRow;
+        now.clashKept = clashRow ? keptSet.has(clashRow.id) : false;
       });
     });
 
@@ -228,21 +265,44 @@ const TeacherView = () => {
                     <div className="grid-cell day-header">{day}</div>
                     {PERIODS.map(p => {
                       const slot = schedule[day][p];
+                      const isClashCell = !!(slot && slot.clash && !slot.clashKept);
+                      const cellTitle = slot
+                        ? isClashCell
+                          ? `CLASH — ${slot.clash.teacher} is allotted to ${slot.clash.classIds.map(c => c.toUpperCase()).join(', ')} on ${day} Period ${p}`
+                          : slot.clashKept
+                            ? `Kept as intentional combined class: ${slot.classIds.map(c => c.toUpperCase()).join(' + ')}`
+                            : slot.combined
+                              ? `Combined class: ${slot.classIds.map(c => c.toUpperCase()).join(' + ')}`
+                              : undefined
+                        : undefined;
                       return (
-                        <div key={`${day}-p${p}`} className="grid-cell" style={slot ? { backgroundColor: 'rgba(79, 70, 229, 0.05)' } : {}}>
+                        <div
+                          key={`${day}-p${p}`}
+                          className={`grid-cell${isClashCell ? ' collision-warning' : ''}`}
+                          style={slot ? { backgroundColor: isClashCell ? '#fef2f2' : 'rgba(79, 70, 229, 0.05)' } : {}}
+                          title={cellTitle}
+                        >
                           {slot ? (
                             <>
-                              <div
-                                className="slot-subject"
-                                title={
-                                  slot.combined
-                                    ? `Combined class: ${slot.classIds.map(c => c.toUpperCase()).join(' + ')}`
-                                    : undefined
-                                }
-                              >
+                              <div className="slot-subject" title={cellTitle}>
                                 {slot.classIds.map(c => c.toUpperCase()).join(' + ')}
                               </div>
                               <div className="slot-teacher">{slot.subjects.join(' / ')}</div>
+                              {slot.clash && (
+                                <div style={{
+                                  marginTop: '3px',
+                                  fontSize: '0.65rem',
+                                  fontWeight: 700,
+                                  padding: '1px 7px',
+                                  borderRadius: '8px',
+                                  display: 'inline-block',
+                                  background: isClashCell ? '#dc2626' : '#16a34a',
+                                  color: '#fff',
+                                  letterSpacing: '0.03em'
+                                }}>
+                                  {isClashCell ? '⚠ CLASH' : 'Combined ✓'}
+                                </div>
+                              )}
                             </>
                           ) : (
                             <div className="slot-teacher" style={{ opacity: 0.3 }}>- Free -</div>
@@ -257,6 +317,70 @@ const TeacherView = () => {
           ) : (
             <div className="card" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
               Please select a teacher to view their schedule.
+            </div>
+          )}
+
+          {/* Per-teacher clash report — catches clashes missed in class timetable */}
+          {selectedTeacher && teacherClashes.length > 0 && (
+            <div className="card no-print" style={{ marginTop: '1rem', border: '1px solid #fca5a5', background: '#fef2f2', borderRadius: '0.5rem', padding: '1rem' }}>
+              <h3 style={{ margin: '0 0 0.5rem 0', color: '#991b1b', fontSize: '1rem', fontWeight: 700 }}>
+                ⚠️ Clash Report — {selectedTeacher.toUpperCase()} ({teacherClashes.filter(c => !keptSet.has(c.id)).length} active • {teacherClashes.filter(c => keptSet.has(c.id)).length} kept)
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '0 0 0.75rem 0' }}>
+                Every period where this teacher is allotted to 2+ classes at once. If a clash was missed in the class timetable, it shows up here.
+              </p>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+                <thead>
+                  <tr style={{ background: '#fee2e2' }}>
+                    <th style={{ padding: '6px 10px', textAlign: 'left', borderBottom: '2px solid #fca5a5' }}>Day</th>
+                    <th style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '2px solid #fca5a5' }}>Period</th>
+                    <th style={{ padding: '6px 10px', textAlign: 'left', borderBottom: '2px solid #fca5a5' }}>Classes Allotted (Subject)</th>
+                    <th style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '2px solid #fca5a5' }}>Status</th>
+                    <th style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '2px solid #fca5a5' }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teacherClashes.map((c, i) => {
+                    const isKept = keptSet.has(c.id);
+                    return (
+                      <tr key={c.id} style={{ background: isKept ? '#f0fdf4' : i % 2 === 0 ? '#fff' : '#fef2f2' }}>
+                        <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca' }}>{c.day}</td>
+                        <td style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '1px solid #fecaca', fontWeight: 700 }}>{c.period}</td>
+                        <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca' }}>
+                          {c.slots.map((s, si) => (
+                            <span key={si}>
+                              <strong>{s.classId.toUpperCase()}</strong>
+                              {s.subject ? ` — ${s.subject}` : ''}
+                              {si < c.slots.length - 1 ? ' & ' : ''}
+                            </span>
+                          ))}
+                        </td>
+                        <td style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '1px solid #fecaca', fontWeight: 700, color: isKept ? '#166534' : '#dc2626' }}>
+                          {isKept ? 'Combined (kept)' : 'CLASH'}
+                        </td>
+                        <td style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '1px solid #fecaca' }}>
+                          <button
+                            onClick={() => handleToggleKeep(c.id, !isKept)}
+                            style={{
+                              background: isKept ? '#dc2626' : '#6b7280',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              padding: '4px 10px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              fontSize: '0.8rem'
+                            }}
+                            title={isKept ? 'Mark this as a real clash again' : 'Keep this — it is an intentional combined class'}
+                          >
+                            {isKept ? 'Unkeep' : 'Keep (combined)'}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
         </>
