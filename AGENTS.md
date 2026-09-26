@@ -198,3 +198,28 @@ Before doing ANYTHING on a prompt:
 - Empty `triedWhy` in a fill failure note = **candidates exhausted**, not teacher busy - check candidate list length vs `need` first.
 - `freeShCount`-style counts must be re-evaluated after placements; snapshot/restore must include `lastPeriodOf` or retries become nondeterministic (it does, `snap.lpo`).
 - `plan.newTimetables` contains ONLY 6a-10a; junior/11-12 occupancy comes from the `busy` map built from original `timetables`.
+
+---
+
+## Session Progress - September 26, 2026 (Print Filtered timetable - SHIPPED)
+
+### Shipped (committed + pushed to main -> Railway)
+| Commit | What |
+| --- | --- |
+| 3c95607 | First-half designer 6-10 (firstHalfPlanner.js + ClassTimetable UI) + Separate Combined (bandAwareFix.js) |
+| 0908bc3 | scripts/export-print-filtered.mjs - local HTML generator |
+| 19b5407 | Print Filtered button live in Class Timetable; shared builder src/utils/filteredPrintHtml.js (script now imports it too) |
+
+### Feature
+- Button "Print Filtered (1-5: P6-9 / 6-11: P1-6)" in ClassTimetable toolbar next to Print All -> opens popup with buildFilteredPrintHtml(timetables, {periodCount}) -> auto window.print().
+- Rules: classes 1-5 keep P6..periodCount (P1-5 grey blank), classes 6-11 keep P1-P6 (P7-9 grey blank), class 12 skipped (21 classes), A4 landscape, one class per page, subject + teacher initials per cell.
+- Data quirks handled: assignedTeachers object entries ({teacher, clash, clashWith}) normalized to initials; label map (English_Lit->English, SSt->SST, ")Science"->Science); corrupted "Math (DP" cell (10a P8) falls outside kept range.
+- Local: node "VS CODE Final TT project Doon Scholars/timetable-web-app/scripts/export-print-filtered.mjs" [outfile] -> D:\downloads data\data\timetable_print_1-5_P6-9_6-11_P1-6.html (source sync-data.json).
+
+### Verified
+- eslint: only 3 pre-existing ClassTimetable errors; new util + script clean. npm run build OK (2.0s). Vite serves both modules 200. Output checked: 21 sections, 498 out-cells, 0 [object Object], multi-teacher cells render "AD, GA".
+
+### NOT done / next steps
+- User to confirm live button after Railway deploy (hard-refresh first). Print dialog tips: destination Save as PDF, landscape, enable background graphics.
+- Local planner UI smoke-test (Design First Half preview -> Apply) still not done in browser.
+- Nothing uncommitted except lock.json/sync-data.json/analyze-csv-map.mjs (NEVER stage those).
