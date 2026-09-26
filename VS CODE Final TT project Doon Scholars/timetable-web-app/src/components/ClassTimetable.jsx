@@ -23,6 +23,7 @@ import {
   summarizeClashMarks,
 } from '../services/clashCheckLedger';
 import { getPeriods } from '../config/periods';
+import { buildFilteredPrintHtml } from '../utils/filteredPrintHtml';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = getPeriods();
@@ -339,6 +340,27 @@ const ClassTimetable = () => {
 
   const handlePrintAll = () => {
     setPrintAllClasses(true);
+  };
+
+  const handlePrintFiltered = () => {
+    const html = buildFilteredPrintHtml(timetables, { periodCount: PERIODS.length });
+    const win = window.open('', '_blank');
+    if (!win) {
+      alert('Pop-up blocked. Please allow pop-ups for this site, then try again.');
+      return;
+    }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    let printed = false;
+    const doPrint = () => {
+      if (printed) return;
+      printed = true;
+      win.focus();
+      win.print();
+    };
+    win.onload = doPrint;
+    setTimeout(doPrint, 700);
   };
 
   const handleSlotUpdate = (day, period, field, value, currentSubject, currentTeacher) => {
@@ -772,6 +794,13 @@ const ClassTimetable = () => {
           </button>
           <button className="btn btn-outline" onClick={handlePrintAll} title="Print or Download PDF for ALL classes">
             🖨️ Print All
+          </button>
+          <button
+            className="btn btn-outline"
+            onClick={handlePrintFiltered}
+            title="Print filtered timetable: classes 1-5 keep P6-P9 only, classes 6-11 keep P1-P6 only, class 12 skipped, other periods left blank (A4 landscape, one class per page)"
+          >
+            🖨️ Print Filtered (1-5: P6-9 · 6-11: P1-6)
           </button>
           <button 
             className={adminOverride ? "btn btn-primary" : "btn"}
