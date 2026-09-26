@@ -342,8 +342,8 @@ const ClassTimetable = () => {
     setPrintAllClasses(true);
   };
 
-  const handlePrintFiltered = () => {
-    const html = buildFilteredPrintHtml(timetables, { periodCount: PERIODS.length });
+  const handlePrintFiltered = (mode) => {
+    const html = buildFilteredPrintHtml(timetables, { periodCount: PERIODS.length, mode });
     const win = window.open('', '_blank');
     if (!win) {
       alert('Pop-up blocked. Please allow pop-ups for this site, then try again.');
@@ -797,10 +797,17 @@ const ClassTimetable = () => {
           </button>
           <button
             className="btn btn-outline"
-            onClick={handlePrintFiltered}
+            onClick={() => handlePrintFiltered('default')}
             title="Print filtered timetable: classes 1-5 keep P6-P9 only, classes 6-11 keep P1-P6 only, class 12 skipped, other periods left blank (A4 landscape, one class per page)"
           >
             🖨️ Print Filtered (1-5: P6-9 · 6-11: P1-6)
+          </button>
+          <button
+            className="btn btn-outline"
+            onClick={() => handlePrintFiltered('split')}
+            title="Print split timetable: classes 1-5 keep P1-P5 only, classes 6-11 keep P6-P9 only, class 12 skipped, other periods left blank (A4 landscape, one class per page)"
+          >
+            🖨️ Print Split (1-5: P1-5 · 6-11: P6-9)
           </button>
           <button 
             className={adminOverride ? "btn btn-primary" : "btn"}

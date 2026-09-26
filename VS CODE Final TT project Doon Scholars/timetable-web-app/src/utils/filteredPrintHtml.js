@@ -1,10 +1,14 @@
-// Printable filtered timetable HTML (shared by the live-site Print button
+// Printable filtered timetable HTML (shared by the live-site Print buttons
 // and scripts/export-print-filtered.mjs).
 //
-// Filter rules:
-//   - Classes 1-5 : keep P6..periodCount only (P1-P5 blanked)
-//   - Classes 6-11: keep P1-P6 only (P7..periodCount blanked)
-//   - Class 12    : skipped entirely
+// modes:
+//   'default' (classic):
+//     - Classes 1-5 : keep P6..periodCount only (P1-P5 blanked)
+//     - Classes 6-11: keep P1-P6 only (P7..periodCount blanked)
+//   'split' (junior/senior halves):
+//     - Classes 1-5 : keep P1-P5 only      (P6..periodCount blanked)
+//     - Classes 6-11: keep P6..periodCount only (P1-P5 blanked)
+//   Class 12 is skipped entirely in both modes.
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -35,10 +39,32 @@ const classSort = (a, b) => {
   return a.slice(String(na).length).localeCompare(b.slice(String(nb).length));
 };
 
+// Which periods a class keeps, per mode.
+export const keepRangeFor = (classNum, mode, periodCount) => {
+  const junior = classNum <= 5;
+  if (mode === 'split') {
+    return junior
+      ? { from: 1, to: Math.min(5, periodCount), label: 'Periods 1-5' }
+      : { from: 6, to: periodCount, label: `Periods 6-${periodCount}` };
+  }
+  return junior
+    ? { from: 6, to: periodCount, label: `Periods 6-${periodCount}` }
+    : { from: 1, to: Math.min(6, periodCount), label: 'Periods 1-6' };
+};
+
+const modeNote = (mode, periodCount) => {
+  if (mode === 'split') {
+    return `Classes 1-5: <b>P1-P5 only</b> &nbsp;|&nbsp; Classes 6-11: <b>P6-P${periodCount} only</b> &nbsp;|&nbsp; Class 12 not included.`;
+  }
+  return `Classes 1-5: <b>P6-P${periodCount} only</b> &nbsp;|&nbsp; Classes 6-11: <b>P1-P6 only</b> &nbsp;|&nbsp; Class 12 not included.`;
+};
+
 export const buildFilteredPrintHtml = (timetables, opts = {}) => {
   const periodCount = opts.periodCount || 9;
+  const mode = opts.mode === 'split' ? 'split' : 'default';
   const periods = Array.from({ length: periodCount }, (_, i) => i + 1);
   const updatedAt = opts.updatedAt || new Date().toLocaleString();
+  const modeTag = mode === 'split' ? ' - junior/senior split' : '';
 
   const classIds = Object.keys(timetables || {})
     .filter((id) => !/^12/.test(id))
@@ -48,9 +74,7 @@ export const buildFilteredPrintHtml = (timetables, opts = {}) => {
 
   for (const id of classIds) {
     const num = parseInt(id, 10);
-    const keepFrom = num <= 5 ? 6 : 1;
-    const keepTo = num <= 5 ? periodCount : 6;
-    const keepLabel = num <= 5 ? `Periods 6-${periodCount}` : 'Periods 1-6';
+    const { from: keepFrom, to: keepTo, label: keepLabel } = keepRangeFor(num, mode, periodCount);
 
     const grid = new Map();
     for (const s of timetables[id] || []) {
@@ -97,7 +121,7 @@ export const buildFilteredPrintHtml = (timetables, opts = {}) => {
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Doon Scholars Timetable - Classes 1-11 (filtered)</title>
+<title>Doon Scholars Timetable - Classes 1-11 (filtered${modeTag})</title>
 <style>
   * { box-sizing: border-box; }
   body { font-family: "Segoe UI", Arial, sans-serif; margin: 0; color: #1a1a1a; }
@@ -131,11 +155,11 @@ export const buildFilteredPrintHtml = (timetables, opts = {}) => {
 </head>
 <body>
   <div class="toolbar">
-    <span>Doon Scholars - Weekly Timetable (filtered)</span>
+    <span>Doon Scholars - Weekly Timetable (filtered${esc(modeTag)})</span>
     <button onclick="window.print()">Print / Save as PDF</button>
   </div>
   <div class="note">
-    Classes 1-5: <b>P6-P${periodCount} only</b> &nbsp;|&nbsp; Classes 6-11: <b>P1-P6 only</b> &nbsp;|&nbsp; Class 12 not included.
+    ${modeNote(mode, periodCount)}
     Grey cells = periods outside the kept range (left blank).
     Generated ${esc(updatedAt)} (periods/day: ${periodCount}).
   </div>

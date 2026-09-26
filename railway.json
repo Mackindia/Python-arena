@@ -3,7 +3,7 @@
   "build": {
     "builder": "NIXPACKS",
     "buildCommand": "npm install && npm run build",
-    "watchPatterns": ["src/**", "app/**", "lib/**", "next.config.js", "package.json"]
+    "watchPatterns": ["src/**", "app/**", "lib/**", "public/**", "next.config.js", "package.json", "railway.json"]
   },
   "deploy": {
     "startCommand": "npm start",
