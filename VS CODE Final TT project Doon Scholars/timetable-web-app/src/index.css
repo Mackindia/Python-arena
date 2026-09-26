@@ -283,6 +283,12 @@ select:focus, input:focus {
   100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
+/* Checked-but-pending-fix State (Amber — reviewed, still a real clash) */
+.checked-warning {
+  border: 1px solid #f59e0b !important;
+  background-color: #fffbeb !important;
+}
+
 /* Missing Mapping State (Blue) */
 .missing-mapping {
   border: 1px solid #3b82f6 !important;

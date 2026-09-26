@@ -6,11 +6,20 @@ import { autoArrangeClass, resolveClashes, resolveClashDeep } from '../services/
 import {
   scanAllClashes,
   getClassClashRows,
-  loadKeptClashes,
-  saveKeptClashes,
-  keepClashes,
-  unkeepClashes,
 } from '../services/clashScanner';
+import {
+  CHECKED,
+  INTENTIONAL,
+  loadLedger,
+  setMarks,
+  clearMarks,
+  askForNote,
+  recordFirstSeen,
+  getLastVisit,
+  setLastVisit,
+  formatTimestamp,
+  summarizeClashMarks,
+} from '../services/clashCheckLedger';
 import { getPeriods } from '../config/periods';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -25,47 +34,102 @@ const ClassTimetable = () => {
   const [resolveLog, setResolveLog] = useState(null);
   const [showLoadBalance, setShowLoadBalance] = useState(false);
 
-  // Intentional combined classes kept by the user (persisted across sessions)
-  const [keptClashes, setKeptClashes] = useState(() => loadKeptClashes());
+  // Check marks: which clashes have I already reviewed? (persisted across days)
+  const [ledger, setLedger] = useState(() => loadLedger());
+  const [lastVisit] = useState(() => getLastVisit());
+
+  // Record that this session started — next visit compares against it (NEW chips)
+  useEffect(() => {
+    setLastVisit();
+  }, []);
 
   // ONE global scan over every class timetable — all clashes, all teachers,
   // reported at once (composite slots included, nothing masked).
   const allClashes = useMemo(() => scanAllClashes(timetables), [timetables]);
-  const keptSet = useMemo(() => new Set(keptClashes), [keptClashes]);
+  const allClashIds = useMemo(() => allClashes.map((c) => c.id), [allClashes]);
+  // First-seen times for NEW chips (idempotent localStorage write, no re-render)
+  const firstSeen = useMemo(() => recordFirstSeen(allClashIds), [allClashIds]);
+
+  const classClashIds = useMemo(
+    () => allClashes.filter((c) => c.classIds.includes(selectedClass)).map((c) => c.id),
+    [allClashes, selectedClass]
+  );
+  const classSummary = useMemo(
+    () => summarizeClashMarks(classClashIds, ledger, firstSeen, lastVisit),
+    [classClashIds, ledger, firstSeen, lastVisit]
+  );
+  const globalSummary = useMemo(
+    () => summarizeClashMarks(allClashIds, ledger, firstSeen, lastVisit),
+    [allClashIds, ledger, firstSeen, lastVisit]
+  );
+  // Marks whose clash no longer exists = already fixed/cleared (history)
+  const clearedMarks = useMemo(() => {
+    const current = new Set(allClashIds);
+    return Object.entries(ledger)
+      .filter(([id]) => !current.has(id))
+      .sort((a, b) => (b[1].checkedAt || 0) - (a[1].checkedAt || 0));
+  }, [ledger, allClashIds]);
 
   // Live clash report for the selected class — recomputed automatically
   // after every edit/resolve, so a second clash is never hidden behind the first.
   const clashReport = useMemo(() => {
     if (!selectedClass) return [];
     return getClassClashRows(allClashes, timetables, selectedClass).map((row) => {
-      const entries = row.entries.map((e) => ({ ...e, kept: keptSet.has(e.id) }));
-      return {
-        ...row,
-        entries,
-        isKept: entries.every((e) => e.kept),
-        activeIds: entries.filter((e) => !e.kept).map((e) => e.id),
-        keptIds: entries.filter((e) => e.kept).map((e) => e.id),
-      };
+      const entries = row.entries.map((e) => ({ ...e, mark: ledger[e.id] || null }));
+      const uncheckedIds = entries.filter((e) => !e.mark).map((e) => e.id);
+      const checkedIds = entries
+        .filter((e) => e.mark && e.mark.status === CHECKED)
+        .map((e) => e.id);
+      const intentionalIds = entries
+        .filter((e) => e.mark && e.mark.status === INTENTIONAL)
+        .map((e) => e.id);
+      const notes = [...new Set(entries.filter((e) => e.mark && e.mark.note).map((e) => e.mark.note))];
+      const state = uncheckedIds.length > 0 ? 'unchecked'
+        : checkedIds.length > 0 ? 'checked'
+        : 'intentional';
+      return { ...row, entries, uncheckedIds, checkedIds, intentionalIds, notes, state };
     });
-  }, [allClashes, timetables, selectedClass, keptSet]);
+  }, [allClashes, timetables, selectedClass, ledger]);
 
-  const activeClashCount = clashReport.filter((r) => !r.isKept).length;
-  const keptClashCount = clashReport.length - activeClashCount;
-
-  const handleKeepClash = (row) => {
-    if (row.activeIds.length === 0) return;
-    setKeptClashes((prev) => {
-      const next = keepClashes(prev, row.activeIds);
-      saveKeptClashes(next);
+  const handleMarkChecked = (row) => {
+    if (row.uncheckedIds.length === 0) return;
+    const existingNote = row.notes[0] || '';
+    const note = askForNote(existingNote);
+    setLedger((prev) => {
+      const next = setMarks(prev, row.uncheckedIds, CHECKED, note);
       return next;
     });
   };
 
-  const handleUnkeepClash = (row) => {
-    if (row.keptIds.length === 0) return;
-    setKeptClashes((prev) => {
-      const next = unkeepClashes(prev, row.keptIds);
-      saveKeptClashes(next);
+  const handleMarkIntentional = (row) => {
+    const ids = [...row.uncheckedIds, ...row.checkedIds];
+    if (ids.length === 0) return;
+    setLedger((prev) => {
+      const next = setMarks(prev, ids, INTENTIONAL, undefined);
+      return next;
+    });
+  };
+
+  const handleUndoChecked = (row) => {
+    if (row.checkedIds.length === 0) return;
+    setLedger((prev) => {
+      const next = clearMarks(prev, row.checkedIds);
+      return next;
+    });
+  };
+
+  const handleUnmarkIntentional = (row) => {
+    if (row.intentionalIds.length === 0) return;
+    setLedger((prev) => {
+      const next = clearMarks(prev, row.intentionalIds);
+      return next;
+    });
+  };
+
+  const handleClearHistory = () => {
+    if (clearedMarks.length === 0) return;
+    setLedger((prev) => {
+      const next = clearMarks(prev, clearedMarks.map(([id]) => id));
       return next;
     });
   };
@@ -310,7 +374,7 @@ const ClassTimetable = () => {
         c.day === day &&
         c.period === parseInt(period, 10) &&
         incoming.includes(c.teacherKey) &&
-        !keptSet.has(c.id)
+        !(ledger[c.id] && ledger[c.id].status === INTENTIONAL)
       );
       if (collisions.length > 0) {
         const detail = collisions
@@ -370,19 +434,17 @@ const ClassTimetable = () => {
     if (!selectedClass) return;
 
     const otherActive = allClashes.filter(
-      c => !c.classIds.includes(selectedClass) && !keptSet.has(c.id)
+      c => !c.classIds.includes(selectedClass) && !ledger[c.id]
     ).length;
 
     if (clashReport.length === 0) {
       setNotification({ type: 'success', message: `No clashes found in ${selectedClass.toUpperCase()}!` });
-    } else if (activeClashCount === 0) {
-      setNotification({ type: 'success', message: `All ${clashReport.length} shared periods in ${selectedClass.toUpperCase()} are kept as intentional combined classes.` });
     } else {
-      let message = `Found ${activeClashCount} active clashes in ${selectedClass.toUpperCase()}`;
+      let message = `Clash check ${classSummary.reviewed}/${classSummary.total} reviewed in ${selectedClass.toUpperCase()} — ${classSummary.unchecked} unchecked, ${classSummary.checked} checked, ${classSummary.intentional} intentional`;
       if (otherActive > 0) {
-        message += ` — plus ${otherActive} more in other classes (check Teacher Timetable)`;
+        message += ` — plus ${otherActive} unchecked in other classes (check Teacher Timetable)`;
       }
-      setNotification({ type: 'error', message });
+      setNotification({ type: classSummary.unchecked > 0 ? 'error' : 'success', message });
     }
     setTimeout(() => setNotification(null), 6000);
   };
@@ -450,19 +512,27 @@ const ClassTimetable = () => {
             {PERIODS.map(p => {
               const slot = timetables[targetClass]?.find(s => s.day === day && parseInt(s.period, 10) === parseInt(p, 10));
               const mappingStatus = getMappingStatus(targetClass, slot?.subject);
-              // Live clash check — global scanner: EVERY clashing teacher/class in this cell
-              const cellClashes = allClashes.filter(c =>
-                c.classIds.includes(targetClass) &&
-                c.day === day &&
-                c.period === parseInt(p, 10) &&
-                !keptSet.has(c.id)
-              );
-              const isCollision = cellClashes.length > 0;
+              // Live clash check — global scanner with check marks:
+              //   red pulse = NOT reviewed yet, amber = reviewed & pending fix,
+              //   no mark   = reviewed as intentional (or no clash)
+              const cellClashMarks = allClashes
+                .filter(c =>
+                  c.classIds.includes(targetClass) &&
+                  c.day === day &&
+                  c.period === parseInt(p, 10)
+                )
+                .map(c => ({ clash: c, mark: ledger[c.id] || null }));
+              const uncheckedCell = cellClashMarks.filter(x => !x.mark);
+              const checkedCell = cellClashMarks.filter(x => x.mark && x.mark.status === CHECKED);
+              const isCollision = uncheckedCell.length > 0;
+              const isCheckedPending = !isCollision && checkedCell.length > 0;
 
               // Clash takes priority so resolve/edit results match Mastersheet
               let cellClassName = 'grid-cell';
               if (isCollision) {
                 cellClassName += ' collision-warning';
+              } else if (isCheckedPending) {
+                cellClassName += ' checked-warning';
               } else if (
                 mappingStatus.status === 'no_subject' ||
                 mappingStatus.status === 'empty' ||
@@ -474,9 +544,14 @@ const ClassTimetable = () => {
               // Determine title tooltip
               let cellTitle = '';
               if (isCollision) {
-                cellTitle = `Clash — ${cellClashes
-                  .map(c => `${c.teacher} is also teaching ${c.classIds.filter(x => x !== targetClass).join(', ').toUpperCase()}`)
+                cellTitle = `UNCHECKED clash — ${uncheckedCell
+                  .map(x => `${x.clash.teacher} is also teaching ${x.clash.classIds.filter(y => y !== targetClass).join(', ').toUpperCase()}`)
                   .join(' | ')}`;
+              } else if (isCheckedPending) {
+                const note = checkedCell.find(x => x.mark && x.mark.note);
+                cellTitle = `Checked, pending fix — ${checkedCell
+                  .map(x => `${x.clash.teacher} also with ${x.clash.classIds.filter(y => y !== targetClass).join(', ').toUpperCase()}`)
+                  .join(' | ')}${note && note.mark.note ? ` — note: ${note.mark.note}` : ''}`;
               } else if (mappingStatus.status === 'no_subject' || mappingStatus.status === 'empty') {
                 cellTitle = 'No valid subject mapping exists - subject may be deleted';
               } else if (mappingStatus.status === 'no_teacher') {
@@ -577,9 +652,14 @@ const ClassTimetable = () => {
             onClick={handleDetectClashes}
             disabled={!selectedClass}
             style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#ea580c', color: 'white', border: 'none', borderRadius: '4px', padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer' }}
-            title="Scan for teacher clashes in the selected class"
+            title="Scan for teacher clashes in the selected class (badge = clashes you have NOT checked yet, school-wide)"
           >
             <Search size={16} /> Detect Clashes
+            {globalSummary.unchecked > 0 && (
+              <span style={{ background: '#fff', color: '#b91c1c', borderRadius: '10px', padding: '1px 8px', fontSize: '0.75rem', fontWeight: 800 }}>
+                {globalSummary.unchecked} unchecked
+              </span>
+            )}
           </button>
           <button
             className="btn"
@@ -772,14 +852,42 @@ const ClassTimetable = () => {
         {teachers.map(t => <option key={t} value={t} />)}
       </datalist>
 
+      {/* Check-Memory progress bar — resumes where you left off next day */}
+      {classSummary.total > 0 && (
+        <div className="no-print" style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', fontSize: '0.85rem', color: '#334155' }}>
+          <span style={{ fontWeight: 700 }}>
+            Clash check: {classSummary.reviewed}/{classSummary.total} reviewed
+          </span>
+          <div style={{ flex: '1 1 200px', height: '10px', background: '#e5e7eb', borderRadius: '5px', overflow: 'hidden', display: 'flex', minWidth: '160px' }}>
+            <div style={{ width: `${(classSummary.intentional / classSummary.total) * 100}%`, background: '#16a34a' }} />
+            <div style={{ width: `${(classSummary.checked / classSummary.total) * 100}%`, background: '#f59e0b' }} />
+            <div style={{ width: `${(classSummary.unchecked / classSummary.total) * 100}%`, background: '#ef4444' }} />
+          </div>
+          <span style={{ color: '#dc2626', fontWeight: 700 }}>{classSummary.unchecked} unchecked</span>
+          {classSummary.newCount > 0 && (
+            <span style={{ background: '#dc2626', color: '#fff', borderRadius: '10px', padding: '1px 8px', fontSize: '0.72rem', fontWeight: 800 }}>
+              {classSummary.newCount} NEW since last visit
+            </span>
+          )}
+          {globalSummary.unchecked - classSummary.unchecked > 0 && (
+            <span style={{ color: '#b45309' }}>
+              + {globalSummary.unchecked - classSummary.unchecked} unchecked in other classes
+            </span>
+          )}
+          <span style={{ color: '#64748b', fontSize: '0.78rem' }}>Last visit: {formatTimestamp(lastVisit)}</span>
+        </div>
+      )}
+
       {/* Clash Report Panel — every clash in this class, listed at once */}
       {clashReport.length > 0 && (
         <div className="no-print" style={{ marginBottom: '1rem', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #fca5a5', background: '#fef2f2' }}>
           <h3 style={{ margin: '0 0 0.75rem 0', color: '#991b1b', fontSize: '1rem', fontWeight: 700 }}>
-            ⚠️ Clash Report — {selectedClass.toUpperCase()} ({activeClashCount} active{keptClashCount > 0 ? ` • ${keptClashCount} kept as combined` : ''})
+            ⚠️ Clash Report — {selectedClass.toUpperCase()} ({classSummary.unchecked} unchecked • {classSummary.checked} checked • {classSummary.intentional} intentional)
           </h3>
           <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '0 0 0.75rem 0' }}>
-            All clashes are shown together (including every teacher of a combination subject). Use <strong>Resolve</strong> to auto-fix by swapping within the class, or <strong>Keep</strong> if it's an intentional combined class.
+            All clashes are shown together (including every teacher of a combination subject). Mark each one so you remember next day:
+            <strong> ✓ Checked</strong> = real, fix later (add a note) · <strong>Intentional</strong> = combined class, leave it.
+            Unchecked clashes stay red &amp; pulsing until reviewed.
           </p>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
             <thead><tr style={{ background: '#fee2e2' }}>
@@ -788,10 +896,12 @@ const ClassTimetable = () => {
               <th style={{ padding: '6px 10px', textAlign: 'left', borderBottom: '2px solid #fca5a5' }}>Subject</th>
               <th style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '2px solid #fca5a5' }}>Teachers</th>
               <th style={{ padding: '6px 10px', textAlign: 'left', borderBottom: '2px solid #fca5a5' }}>Clashes With</th>
+              <th style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '2px solid #fca5a5' }}>Status</th>
+              <th style={{ padding: '6px 10px', textAlign: 'left', borderBottom: '2px solid #fca5a5' }}>Note</th>
               <th style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '2px solid #fca5a5' }}>Action</th>
             </tr></thead>
             <tbody>{clashReport.map((c, i) => (
-              <tr key={`${c.day}-${c.period}-${i}`} style={{ background: c.isKept ? '#f0fdf4' : i % 2 === 0 ? '#fff' : '#fef2f2' }}>
+              <tr key={`${c.day}-${c.period}-${i}`} style={{ background: c.state === 'intentional' ? '#f0fdf4' : c.state === 'checked' ? '#fffbeb' : '#fef2f2' }}>
                 <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca' }}>{c.day}</td>
                 <td style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '1px solid #fecaca', fontWeight: 700 }}>{c.period}</td>
                 <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca' }}>
@@ -801,10 +911,11 @@ const ClassTimetable = () => {
                 <td style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '1px solid #fecaca' }}>
                   {(c.allTeachers.length > 0 ? c.allTeachers : c.entries.map(e => e.teacher)).map((t, ti) => {
                     const entry = c.entries.find(e => e.teacher.toUpperCase() === t.toUpperCase());
-                    const color = entry ? (entry.kept ? '#166534' : '#dc2626') : '#166534';
+                    const mark = entry ? entry.mark : null;
+                    const color = !mark ? '#dc2626' : mark.status === CHECKED ? '#b45309' : '#166534';
                     return (
                       <span key={ti} style={{ fontWeight: 700, color }}>
-                        {t}{entry && entry.kept ? ' ✓' : ''}{ti < (c.allTeachers.length || c.entries.length) - 1 ? ', ' : ''}
+                        {t}{mark ? ' ✓' : ''}{ti < (c.allTeachers.length || c.entries.length) - 1 ? ', ' : ''}
                       </span>
                     );
                   })}
@@ -812,36 +923,78 @@ const ClassTimetable = () => {
                 <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca' }}>
                   {c.clashClasses.map(cl => cl.toUpperCase()).join(', ')}
                 </td>
+                <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca', textAlign: 'center', whiteSpace: 'nowrap', fontWeight: 700, fontSize: '0.78rem' }}>
+                  {c.state === 'unchecked' && (
+                    <span style={{ color: '#dc2626' }}>
+                      {c.uncheckedIds.length} unchecked{c.checkedIds.length > 0 ? ` · ${c.checkedIds.length} checked` : ''}
+                    </span>
+                  )}
+                  {c.state === 'checked' && <span style={{ color: '#b45309' }}>✓ Checked · to fix</span>}
+                  {c.state === 'intentional' && <span style={{ color: '#166534' }}>✓ Intentional</span>}
+                </td>
+                <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca', fontSize: '0.78rem', color: '#475569', fontStyle: 'italic', maxWidth: '160px' }}>
+                  {c.notes.length > 0 ? c.notes.join(' · ') : '—'}
+                </td>
                 <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                  {c.isKept ? (
-                    <button
-                      onClick={() => handleUnkeepClash(c)}
-                      style={{ background: '#16a34a', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem' }}
-                      title="This is kept as an intentional combined class — click to mark it as a real clash again"
-                    >Kept ✓ — Unkeep</button>
-                  ) : (
+                  {c.state !== 'intentional' && (
                     <>
                       <button
                         onClick={() => handleResolveSingle(c.day, c.period, false)}
-                        style={{ background: '#0d9488', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem', marginRight: '4px' }}
+                        style={{ background: '#0d9488', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.78rem', marginRight: '4px' }}
                         title="Auto-resolve this specific clash by swapping within the class"
                       >Resolve</button>
                       <button
                         onClick={() => handleResolveSingle(c.day, c.period, true)}
-                        style={{ background: '#7c3aed', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem', marginRight: '4px' }}
-                        title="Try Deep Resolve: Fixes the clash by swapping in other classes if internal swap fails"
-                      >Deep Resolve</button>
-                      <button
-                        onClick={() => handleKeepClash(c)}
-                        style={{ background: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 600, cursor: 'pointer', fontSize: '0.8rem' }}
-                        title="Keep this clash — it's an intentional combined class"
-                      >Keep</button>
+                        style={{ background: '#7c3aed', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.78rem', marginRight: '4px' }}
+                        title="Try Deep Resolve: fixes the clash by swapping in other classes if internal swap fails"
+                      >Deep</button>
                     </>
+                  )}
+                  {c.uncheckedIds.length > 0 && (
+                    <button
+                      onClick={() => handleMarkChecked(c)}
+                      style={{ background: '#d97706', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.78rem', marginRight: '4px' }}
+                      title="Mark as reviewed: a real clash you will fix later (you can add a note)"
+                    >✓ Checked</button>
+                  )}
+                  {c.state === 'checked' && (
+                    <button
+                      onClick={() => handleUndoChecked(c)}
+                      style={{ background: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.78rem', marginRight: '4px' }}
+                      title="Undo the check mark — back to unchecked"
+                    >Undo</button>
+                  )}
+                  {c.state === 'intentional' ? (
+                    <button
+                      onClick={() => handleUnmarkIntentional(c)}
+                      style={{ background: '#16a34a', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.78rem' }}
+                      title="This is marked as an intentional combined class — click to unmark"
+                    >✓ Intentional — Unmark</button>
+                  ) : (
+                    <button
+                      onClick={() => handleMarkIntentional(c)}
+                      style={{ background: '#16a34a', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.78rem' }}
+                      title="Mark as intentional combined class (reviewed — not a real clash)"
+                    >Intentional</button>
                   )}
                 </td>
               </tr>
             ))}</tbody>
           </table>
+        </div>
+      )}
+
+      {/* Cleared history — clashes you marked that no longer exist (fixed) */}
+      {clearedMarks.length > 0 && (
+        <div className="no-print" style={{ marginBottom: '1rem', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #bbf7d0', background: '#f0fdf4', fontSize: '0.8rem', color: '#166534' }}>
+          <strong>✓ Already cleared ({clearedMarks.length}):</strong>{' '}
+          {clearedMarks.slice(0, 5).map(([id, m]) => id.split('|').slice(0, 3).join(' ') + (m.note ? ` “${m.note}”` : '')).join(' · ')}
+          {clearedMarks.length > 5 ? ` … +${clearedMarks.length - 5} more` : ''}
+          <button
+            onClick={handleClearHistory}
+            style={{ marginLeft: '8px', background: 'none', border: '1px solid #86efac', color: '#15803d', borderRadius: '4px', padding: '2px 8px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}
+            title="Remove these finished entries from memory"
+          >Clear list</button>
         </div>
       )}
 

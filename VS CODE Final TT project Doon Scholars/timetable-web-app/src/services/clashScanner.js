@@ -8,7 +8,6 @@
 // =============================================
 
 const DAYS_ORDER = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const KEPT_STORAGE_KEY = 'keptClashKeys';
 
 const lower = (t) => (t || '').trim().toLowerCase();
 const periodOf = (p) => parseInt(p, 10);
@@ -114,27 +113,3 @@ export const getTeacherClashes = (allClashes, teacherId) => {
   if (!key) return [];
   return allClashes.filter((c) => c.teacherKey === key);
 };
-
-// ---- "Keep" persistence (intentional combined classes) ----
-export const loadKeptClashes = () => {
-  try {
-    const raw = localStorage.getItem(KEPT_STORAGE_KEY);
-    const list = raw ? JSON.parse(raw) : [];
-    return Array.isArray(list) ? list : [];
-  } catch {
-    return [];
-  }
-};
-
-export const saveKeptClashes = (list) => {
-  try {
-    localStorage.setItem(KEPT_STORAGE_KEY, JSON.stringify(list));
-  } catch {
-    // storage unavailable — kept marks stay in memory for this session
-  }
-};
-
-export const keepClashes = (kept, ids) => [...new Set([...kept, ...ids])];
-
-export const unkeepClashes = (kept, ids) =>
-  kept.filter((id) => !ids.includes(id));
