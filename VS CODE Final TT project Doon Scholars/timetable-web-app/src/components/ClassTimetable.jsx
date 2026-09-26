@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTimetable } from '../context/TimetableContext';
-import { AlertTriangle, CheckCircle2, Zap, Search, Wrench } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Zap, Search, Wrench, Scissors, CalendarRange } from 'lucide-react';
 import { autoAssignTeacher } from '../services/allocationEngine';
 import { autoArrangeClass, resolveClashes, resolveClashDeep } from '../services/autoArrangeEngine';
+import { fixClass } from '../services/bandAwareFix';
+import { planFirstHalf } from '../services/firstHalfPlanner';
 import {
   scanAllClashes,
   getClassClashRows,
@@ -32,6 +34,8 @@ const ClassTimetable = () => {
   const [adminOverride, setAdminOverride] = useState(false);
   const [notification, setNotification] = useState(null);
   const [resolveLog, setResolveLog] = useState(null);
+  const [fixPlan, setFixPlan] = useState(null);
+  const [fhPlan, setFhPlan] = useState(null);
   const [showLoadBalance, setShowLoadBalance] = useState(false);
 
   // Check marks: which clashes have I already reviewed? (persisted across days)
@@ -473,6 +477,82 @@ const ClassTimetable = () => {
   };
 
   // =============================================
+  // SEPARATE COMBINED + Maths/Science both-halves fix (preview first)
+  // =============================================
+  const handleSeparateCombined = () => {
+    if (!selectedClass) return;
+    const plan = fixClass(selectedClass, timetables, PERIODS.length);
+    if (plan.moves.length === 0 && plan.manual.length === 0) {
+      setNotification({
+        type: 'success',
+        message: `${selectedClass.toUpperCase()}: nothing to fix — no combined cells and Maths/Science already in both halves every day.`,
+      });
+      setTimeout(() => setNotification(null), 5000);
+      return;
+    }
+    setFixPlan(plan);
+  };
+
+  const applyFixPlan = () => {
+    if (!fixPlan) return;
+    const locked = fixPlan.updates.some(
+      (u) => updateSlot(fixPlan.classId, u.day, u.period, u.subject, u.teacher, u.assignedTeachers, []) === false
+    );
+    if (locked) {
+      setNotification({ type: 'error', message: 'Timetable is locked — unlock it first, then apply again.' });
+    } else {
+      setNotification({
+        type: fixPlan.ok ? 'success' : 'warning',
+        message:
+          `Applied ${fixPlan.moves.length} move(s) to ${fixPlan.classId.toUpperCase()}: ` +
+          `combined cells → ${fixPlan.expected.combined.length}, ` +
+          `daily Maths/Science gaps → ${fixPlan.expected.band.length}` +
+          (fixPlan.manual.length ? `, ${fixPlan.manual.length} still need a manual fix.` : '. All clean.'),
+      });
+    }
+    setFixPlan(null);
+    setTimeout(() => setNotification(null), 7000);
+  };
+
+  // =============================================
+  // DESIGN FIRST HALF (classes 6-10, cross-class planner; preview first)
+  // =============================================
+  const handleDesignFirstHalf = () => {
+    const plan = planFirstHalf(timetables, { periodCount: PERIODS.length });
+    if (plan.updates.length === 0 && plan.ok) {
+      setNotification({
+        type: 'success',
+        message: 'First half already matches the design — no changes needed.',
+      });
+      setTimeout(() => setNotification(null), 5000);
+      return;
+    }
+    setFhPlan(plan);
+  };
+
+  const applyFhPlan = () => {
+    if (!fhPlan) return;
+    let locked = false;
+    fhPlan.updates.forEach((u) => {
+      const r = updateSlot(u.classId, u.day, u.period, u.subject, u.teacher, u.assignedTeachers, []);
+      if (r === false) locked = true;
+    });
+    if (locked) {
+      setNotification({ type: 'error', message: 'Timetable is locked — unlock it first, then apply again.' });
+    } else {
+      const fails = fhPlan.report.failures.length;
+      setNotification({
+        type: fhPlan.ok ? 'success' : 'warning',
+        message:
+          `Designed first half for ${fhPlan.classes.length} classes (6-10): ${fhPlan.updates.length} cell(s) changed` +
+          (fhPlan.ok ? ', all checks passed.' : ` — ${fails} check(s) need review.`),
+      });
+    }
+    setFhPlan(null);
+    setTimeout(() => setNotification(null), 7000);
+  };
+
+  // =============================================
   // RESOLVE A SINGLE CLASH (per-row button, supports deep swap)
   // =============================================
   const handleResolveSingle = (day, period, deep = false) => {
@@ -670,6 +750,23 @@ const ClassTimetable = () => {
           >
             <Wrench size={16} /> Resolve Clashes
           </button>
+          <button
+            className="btn"
+            onClick={handleSeparateCombined}
+            disabled={!selectedClass}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#0369a1', color: 'white', border: 'none', borderRadius: '4px', padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer' }}
+            title="Move this class's slots out of combined-section cells and put Maths/Science in both halves (P1-5 AND P6-9) of every day. Preview shown before anything changes; only THIS class is touched."
+          >
+            <Scissors size={16} /> Separate Combined
+          </button>
+          <button
+            className="btn"
+            onClick={handleDesignFirstHalf}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#7c3aed', color: 'white', border: 'none', borderRadius: '4px', padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer' }}
+            title="Rebuild P1-5 for classes 6-10: Maths/Science/SST daily, weekly quotas, no adjacent repeats, fixed per-section teachers, science rotation. Preview shown before anything changes; classes 11/12 are never touched."
+          >
+            <CalendarRange size={16} /> Design First Half (6–10)
+          </button>
           <button className="btn btn-outline" onClick={handlePrintCurrent} title="Print or Download PDF for this class">
             🖨️ Print Class
           </button>
@@ -710,6 +807,98 @@ const ClassTimetable = () => {
         </div>
       )}
 
+      {fixPlan && (
+        <div className="no-print" style={{
+          margin: '1rem 0',
+          padding: '1rem',
+          borderRadius: '0.5rem',
+          background: '#f0f9ff',
+          border: '1px solid #0369a1',
+          color: '#0c4a6e'
+        }}>
+          <strong>
+            Preview — {fixPlan.classId.toUpperCase()}: {fixPlan.moves.length} move(s)
+            {fixPlan.expected.combined.length === 0 && fixPlan.expected.band.length === 0
+              ? ' (result: 0 combined cells, Maths/Science in both halves every day)'
+              : ' (partial result — see below)'}
+          </strong>
+          <div style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '0.15rem' }}>
+            Only {fixPlan.classId.toUpperCase()}'s own slots move. Teachers, loads, and every other class stay untouched.
+          </div>
+          <ul style={{ margin: '0.6rem 0', paddingLeft: '1.2rem', maxHeight: '220px', overflowY: 'auto', fontSize: '0.85rem' }}>
+            {fixPlan.moves.map((m, i) => (
+              <li key={i}>
+                <strong>[{m.reason}]</strong> {m.subject} ({m.teacher || 'no teacher'}) — {m.fromDay} P{m.fromPeriod} → {m.toDay} P{m.toPeriod}
+              </li>
+            ))}
+          </ul>
+          {fixPlan.manual.length > 0 && (
+            <div style={{ color: '#b91c1c', fontSize: '0.85rem', marginBottom: '0.6rem' }}>
+              <AlertTriangle size={13} style={{ display: 'inline' }} /> {fixPlan.manual.length} need manual fix:{' '}
+              {fixPlan.manual.map((m) => `${m.day} ${m.half || `P${m.period}`} ${m.subject || ''} (${m.note})`).join(' · ')}
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              className="btn btn-primary"
+              onClick={applyFixPlan}
+              style={{ background: '#0369a1', color: 'white', border: 'none', borderRadius: '4px', padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Apply {fixPlan.moves.length} move(s)
+            </button>
+            <button className="btn btn-outline" onClick={() => setFixPlan(null)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {fhPlan && (
+        <div className="no-print" style={{
+          margin: '1rem 0',
+          padding: '1rem',
+          borderRadius: '0.5rem',
+          background: '#faf5ff',
+          border: '1px solid #7c3aed',
+          color: '#5b21b6'
+        }}>
+          <strong>
+            Preview — First-half design: {fhPlan.classes.length} classes (6-10), {fhPlan.updates.length} cell(s) to change
+          </strong>
+          <div style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '0.15rem' }}>
+            Rebuilds P1-5 daily (Maths/Science/SST + language rotation), rest of the week in P6-8. Classes 11/12 and all other data stay untouched.
+          </div>
+          <div style={{ fontSize: '0.85rem', marginTop: '0.4rem' }}>
+            {fhPlan.ok ? (
+              <span style={{ color: '#047857' }}>✓ All checks passed — 5 first-half cells and 3 second-half cells per class, loads preserved, no teacher clashes.</span>
+            ) : (
+              <span style={{ color: '#b45309' }}>
+                ⚠ {fhPlan.report.failures.length} check(s), {fhPlan.manual.length} need manual review — applying is still possible, but review first.
+              </span>
+            )}
+          </div>
+          {!fhPlan.ok && fhPlan.report.failures.length > 0 && (
+            <ul style={{ margin: '0.6rem 0', paddingLeft: '1.2rem', maxHeight: '180px', overflowY: 'auto', fontSize: '0.85rem' }}>
+              {fhPlan.report.failures.slice(0, 20).map((f, i) => (
+                <li key={i}>{typeof f === 'string' ? f : `${f.classId} ${f.day}: ${f.note}`}</li>
+              ))}
+            </ul>
+          )}
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <button
+              className="btn btn-primary"
+              onClick={applyFhPlan}
+              style={{ background: '#7c3aed', color: 'white', border: 'none', borderRadius: '4px', padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Apply to {fhPlan.classes.length} classes ({fhPlan.updates.length} cells)
+            </button>
+            <button className="btn btn-outline" onClick={() => setFhPlan(null)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="filter-bar no-print">
         <div className="filter-group">
           <label>Select Class:</label>
@@ -718,6 +907,8 @@ const ClassTimetable = () => {
             onChange={(e) => {
               setSelectedClass(e.target.value);
               setResolveLog(null);
+              setFixPlan(null);
+              setFhPlan(null);
             }}
             style={{ width: '150px' }}
             disabled={classes.length === 0}
