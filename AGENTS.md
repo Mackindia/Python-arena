@@ -223,3 +223,47 @@ Before doing ANYTHING on a prompt:
 - User to confirm live button after Railway deploy (hard-refresh first). Print dialog tips: destination Save as PDF, landscape, enable background graphics.
 - Local planner UI smoke-test (Design First Half preview -> Apply) still not done in browser.
 - Nothing uncommitted except lock.json/sync-data.json/analyze-csv-map.mjs (NEVER stage those).
+
+---
+
+## Session Progress - September 26, 2026 (Print Filtered missing on live + NEW Print Split mode - SHIPPED)
+
+### Root cause: why "Print Filtered" never appeared on the live site
+Two independent traps, both fixed:
+1. **Stale bundle**: Railway serves the committed prebuilt Vite app at `public/timetable/`, NOT a fresh Vite build. Commit `19b5407` (the button) only touched `src/**` + `scripts/**` and **never re-ran the sync**, so `public/timetable` still held the `74af59a` build (25 Sep 23:47, `index-D7I3VvFz.js`) with no button.
+2. **Watch paths**: `railway.json` `watchPatterns` was `["src/**","app/**","lib/**","next.config.js","package.json"]`. Railway docs: *"When specified, any changes that don't match the patterns will skip creating a new deployment."* Commits touching only the Vite app were therefore **silently skipped** - no deploy was ever triggered.
+   - Fix: added `public/**` and `railway.json` to `watchPatterns`.
+   - **Rule: any change to the timetable UI requires `node scripts/sync-timetable.mjs` (build Vite -> copy `dist/` -> `public/timetable/`) AND a commit that includes `public/**`, otherwise it never reaches the live site.**
+
+### Shipped (commit `483ab4d`, pushed to main -> Railway deployed)
+| File | What |
+| --- | --- |
+| `.../src/utils/filteredPrintHtml.js` | New `mode` option: `'default'` (classic 1-5 P6-9 / 6-11 P1-6) and **`'split'`** (classes 1-5 keep **P1-P5**, classes 6-11 keep **P6-P9**). Exports `keepRangeFor(classNum, mode, periodCount)`; `modeNote()` drives the header text; class 12 skipped in both modes. Default mode is byte-compatible with the old rules. |
+| `.../src/components/ClassTimetable.jsx` | `handlePrintFiltered(mode)` + second button **"Print Split (1-5: P1-5 · 6-11: P6-9)"**. Buttons call `onClick={() => handlePrintFiltered('default'/'split')}` - never pass the event as `mode`. |
+| `.../scripts/export-print-filtered.mjs` | `--mode split` flag; default outfile names now mode-specific. |
+| `public/timetable/**` | Rebuilt bundle `index-CM1Zzu6Y.js` / `index-BjR4R-NW.css`. |
+| `railway.json` | `watchPatterns` += `public/**`, `railway.json`. |
+
+### Verified
+- `%TEMP%\opencode\print-modes-test.mjs`: **294/294 assertions** against live `sync-data.json` (21 classes, periodCount 9) - keep ranges, out-cell counts, badges, note text, class-12 skipped, no `undefined` in output.
+- eslint: `filteredPrintHtml.js` + `export-print-filtered.mjs` clean; `ClassTimetable.jsx` only its 3 pre-existing errors (279 surrogate x2, 317 set-state-in-effect - untouched lines).
+- `node scripts/sync-timetable.mjs` OK (vite build 10.0s). Both script modes write 21 classes.
+- **Live confirmed**: `https://python-arena-production.up.railway.app/timetable/index.html` now serves `index-CM1Zzu6Y.js` (deployed after ~4.5 min; old bundle was `index-D7I3VvFz.js`), and that JS contains `Print Filtered`, `Print Split`, `Print Class`, `Print All`, `P1-P5 only`. Hard-refresh (Ctrl+Shift+R) to see it.
+
+### Gotchas
+- `onClick={handlePrintFiltered}` would pass the click event as `mode` - always wrap in `() =>`.
+- `Periods 6-9` is not a literal in the minified bundle (built as `` `Periods 6-${periodCount}` ``) - assert on generated HTML, not on the bundle string.
+- Only `railway.json`/`public/**`/`app|src|lib`/`package.json`/`next.config.js` trigger deploys - Vite-app-only pushes are skipped by Railway.
+
+### Addendum (same session, commit `138b700`): free period -> prints "Practice"
+- `filteredPrintHtml.js`: an **in-range cell with no subject** now renders `<td class="free"><span class="free-txt">Practice</span></td>` (italic grey, white bg so it prints without background graphics). Applies to **both** `default` and `split` modes. Out-of-range cells stay grey and empty (they are excluded, not free). Note + legend explain it.
+- **Data reality check:** the current `sync-data.json` is 100% full - 21 classes x 6 days x 9 periods = **1134/1134 slots have a subject AND a teacher, 0 free periods**. So today's print shows **no** "Practice" anywhere; it appears only after a slot is emptied (editor/clear/planner).
+- Tests: `%TEMP%\opencode\print-modes-test.mjs` -> **6042/6042**, incl. synthetic runs that clear 6a Mon P6 (Practice in both modes), 1a Mon P1 (stays grey in default, becomes Practice in split), and all-days cell-content coverage (`sub` xor `free-txt`).
+- Live confirmed: `/timetable/index.html` serves `index-Dv_SLqZ0.js` containing `free-txt` + `Practice` + both print buttons.
+
+### Addendum 2 (same session, commit `7ff859e`): Practice in **every** blank cell
+- User asked for a report first, then chose **"Grey cells = Practice too"** (and, in the same breath, "grey = just not printed" - contradictory; implemented the primary answer, data untouched).
+- `filteredPrintHtml.js`: out-of-range cells now render `<td class="out"><span class="free-txt">Practice</span></td>` (grey band kept, text `#475569` for legibility), in-range blanks unchanged (`<td class="free">`). So **no cell in either printout can ever be blank** - every cell is subject or Practice. Note + legend updated ("Practice = no lesson printed here (free period or out of range)").
+- Numbers with current data: **default mode 498 Practice** (498 grey + 0 free), **split mode 570 Practice** (570 grey + 0 free); 636/564 real subject cells.
+- Tests: `%TEMP%\opencode\print-modes-test.mjs` -> **9380/9380**, incl. "no blank cell anywhere" (all 21 classes x 6 days x 9 periods x 2 modes), grey band retained, Practice counters vs expected band size, synthetic clears.
+- eslint clean. Bundle `index-BPDkTGIc.js` live-verified (`no lesson printed here`, `class="out"`, `class="free"`, both print buttons).
