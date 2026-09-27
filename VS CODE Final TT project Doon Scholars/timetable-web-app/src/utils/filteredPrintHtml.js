@@ -4,7 +4,7 @@
 // modes:
 //   'default' (classic):
 //     - Classes 1-5 : keep P6..periodCount only (P1-P5 blanked)
-//     - Classes 6-11: keep P1-P6 only (P7..periodCount blanked)
+//     - Classes 6-11: keep P1-P5 only (P6..periodCount blanked)
 //   'split' (junior/senior halves):
 //     - Classes 1-5 : keep P1-P5 only      (P6..periodCount blanked)
 //     - Classes 6-11: keep P6..periodCount only (P1-P5 blanked)
@@ -52,14 +52,14 @@ export const keepRangeFor = (classNum, mode, periodCount) => {
   }
   return junior
     ? { from: 6, to: periodCount, label: `Periods 6-${periodCount}` }
-    : { from: 1, to: Math.min(6, periodCount), label: 'Periods 1-6' };
+    : { from: 1, to: Math.min(5, periodCount), label: 'Periods 1-5' };
 };
 
 const modeNote = (mode, periodCount) => {
   if (mode === 'split') {
     return `Classes 1-5: <b>P1-P5 only</b> &nbsp;|&nbsp; Classes 6-11: <b>P6-P${periodCount} only</b> &nbsp;|&nbsp; Class 12 not included.`;
   }
-  return `Classes 1-5: <b>P6-P${periodCount} only</b> &nbsp;|&nbsp; Classes 6-11: <b>P1-P6 only</b> &nbsp;|&nbsp; Class 12 not included.`;
+  return `Classes 1-5: <b>P6-P${periodCount} only</b> &nbsp;|&nbsp; Classes 6-11: <b>P1-P5 only</b> &nbsp;|&nbsp; Class 12 not included.`;
 };
 
 export const buildFilteredPrintHtml = (timetables, opts = {}) => {

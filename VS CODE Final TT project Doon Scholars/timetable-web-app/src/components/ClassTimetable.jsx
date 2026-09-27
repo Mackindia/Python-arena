@@ -798,9 +798,9 @@ const ClassTimetable = () => {
           <button
             className="btn btn-outline"
             onClick={() => handlePrintFiltered('default')}
-            title="Print filtered timetable: classes 1-5 keep P6-P9 only, classes 6-11 keep P1-P6 only, class 12 skipped, other periods left blank (A4 landscape, one class per page)"
+            title="Print filtered timetable: classes 1-5 keep P6-P9 only, classes 6-11 keep P1-P5 only, class 12 skipped, other periods left blank (A4 landscape, one class per page)"
           >
-            🖨️ Print Filtered (1-5: P6-9 · 6-11: P1-6)
+            🖨️ Print Filtered (1-5: P6-9 · 6-11: P1-5)
           </button>
           <button
             className="btn btn-outline"

@@ -3,7 +3,7 @@
  * Generate a print-friendly HTML timetable with period filtering.
  *
  * modes (--mode):
- *   default : classes 1-5 keep P6-P9 only, classes 6-11 keep P1-P6 only
+ *   default : classes 1-5 keep P6-P9 only, classes 6-11 keep P1-P5 only
  *   split   : classes 1-5 keep P1-P5 only, classes 6-11 keep P6-P9 only
  *   Class 12    : skipped entirely (both modes)
  *
@@ -40,7 +40,7 @@ const outPath = resolve(
       '..',
       mode === 'split'
         ? 'timetable_print_split_1-5_P1-5_6-11_P6-9.html'
-        : 'timetable_print_1-5_P6-9_6-11_P1-6.html'
+        : 'timetable_print_1-5_P6-9_6-11_P1-5.html'
     )
 );
 
