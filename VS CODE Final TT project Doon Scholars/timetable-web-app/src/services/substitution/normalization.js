@@ -43,3 +43,8 @@ export const generateSlotId = (
 
   return `${String(day).trim()}-${normalizePeriod(period)}-${normalizeClassId(classId)}`
 }
+
+// Teachers who NEVER take another teacher's class (exempt from relief duty).
+// If THEY are absent, other teachers still cover their periods.
+// Single source shared by the auto engine and the manual substitute dropdown.
+export const SUBSTITUTION_EXEMPT = ['AN', 'P', 'RN', 'DK']

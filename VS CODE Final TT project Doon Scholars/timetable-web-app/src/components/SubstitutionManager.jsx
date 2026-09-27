@@ -7,7 +7,8 @@ import { Calendar as CalendarIcon, Users } from 'lucide-react';
 import {
   normalizeTeacherId,
   normalizePeriod,
-  normalizeClassId
+  normalizeClassId,
+  SUBSTITUTION_EXEMPT
 } from "../services/substitution/normalization";
 
 import {
@@ -17,6 +18,7 @@ import {
 import { buildTeacherScheduleMap } from "../services/timetable/buildTeacherScheduleMap";
 import { buildTeacherUsageMap } from "../services/timetable/buildTeacherUsageMap";
 import { getPeriodCount } from "../config/periods";
+import { rosterCodes, knownTeachers } from "../utils/csvTimetableImport";
 
 const SubstitutionEngineUI = ({
   timetables,
@@ -39,6 +41,18 @@ const SubstitutionEngineUI = ({
   const teacherScheduleMap = useMemo(() => {
     return buildTeacherScheduleMap(timetables);
   }, [timetables]);
+
+  // Weekly period count per teacher — substitute priority: lightest load first
+  const weeklyLoad = useMemo(() => {
+    const counts = {};
+    Object.entries(teacherScheduleMap || {}).forEach(([tid, dayMap]) => {
+      counts[normalizeTeacherId(tid)] = Object.values(dayMap || {}).reduce(
+        (n, slots) => n + Object.keys(slots || {}).length,
+        0
+      );
+    });
+    return counts;
+  }, [teacherScheduleMap]);
 
   // =========================================
   // AUTO GENERATE SUBSTITUTIONS
@@ -119,8 +133,8 @@ const SubstitutionEngineUI = ({
           s => normalizeTeacherId(s.substituteTeacher) === tId && normalizePeriod(s.period) === normalizedPeriod
         );
       })
-      // exempt from substitution duty
-      .filter(t => !['AN', 'P', 'RN'].includes(normalizeTeacherId(t)))
+      // exempt from substitution duty (AN, P, RN, DK never cover others)
+      .filter(t => !SUBSTITUTION_EXEMPT.includes(normalizeTeacherId(t)))
       .map(t => {
         const tId = normalizeTeacherId(t);
         const usage = stableTeacherUsage?.[tId]?.[selectedDayName] || {};
@@ -133,9 +147,12 @@ const SubstitutionEngineUI = ({
       // strictly enforce max 3 arrangements AND total periods < period count
       .filter(t => t.extraLoad < 3 && t.load < getPeriodCount())
       .sort((a, b) => {
-        if (a.extraLoad !== b.extraLoad) {
-          return a.extraLoad - b.extraLoad;
-        }
+        // PRIORITY: FEWEST periods/week first → heaviest last
+        const weekA = weeklyLoad[normalizeTeacherId(a.name)] || 0;
+        const weekB = weeklyLoad[normalizeTeacherId(b.name)] || 0;
+        if (weekA !== weekB) return weekA - weekB;
+        // then spread today's arrangements evenly
+        if (a.extraLoad !== b.extraLoad) return a.extraLoad - b.extraLoad;
         return a.baseLoad - b.baseLoad;
       });
   };
@@ -367,22 +384,28 @@ const SubstitutionManager = () => {
   } = useTimetable();
 
   // ──────────────────────────────────────────────────────────────────
-  // FIX: Derive teacher list from ACTUAL timetable data (teacherScheduleMap),
-  // NOT from context's `teachers` state. The context's `teachers` may include
-  // stale entries from `addedTeachers` in localStorage that are NOT synced
-  // across clients — causing sadmin to see old teacher initials while
-  // super admin sees correct ones.
-  // teacherScheduleMap is built from timetables (synced data) and is the
-  // single source of truth for which teachers actually exist.
+  // FIX: Teacher list = timetable truth UNION current-staff roster.
+  // - every code that actually has periods (built from timetables) shows;
+  // - every current staff code from teacher_mapping.json also shows even
+  //   with 0 periods (MP, RN, SL), otherwise they can never be ticked
+  //   absent and their classes could not be covered;
+  // - context `teachers` is merged ONLY for codes still on the roster, so
+  //   stale localStorage initials (departed staff) can never come back.
   // ──────────────────────────────────────────────────────────────────
   const timetableTeachers = useMemo(() => {
     const map = buildTeacherScheduleMap(timetables);
     return Object.keys(map).sort();
   }, [timetables]);
 
-  // Use timetable-derived teachers for the checkbox list (absent teacher selection)
-  // Fall back to context teachers if timetable scan is empty
-  const displayTeachers = timetableTeachers.length > 0 ? timetableTeachers : teachers;
+  const displayTeachers = useMemo(() => {
+    const set = new Set(timetableTeachers);
+    rosterCodes.forEach((code) => set.add(code));
+    (teachers || []).forEach((t) => {
+      const id = normalizeTeacherId(t);
+      if (id && knownTeachers.has(id)) set.add(id);
+    });
+    return Array.from(set).sort();
+  }, [timetableTeachers, teachers]);
 
   const getTeacherFullName = (shortName) => {
     const normalized = normalizeTeacherId(shortName);

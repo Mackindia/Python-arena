@@ -23,13 +23,26 @@ import ShiftQueueSidebar from './relief/ShiftQueueSidebar';
 import RecommendationPanel from './relief/RecommendationPanel';
 import './relief/reliefStyles.css';
 import { getPeriods } from '../config/periods';
+import { buildTeacherScheduleMap } from '../services/timetable/buildTeacherScheduleMap';
+import { buildTeacherSchedulePrintHtml, buildAllTeachersPrintHtml } from '../utils/teacherSchedulePrintHtml';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = getPeriods();
 
 const TeacherView = () => {
   const { timetables, teachers, updateSlot } = useTimetable();
-  const [selectedTeacher, setSelectedTeacher] = useState(teachers[0] || '');
+  // Teacher list comes from the timetable itself - context `teachers` can still
+  // carry stale initials from localStorage addedTeachers (old staff who no
+  // longer teach), which must never appear in this dropdown.
+  const teacherOptions = useMemo(
+    () => Object.keys(buildTeacherScheduleMap(timetables)).sort(),
+    [timetables]
+  );
+  const [selectedTeacher, setSelectedTeacher] = useState('');
+  const activeTeacher =
+    selectedTeacher && teacherOptions.includes(selectedTeacher)
+      ? selectedTeacher
+      : teacherOptions[0] || '';
   const [activeTab, setActiveTab] = useState('schedule');
   const [shiftQueue, setShiftQueue] = useState([]);
 
@@ -48,8 +61,8 @@ const TeacherView = () => {
   const allClashIds = useMemo(() => allClashes.map((c) => c.id), [allClashes]);
   const firstSeen = useMemo(() => recordFirstSeen(allClashIds), [allClashIds]);
   const teacherClashes = useMemo(
-    () => getTeacherClashes(allClashes, selectedTeacher),
-    [allClashes, selectedTeacher]
+    () => getTeacherClashes(allClashes, activeTeacher),
+    [allClashes, activeTeacher]
   );
   const teacherSummary = useMemo(
     () => summarizeClashMarks(teacherClashes.map((c) => c.id), ledger, firstSeen, lastVisit),
@@ -89,8 +102,9 @@ const TeacherView = () => {
     setLedger(prev => clearMarks(prev, ids));
   }, [clearedMarks]);
 
-  // Calculate teacher's schedule across all classes (for Schedule tab)
-  const getTeacherSchedule = () => {
+  // Calculate teacher's schedule across all classes (for Schedule tab).
+  // `teacher` is a parameter so the "print every teacher" buttons can reuse it.
+  const getTeacherSchedule = (teacher = activeTeacher) => {
     const schedule = {};
     DAYS.forEach(day => {
       schedule[day] = {};
@@ -99,13 +113,13 @@ const TeacherView = () => {
       });
     });
 
-    if (!selectedTeacher) return schedule;
+    if (!teacher) return schedule;
 
     Object.entries(timetables).forEach(([classId, classSchedule]) => {
       classSchedule.forEach(slot => {
         // Handle comma-separated teachers (e.g., "SB,RD,DV")
         const slotTeachers = slot.teacher ? slot.teacher.split(',').map(t => t.trim()) : [];
-        if (!slotTeachers.includes(selectedTeacher)) return;
+        if (!slotTeachers.includes(teacher)) return;
         const p = parseInt(slot.period);
         const clashRow = clashIndex[`${slot.day}|${p}`] || null;
         const cell = schedule[slot.day][p];
@@ -115,10 +129,14 @@ const TeacherView = () => {
           // behind 11b, so the teacher view disagreed with the class grid).
           if (!cell.classIds.includes(classId)) cell.classIds.push(classId);
           if (!cell.subjects.includes(slot.subject)) cell.subjects.push(slot.subject);
+          if (!cell.entries.some(e => e.classId === classId)) {
+            cell.entries.push({ classId, subject: slot.subject });
+          }
         } else {
           schedule[slot.day][p] = {
             classIds: [classId],
             subjects: [slot.subject],
+            entries: [{ classId, subject: slot.subject }],
             combined: false,
           };
         }
@@ -133,7 +151,7 @@ const TeacherView = () => {
     return schedule;
   };
 
-  const schedule = getTeacherSchedule();
+  const schedule = getTeacherSchedule(activeTeacher);
 
   // Calculate total classes per week
   let totalClasses = 0;
@@ -142,12 +160,78 @@ const TeacherView = () => {
       if (schedule[day][p]) totalClasses++;
     });
   });
+  const countLoad = sched => {
+    let n = 0;
+    DAYS.forEach(day => {
+      PERIODS.forEach(p => {
+        if (sched[day][p]) n++;
+      });
+    });
+    return n;
+  };
 
   // Get overloaded count for badge
   const overloadedCount = useMemo(() => {
     const summary = getAllTeachersSummary(timetables, teachers);
     return summary.filter(t => t.overloadedDays.length > 0).length;
   }, [timetables, teachers]);
+
+  // Shared popup → auto print (same pattern as ClassTimetable's print buttons)
+  const printInWindow = html => {
+    const win = window.open('', '_blank');
+    if (!win) {
+      alert('Pop-up blocked. Please allow pop-ups for this site, then try again.');
+      return;
+    }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    let printed = false;
+    const doPrint = () => {
+      if (printed) return;
+      printed = true;
+      win.focus();
+      win.print();
+    };
+    win.onload = doPrint;
+    setTimeout(doPrint, 700);
+  };
+
+  // Print ONE teacher's weekly schedule (popup + auto print, like Print Filtered)
+  // mode: 'all' (whole week) | 'default' (1-5: P6-9 / 6-11: P1-5) | 'split'
+  const handlePrintSchedule = (mode = 'all') => {
+    if (!activeTeacher) return;
+    printInWindow(
+      buildTeacherSchedulePrintHtml({
+        teacher: activeTeacher,
+        schedule,
+        days: DAYS,
+        periods: PERIODS,
+        totalClasses,
+        mode,
+        updatedAt: new Date().toLocaleString(),
+      })
+    );
+  };
+
+  // Print EVERY teacher - one teacher per page, same modes as the class
+  // timetable's Print All / Print Filtered / Print Split.
+  const handlePrintAllTeachers = (mode = 'all') => {
+    const list = teacherOptions.map(t => {
+      const sched = getTeacherSchedule(t);
+      return { teacher: t, schedule: sched, totalClasses: countLoad(sched) };
+    });
+    if (!list.length) return;
+    printInWindow(
+      buildAllTeachersPrintHtml({
+        teachers: list,
+        days: DAYS,
+        periods: PERIODS,
+        mode,
+        updatedAt: new Date().toLocaleString(),
+      })
+    );
+  };
 
   // Shift queue handlers
   const handleAddShift = useCallback((shift) => {
@@ -272,22 +356,54 @@ const TeacherView = () => {
             <div className="filter-group">
               <label>Select Teacher:</label>
               <select
-                value={selectedTeacher}
+                value={activeTeacher}
                 onChange={(e) => setSelectedTeacher(e.target.value)}
                 style={{ width: '200px' }}
               >
                 <option value="">- Select Teacher -</option>
-                {teachers.map(t => (
+                {teacherOptions.map(t => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </select>
             </div>
 
-            {selectedTeacher && (
-              <div className="filter-group" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {activeTeacher && (
+              <div className="filter-group" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                 <span className="badge badge-success" style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}>
                   Total Load: {totalClasses} classes/week
                 </span>
+                <button
+                  className="btn btn-outline"
+                  onClick={() => handlePrintSchedule('all')}
+                  title="Print only this teacher's whole week as-is (A4 landscape)"
+                  style={{ fontSize: '0.9rem', padding: '0.45rem 0.9rem', whiteSpace: 'nowrap' }}
+                >
+                  🖨️ Print Teacher
+                </button>
+                <button
+                  className="btn btn-outline"
+                  onClick={() => handlePrintAllTeachers('all')}
+                  title="Print every teacher's schedule - one teacher per page (A4 landscape)"
+                  style={{ fontSize: '0.9rem', padding: '0.45rem 0.9rem', whiteSpace: 'nowrap' }}
+                >
+                  🖨️ Print All
+                </button>
+                <button
+                  className="btn btn-outline"
+                  onClick={() => handlePrintAllTeachers('default')}
+                  title="All teachers, one per page - classes 1-5 print periods 6-9, classes 6-11 print periods 1-5, everything else prints Practice"
+                  style={{ fontSize: '0.9rem', padding: '0.45rem 0.9rem', whiteSpace: 'nowrap' }}
+                >
+                  🖨️ Print Filtered (1-5: P6-{PERIODS.length} · 6-11: P1-5)
+                </button>
+                <button
+                  className="btn btn-outline"
+                  onClick={() => handlePrintAllTeachers('split')}
+                  title="All teachers, one per page - classes 1-5 print periods 1-5, classes 6-11 print periods 6-9, everything else prints Practice"
+                  style={{ fontSize: '0.9rem', padding: '0.45rem 0.9rem', whiteSpace: 'nowrap' }}
+                >
+                  🖨️ Print Split (1-5: P1-5 · 6-11: P6-{PERIODS.length})
+                </button>
                 {teacherSummary.unchecked > 0 && (
                   <span className="badge" style={{ background: '#dc2626', color: '#fff', fontSize: '0.9rem', padding: '0.5rem 1rem', borderRadius: '12px', fontWeight: 700 }} title="Clashes of this teacher you have not checked yet">
                     {teacherSummary.unchecked} unchecked
@@ -297,7 +413,7 @@ const TeacherView = () => {
             )}
           </div>
 
-          {selectedTeacher ? (
+          {activeTeacher ? (
             <div className="card">
               <div className="timetable-grid">
                 <div className="grid-cell grid-header">Day</div>
@@ -371,10 +487,10 @@ const TeacherView = () => {
           )}
 
           {/* Per-teacher clash report — catches clashes missed in class timetable */}
-          {selectedTeacher && teacherClashes.length > 0 && (
+          {activeTeacher && teacherClashes.length > 0 && (
             <div className="card no-print" style={{ marginTop: '1rem', border: '1px solid #fca5a5', background: '#fef2f2', borderRadius: '0.5rem', padding: '1rem' }}>
               <h3 style={{ margin: '0 0 0.5rem 0', color: '#991b1b', fontSize: '1rem', fontWeight: 700 }}>
-                ⚠️ Clash Report — {selectedTeacher.toUpperCase()} ({teacherSummary.unchecked} unchecked • {teacherSummary.checked} checked • {teacherSummary.intentional} intentional)
+                ⚠️ Clash Report — {activeTeacher.toUpperCase()} ({teacherSummary.unchecked} unchecked • {teacherSummary.checked} checked • {teacherSummary.intentional} intentional)
               </h3>
               {/* Check-memory progress bar */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', fontSize: '0.82rem', color: '#334155', marginBottom: '0.5rem' }}>
@@ -470,7 +586,7 @@ const TeacherView = () => {
           )}
 
           {/* Cleared history — clashes you marked that no longer exist (fixed) */}
-          {selectedTeacher && clearedMarks.length > 0 && (
+          {activeTeacher && clearedMarks.length > 0 && (
             <div className="no-print" style={{ marginTop: '0.75rem', padding: '0.75rem 1rem', borderRadius: '0.5rem', border: '1px solid #bbf7d0', background: '#f0fdf4', fontSize: '0.8rem', color: '#166534' }}>
               <strong>✓ Already cleared ({clearedMarks.length}):</strong>{' '}
               {clearedMarks.slice(0, 5).map(([id, m]) => id.split('|').slice(0, 3).join(' ') + (m.note ? ` “${m.note}”` : '')).join(' · ')}

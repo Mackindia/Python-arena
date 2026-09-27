@@ -62,6 +62,10 @@ const modeNote = (mode, periodCount) => {
   return `Classes 1-5: <b>P6-P${periodCount} only</b> &nbsp;|&nbsp; Classes 6-11: <b>P1-P5 only</b> &nbsp;|&nbsp; Class 12 not included.`;
 };
 
+// Reused by the teacher-schedule print so both printouts say the same thing.
+export { modeNote as printModeNote };
+export const subjectLabel = (s) => label(s);
+
 export const buildFilteredPrintHtml = (timetables, opts = {}) => {
   const periodCount = opts.periodCount || 9;
   const mode = opts.mode === 'split' ? 'split' : 'default';

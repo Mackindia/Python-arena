@@ -4,7 +4,8 @@ import {
   normalizeTeacherId,
   normalizePeriod,
   normalizeClassId,
-  generateSlotId
+  generateSlotId,
+  SUBSTITUTION_EXEMPT
 } from "./normalization"
 import { getPeriodCount } from "../../config/periods"
 
@@ -46,6 +47,21 @@ export const generateAllSubstitutions = (
       assignedMap[tId] = []
     }
   })
+
+  // ──────────────────────────────────────────────────────────────────────
+  // PRIORITY: weekly period count per teacher. Substitute order = fewest
+  // periods per week first, then heaviest (lightest load takes relief).
+  // Teachers with no timetable (0 periods) score 0 and come first.
+  // ──────────────────────────────────────────────────────────────────────
+  const weeklyLoad = {}
+  Object.entries(teacherScheduleMap || {}).forEach(([teacherId, dayMap]) => {
+    const id = normalizeTeacherId(teacherId)
+    weeklyLoad[id] = Object.values(dayMap || {}).reduce(
+      (n, slots) => n + Object.keys(slots || {}).length,
+      0
+    )
+  })
+  const weekLoadOf = (id) => weeklyLoad[id] || 0
 
   Object.entries(
     teacherScheduleMap || {}
@@ -137,8 +153,8 @@ export const generateAllSubstitutions = (
             )
           })
 
-          // exempt from substitution duty
-          .filter(t => !['AN', 'P', 'RN'].includes(t.id))
+          // exempt from substitution duty (AN, P, RN, DK never cover others)
+          .filter(t => !SUBSTITUTION_EXEMPT.includes(t.id))
 
           // max 3 arrangements AND total periods < period count
           .filter(t => {
@@ -161,8 +177,15 @@ export const generateAllSubstitutions = (
             return extraLoad < 3 && (baseLoad + extraLoad) < getPeriodCount();
           })
 
-          // fairness
+          // fairness: FEWEST periods/week first → heaviest last
           .sort((a,b) => {
+            const weekA = weekLoadOf(a.id)
+            const weekB = weekLoadOf(b.id)
+
+            if (weekA !== weekB) {
+              return weekA - weekB
+            }
+
             const usageA =
               teacherUsage?.[
                 a.id
@@ -195,13 +218,13 @@ export const generateAllSubstitutions = (
             const extraLoadB =
               (assignedMap[b.id] || []).length
 
-            // Sort by extraLoad first (distribute arrangements evenly)
+            // Spread today's arrangements evenly
             if (extraLoadA !== extraLoadB) {
-              return extraLoadA - extraLoadB;
+              return extraLoadA - extraLoadB
             }
 
-            // Sort by baseLoad (prefer teachers with fewer own classes / free for maximum periods)
-            return baseLoadA - baseLoadB;
+            // Then fewer of today's own classes
+            return baseLoadA - baseLoadB
           })
 
       const assignedTeacher =
