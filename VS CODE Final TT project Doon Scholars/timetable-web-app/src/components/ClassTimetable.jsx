@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTimetable } from '../context/TimetableContext';
-import { AlertTriangle, CheckCircle2, Zap, Search, Wrench, Scissors, CalendarRange } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Zap, Search, Wrench, Scissors, CalendarRange, Brain } from 'lucide-react';
 import { autoAssignTeacher } from '../services/allocationEngine';
 import { autoArrangeClass, resolveClashes, resolveClashDeep } from '../services/autoArrangeEngine';
 import { fixClass } from '../services/bandAwareFix';
 import { planFirstHalf } from '../services/firstHalfPlanner';
+import SolutionManager from './SolutionManager';
 import {
   scanAllClashes,
   getClassClashRows,
@@ -37,6 +38,8 @@ const ClassTimetable = () => {
   const [resolveLog, setResolveLog] = useState(null);
   const [fixPlan, setFixPlan] = useState(null);
   const [fhPlan, setFhPlan] = useState(null);
+  const [showSolver, setShowSolver] = useState(false);
+  const [solverPrefill, setSolverPrefill] = useState(null);
   const [showLoadBalance, setShowLoadBalance] = useState(false);
 
   // Check marks: which clashes have I already reviewed? (persisted across days)
@@ -774,6 +777,17 @@ const ClassTimetable = () => {
           </button>
           <button
             className="btn"
+            onClick={() => {
+              setShowSolver((v) => !v);
+              setSolverPrefill(null);
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#6d28d9', color: 'white', border: 'none', borderRadius: '4px', padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer' }}
+            title="Brain: pick a class + subject (optionally one period) and see every legal move - same-class swap, empty-slot move, free-the-teacher, cross-class. Each option is re-checked against the WHOLE timetable, so it can never fix one clash and create another."
+          >
+            <Brain size={16} /> Solution Manager
+          </button>
+          <button
+            className="btn"
             onClick={handleSeparateCombined}
             disabled={!selectedClass}
             style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#0369a1', color: 'white', border: 'none', borderRadius: '4px', padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer' }}
@@ -935,6 +949,26 @@ const ClassTimetable = () => {
         </div>
       )}
 
+      {/* Brain: Solution Manager - every legal swap for a class + subject */}
+      {showSolver && selectedClass && (
+        <div id="solution-manager">
+          <SolutionManager
+            key={solverPrefill ? `${solverPrefill.subject}|${solverPrefill.day}|${solverPrefill.period}` : 'open'}
+            selectedClass={selectedClass}
+            timetables={timetables}
+            updateSlot={updateSlot}
+            allClashes={allClashes}
+            periodCount={PERIODS.length}
+            prefill={solverPrefill}
+            onNotify={(type, message) => setNotification({ type, message })}
+            onClose={() => {
+              setShowSolver(false);
+              setSolverPrefill(null);
+            }}
+          />
+        </div>
+      )}
+
       <div className="filter-bar no-print">
         <div className="filter-group">
           <label>Select Class:</label>
@@ -945,6 +979,7 @@ const ClassTimetable = () => {
               setResolveLog(null);
               setFixPlan(null);
               setFhPlan(null);
+              setSolverPrefill(null);
             }}
             style={{ width: '150px' }}
             disabled={classes.length === 0}
@@ -1165,6 +1200,18 @@ const ClassTimetable = () => {
                 <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca', textAlign: 'center', whiteSpace: 'nowrap' }}>
                   {c.state !== 'intentional' && (
                     <>
+                      <button
+                        onClick={() => {
+                          setSolverPrefill({ subject: c.subject, day: c.day, period: c.period });
+                          setShowSolver(true);
+                          setTimeout(() => {
+                            const el = document.getElementById('solution-manager');
+                            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          }, 80);
+                        }}
+                        style={{ background: '#6d28d9', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem', marginRight: '4px' }}
+                        title="Open the Solution Manager for this subject + period (every legal swap, verified)"
+                      >🧠 Solve</button>
                       <button
                         onClick={() => handleResolveSingle(c.day, c.period, false)}
                         style={{ background: '#0d9488', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.78rem', marginRight: '4px' }}
