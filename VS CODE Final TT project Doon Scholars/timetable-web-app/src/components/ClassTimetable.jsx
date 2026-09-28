@@ -26,11 +26,13 @@ import {
   summarizeClashMarks,
 } from '../services/clashCheckLedger';
 import { rowKeyOf, collectBatchIds, pendingCheckedIds, countBatch } from '../services/clashBatchApply';
-import { getPeriods } from '../config/periods';
+import { getPeriods, BREAK_AFTER_PERIOD, formatPeriodTime, formatBreakTime } from '../config/periods';
 import { buildFilteredPrintHtml } from '../utils/filteredPrintHtml';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = getPeriods();
+// The Break column (between P5 and P6) only exists when the day runs past the break.
+const showBreak = PERIODS.length > BREAK_AFTER_PERIOD;
 
 // Hide/unhide of the Clash Report is ONE switch for every class and is
 // remembered across visits (localStorage).
@@ -734,11 +736,22 @@ const ClassTimetable = () => {
       <h2 className="print-only-title" style={{ display: 'none', textAlign: 'center', marginBottom: '1rem', color: '#0f172a', fontSize: '1.5rem', fontWeight: 'bold' }}>
         Doon Scholars - Class {targetClass.toUpperCase()} Timetable
       </h2>
-      <div className="timetable-grid">
-        {/* Header Row */}
+      <div className={showBreak ? `timetable-grid has-break pc-${PERIODS.length}` : 'timetable-grid'}>
+        {/* Header Row — period number + bell timing; Break column sits after P5 */}
         <div className="grid-cell grid-header">Day</div>
         {PERIODS.map(p => (
-          <div key={`p${p}`} className="grid-cell grid-header">P{p}</div>
+          <React.Fragment key={`p${p}`}>
+            <div className="grid-cell grid-header period-header" title={`Period ${p}: ${formatPeriodTime(p, true)}`}>
+              <span className="p-label">P{p}</span>
+              <span className="p-time">{formatPeriodTime(p)}</span>
+            </div>
+            {p === BREAK_AFTER_PERIOD && (
+              <div className="grid-cell grid-header break-header" title={`Break: ${formatBreakTime(true)}`}>
+                <span className="p-label">Break</span>
+                <span className="p-time">{formatBreakTime()}</span>
+              </div>
+            )}
+          </React.Fragment>
         ))}
 
         {/* Data Rows */}
@@ -794,9 +807,8 @@ const ClassTimetable = () => {
                 cellTitle = 'Subject exists but teacher is not assigned';
               }
               
-              return (
-                <div 
-                  key={`${day}-p${p}`} 
+              const cell = (
+                <div
                   className={cellClassName}
                   title={cellTitle}
                 >
@@ -861,6 +873,15 @@ const ClassTimetable = () => {
                     </>
                   )}
                 </div>
+              );
+              return (
+                <React.Fragment key={`${day}-p${p}`}>
+                  {cell}
+                  {/* Break column: blank on purpose — no lesson is taught during the break */}
+                  {p === BREAK_AFTER_PERIOD && (
+                    <div className="grid-cell break-cell" aria-hidden="true" />
+                  )}
+                </React.Fragment>
               );
             })}
           </React.Fragment>

@@ -173,6 +173,67 @@ body {
   color: var(--primary-color);
 }
 
+/* Period header: number + bell timing (e.g. "P1" / "8:00 – 8:35") */
+.period-header {
+  gap: 0.15rem;
+  padding: 0.6rem 0.35rem;
+}
+
+.period-header .p-label,
+.break-header .p-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.period-header .p-time,
+.break-header .p-time {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  color: #475569;
+}
+
+.break-header {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.break-header .p-time {
+  color: #b45309;
+}
+
+/* Break column cells are deliberately blank — no lesson is taught there */
+.break-cell {
+  background-color: #f8fafc;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 5px,
+    rgba(148, 163, 184, 0.28) 5px,
+    rgba(148, 163, 184, 0.28) 10px
+  );
+}
+
+.break-cell:hover {
+  background-color: #f8fafc;
+}
+
+/* Break column layout: Day + P1-P5 + Break + P6-P9.
+   The pc-8 / pc-9 variants must match ALLOWED_PERIOD_COUNTS in config/periods.js
+   (add the next variant there if another period count is ever allowed). */
+.timetable-grid.has-break.pc-9 {
+  grid-template-columns: 80px repeat(5, minmax(120px, 1fr)) 112px repeat(4, minmax(120px, 1fr));
+  min-width: calc(80px + 9 * 120px + 112px);
+}
+
+.timetable-grid.has-break.pc-8 {
+  grid-template-columns: 80px repeat(5, minmax(120px, 1fr)) 112px repeat(3, minmax(120px, 1fr));
+  min-width: calc(80px + 8 * 120px + 112px);
+}
+
 .slot-subject {
   font-weight: 600;
   font-size: 0.875rem;
@@ -409,6 +470,24 @@ select:focus, input:focus {
     border: 1px solid #000;
     grid-template-columns: 50px repeat(var(--period-count, 9), minmax(0, 1fr)) !important;
     gap: 1px !important;
+  }
+
+  /* Class grid with the Break column — higher specificity so it wins */
+  .timetable-grid.has-break.pc-9 {
+    grid-template-columns: 50px repeat(5, minmax(0, 1fr)) 64px repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .timetable-grid.has-break.pc-8 {
+    grid-template-columns: 50px repeat(5, minmax(0, 1fr)) 64px repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .period-header .p-time,
+  .break-header .p-time {
+    font-size: 0.58rem !important;
+  }
+
+  .break-cell {
+    background-image: none !important;
   }
   
   .grid-cell {
