@@ -32,6 +32,24 @@ import { buildFilteredPrintHtml } from '../utils/filteredPrintHtml';
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PERIODS = getPeriods();
 
+// Hide/unhide of the Clash Report is ONE switch for every class and is
+// remembered across visits (localStorage).
+const HIDDEN_KEY = 'clashReportHidden';
+const readReportHidden = () => {
+  try {
+    return localStorage.getItem(HIDDEN_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
+const writeReportHidden = (value) => {
+  try {
+    localStorage.setItem(HIDDEN_KEY, value ? '1' : '0');
+  } catch {
+    // storage unavailable — hidden state lives for this session only
+  }
+};
+
 const ClassTimetable = () => {
   const { timetables, classes, updateSlot, loadMaster, teachers, teacherSubjectMap, getAllowedSubjectsForClass } = useTimetable();
   const [selectedClass, setSelectedClass] = useState('');
@@ -49,6 +67,13 @@ const ClassTimetable = () => {
   // to all of them in one click — "one go" across this class or every class.
   const [batchScope, setBatchScope] = useState('class');
   const [selectedRowKeys, setSelectedRowKeys] = useState(() => new Set());
+
+  // Clash Report visibility — global (all classes) + persisted
+  const [reportHidden, setReportHiddenState] = useState(() => readReportHidden());
+  const setReportHidden = (next) => {
+    writeReportHidden(next);
+    setReportHiddenState(next);
+  };
 
   // Check marks: which clashes have I already reviewed? (persisted across days)
   const [ledger, setLedger] = useState(() => loadLedger());
@@ -209,9 +234,23 @@ const ClassTimetable = () => {
 
     setLedger((prev) => setMarks(prev, ids, status, note));
     setSelectedRowKeys(new Set());
+
+    // Every clash intentional in the WHOLE timetable? Then the report has
+    // nothing left to show — hide it (one click on "Show" brings it back).
+    let hiddenNote = '';
+    if (status === INTENTIONAL) {
+      const nextLedger = setMarks(ledger, ids, INTENTIONAL, note);
+      const allIntentional = allClashIds.length > 0 &&
+        allClashIds.every((id) => nextLedger[id] && nextLedger[id].status === INTENTIONAL);
+      if (allIntentional) {
+        setReportHidden(true);
+        hiddenNote = ' Every clash in the timetable is intentional now — report hidden (Show report brings it back).';
+      }
+    }
+
     notifyBatch(
       'success',
-      `Marked ${ids.length} clash(es) as ${status === INTENTIONAL ? 'Intentional' : 'Checked'} — ${batchScopeLabel()}.`
+      `Marked ${ids.length} clash(es) as ${status === INTENTIONAL ? 'Intentional' : 'Checked'} — ${batchScopeLabel()}.${hiddenNote}`
     );
   };
 
@@ -1233,12 +1272,48 @@ const ClassTimetable = () => {
         </div>
       )}
 
+      {/* Hidden strip — report is collapsed for every class, counts still visible */}
+      {selectedClass && reportHidden && globalSummary.total > 0 && (
+        <div
+          className="no-print"
+          style={{
+            marginBottom: '1rem',
+            padding: '8px 12px',
+            borderRadius: '0.5rem',
+            border: '1px solid #cbd5e1',
+            background: '#f8fafc',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            flexWrap: 'wrap',
+            fontSize: '0.85rem',
+            color: '#334155',
+          }}
+        >
+          <span style={{ fontWeight: 600 }}>
+            ⚠️ Clash report hidden for all classes — {globalSummary.total} clashes ({globalSummary.unchecked} unchecked • {globalSummary.checked} checked • {globalSummary.intentional} intentional)
+          </span>
+          <button
+            onClick={() => setReportHidden(false)}
+            style={{ background: '#16a34a', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem' }}
+            title="Show the clash report again (for every class)"
+          >👁 Show report</button>
+        </div>
+      )}
+
       {/* Clash Report Panel — every clash in this class, listed at once */}
-      {selectedClass && (clashReport.length > 0 || globalSummary.total > 0) && (
+      {selectedClass && !reportHidden && (clashReport.length > 0 || globalSummary.total > 0) && (
         <div className="no-print" style={{ marginBottom: '1rem', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #fca5a5', background: '#fef2f2' }}>
-          <h3 style={{ margin: '0 0 0.75rem 0', color: '#991b1b', fontSize: '1rem', fontWeight: 700 }}>
-            ⚠️ Clash Report — {selectedClass.toUpperCase()} ({classSummary.unchecked} unchecked • {classSummary.checked} checked • {classSummary.intentional} intentional)
-          </h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+            <h3 style={{ margin: 0, color: '#991b1b', fontSize: '1rem', fontWeight: 700 }}>
+              ⚠️ Clash Report — {selectedClass.toUpperCase()} ({classSummary.unchecked} unchecked • {classSummary.checked} checked • {classSummary.intentional} intentional)
+            </h3>
+            <button
+              onClick={() => setReportHidden(true)}
+              style={{ background: 'white', border: '1px solid #fca5a5', color: '#991b1b', borderRadius: '4px', padding: '4px 10px', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem' }}
+              title="Hide the clash report for every class (marks are kept — Show report brings it back)"
+            >🙈 Hide report</button>
+          </div>
           <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '0 0 0.75rem 0' }}>
             All clashes are shown together (including every teacher of a combination subject). Mark each one so you remember next day:
             <strong> ✓ Checked</strong> = real, fix later (add a note) · <strong>Intentional</strong> = combined class, leave it.
