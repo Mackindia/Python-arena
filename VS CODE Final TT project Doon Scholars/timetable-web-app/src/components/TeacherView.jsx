@@ -9,6 +9,7 @@ import {
   CHECKED,
   INTENTIONAL,
   loadLedger,
+  saveLedger,
   setMarks,
   clearMarks,
   askForNote,
@@ -49,6 +50,11 @@ const TeacherView = () => {
   // Check marks: which clashes have I already reviewed? (shared with Class Timetable)
   const [ledger, setLedger] = useState(() => loadLedger());
   const [lastVisit] = useState(() => getLastVisit());
+
+  // Marks must survive a refresh — the ledger was loaded but never saved back.
+  useEffect(() => {
+    saveLedger(ledger);
+  }, [ledger]);
 
   // Record that this session started — next visit compares against it (NEW chips)
   useEffect(() => {

@@ -6,6 +6,7 @@ import { autoArrangeClass, resolveClashes, resolveClashDeep } from '../services/
 import { fixClass } from '../services/bandAwareFix';
 import { planFirstHalf } from '../services/firstHalfPlanner';
 import SolutionManager from './SolutionManager';
+import ClashBatchBar from './ClashBatchBar';
 import {
   scanAllClashes,
   getClassClashRows,
@@ -14,6 +15,7 @@ import {
   CHECKED,
   INTENTIONAL,
   loadLedger,
+  saveLedger,
   setMarks,
   clearMarks,
   askForNote,
@@ -23,6 +25,7 @@ import {
   formatTimestamp,
   summarizeClashMarks,
 } from '../services/clashCheckLedger';
+import { rowKeyOf, collectBatchIds, pendingCheckedIds, countBatch } from '../services/clashBatchApply';
 import { getPeriods } from '../config/periods';
 import { buildFilteredPrintHtml } from '../utils/filteredPrintHtml';
 
@@ -42,9 +45,19 @@ const ClassTimetable = () => {
   const [solverPrefill, setSolverPrefill] = useState(null);
   const [showLoadBalance, setShowLoadBalance] = useState(false);
 
+  // Batch review: tick rows (or pick a scope) and apply Intentional/Checked
+  // to all of them in one click — "one go" across this class or every class.
+  const [batchScope, setBatchScope] = useState('class');
+  const [selectedRowKeys, setSelectedRowKeys] = useState(() => new Set());
+
   // Check marks: which clashes have I already reviewed? (persisted across days)
   const [ledger, setLedger] = useState(() => loadLedger());
   const [lastVisit] = useState(() => getLastVisit());
+
+  // Marks must survive a refresh — the ledger was loaded but never saved back.
+  useEffect(() => {
+    saveLedger(ledger);
+  }, [ledger]);
 
   // Record that this session started — next visit compares against it (NEW chips)
   useEffect(() => {
@@ -95,9 +108,16 @@ const ClassTimetable = () => {
       const state = uncheckedIds.length > 0 ? 'unchecked'
         : checkedIds.length > 0 ? 'checked'
         : 'intentional';
-      return { ...row, entries, uncheckedIds, checkedIds, intentionalIds, notes, state };
+      return { ...row, entries, rowKey: rowKeyOf({ entries }), uncheckedIds, checkedIds, intentionalIds, notes, state };
     });
   }, [allClashes, timetables, selectedClass, ledger]);
+
+  // What the batch buttons will touch (ticked rows beat the scope switch)
+  const batchIds = useMemo(
+    () => collectBatchIds({ rows: clashReport, selectedKeys: [...selectedRowKeys], scope: batchScope, allClashIds }),
+    [clashReport, selectedRowKeys, batchScope, allClashIds]
+  );
+  const batchStat = useMemo(() => countBatch(batchIds, ledger), [batchIds, ledger]);
 
   const handleMarkChecked = (row) => {
     if (row.uncheckedIds.length === 0) return;
@@ -132,6 +152,78 @@ const ClassTimetable = () => {
       const next = clearMarks(prev, row.intentionalIds);
       return next;
     });
+  };
+
+  // ---- Batch apply: one click for every clash in the target scope ----
+  const notifyBatch = (type, message) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 6000);
+  };
+
+  const batchScopeLabel = () =>
+    selectedRowKeys.size > 0
+      ? `${selectedRowKeys.size} ticked row(s)`
+      : batchScope === 'all'
+        ? 'every class'
+        : selectedClass.toUpperCase();
+
+  const toggleRowSelection = (key) => {
+    setSelectedRowKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const selectAllRows = () => setSelectedRowKeys(new Set(clashReport.map((r) => r.rowKey)));
+  const clearRowSelection = () => setSelectedRowKeys(new Set());
+
+  // Confirm before a whole-timetable write (nothing ticked + "All classes")
+  const confirmWholeTimetable = (action) => {
+    if (selectedRowKeys.size > 0 || batchScope !== 'all') return true;
+    return window.confirm(
+      `${action} ALL ${batchIds.length} clashes across every class? (Ticking rows narrows it down.)`
+    );
+  };
+
+  const handleBatchApply = (status) => {
+    if (batchIds.length === 0) {
+      notifyBatch('warning', 'Nothing in this scope to apply — pick a scope that has clashes.');
+      return;
+    }
+    const ids = status === CHECKED ? pendingCheckedIds(batchIds, ledger) : batchIds;
+    if (ids.length === 0) {
+      notifyBatch('success', `All ${batchIds.length} clash(es) in scope are already reviewed — nothing new to mark.`);
+      return;
+    }
+    const label = status === INTENTIONAL ? `Apply INTENTIONAL to` : `Apply CHECKED to`;
+    if (!confirmWholeTimetable(label)) return;
+
+    let note;
+    if (status === CHECKED) {
+      // ONE prompt for the whole batch (blank/cancel = no note) instead of one per row
+      const answer = window.prompt(`Note for these ${ids.length} clashes (optional, blank = none):`, '');
+      note = answer === null ? '' : answer.trim();
+    }
+
+    setLedger((prev) => setMarks(prev, ids, status, note));
+    setSelectedRowKeys(new Set());
+    notifyBatch(
+      'success',
+      `Marked ${ids.length} clash(es) as ${status === INTENTIONAL ? 'Intentional' : 'Checked'} — ${batchScopeLabel()}.`
+    );
+  };
+
+  const handleBatchUndo = () => {
+    if (batchIds.length === 0) {
+      notifyBatch('warning', 'Nothing to undo in this scope.');
+      return;
+    }
+    if (!confirmWholeTimetable('Clear review marks on')) return;
+    setLedger((prev) => clearMarks(prev, batchIds));
+    setSelectedRowKeys(new Set());
+    notifyBatch('success', `Cleared ${batchIds.length} review mark(s) — back to unchecked.`);
   };
 
   const handleClearHistory = () => {
@@ -980,6 +1072,7 @@ const ClassTimetable = () => {
               setFixPlan(null);
               setFhPlan(null);
               setSolverPrefill(null);
+              setSelectedRowKeys(new Set());
             }}
             style={{ width: '150px' }}
             disabled={classes.length === 0}
@@ -1141,7 +1234,7 @@ const ClassTimetable = () => {
       )}
 
       {/* Clash Report Panel — every clash in this class, listed at once */}
-      {clashReport.length > 0 && (
+      {selectedClass && (clashReport.length > 0 || globalSummary.total > 0) && (
         <div className="no-print" style={{ marginBottom: '1rem', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #fca5a5', background: '#fef2f2' }}>
           <h3 style={{ margin: '0 0 0.75rem 0', color: '#991b1b', fontSize: '1rem', fontWeight: 700 }}>
             ⚠️ Clash Report — {selectedClass.toUpperCase()} ({classSummary.unchecked} unchecked • {classSummary.checked} checked • {classSummary.intentional} intentional)
@@ -1151,8 +1244,42 @@ const ClassTimetable = () => {
             <strong> ✓ Checked</strong> = real, fix later (add a note) · <strong>Intentional</strong> = combined class, leave it.
             Unchecked clashes stay red &amp; pulsing until reviewed.
           </p>
+
+          {/* Batch bar — tick rows (optional) and apply in one go */}
+          <ClashBatchBar
+            classCount={classSummary.total}
+            allCount={globalSummary.total}
+            scope={batchScope}
+            onScopeChange={setBatchScope}
+            rowCount={clashReport.length}
+            selectedCount={selectedRowKeys.size}
+            total={batchStat.total}
+            pending={batchStat.pending}
+            reviewed={batchStat.reviewed}
+            onTickAll={selectAllRows}
+            onUntick={clearRowSelection}
+            onApplyIntentional={() => handleBatchApply(INTENTIONAL)}
+            onApplyChecked={() => handleBatchApply(CHECKED)}
+            onUndo={handleBatchUndo}
+          />
+
+          {clashReport.length === 0 && (
+            <p style={{ fontSize: '0.85rem', color: '#166534', fontWeight: 600, margin: 0 }}>
+              ✓ No clashes in {selectedClass.toUpperCase()} — switch scope to <strong>All classes</strong> to review the other {globalSummary.total} at once.
+            </p>
+          )}
+
+          {clashReport.length > 0 && (
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
             <thead><tr style={{ background: '#fee2e2' }}>
+              <th style={{ padding: '6px 8px', textAlign: 'center', borderBottom: '2px solid #fca5a5' }} title="Tick rows to choose them for the batch buttons">
+                <input
+                  type="checkbox"
+                  checked={clashReport.length > 0 && selectedRowKeys.size === clashReport.length}
+                  onChange={(e) => (e.target.checked ? selectAllRows() : clearRowSelection())}
+                  style={{ accentColor: '#16a34a', cursor: 'pointer' }}
+                />
+              </th>
               <th style={{ padding: '6px 10px', textAlign: 'left', borderBottom: '2px solid #fca5a5' }}>Day</th>
               <th style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '2px solid #fca5a5' }}>Period</th>
               <th style={{ padding: '6px 10px', textAlign: 'left', borderBottom: '2px solid #fca5a5' }}>Subject</th>
@@ -1164,6 +1291,15 @@ const ClassTimetable = () => {
             </tr></thead>
             <tbody>{clashReport.map((c, i) => (
               <tr key={`${c.day}-${c.period}-${i}`} style={{ background: c.state === 'intentional' ? '#f0fdf4' : c.state === 'checked' ? '#fffbeb' : '#fef2f2' }}>
+                <td style={{ padding: '6px 8px', textAlign: 'center', borderBottom: '1px solid #fecaca' }}>
+                  <input
+                    type="checkbox"
+                    checked={selectedRowKeys.has(c.rowKey)}
+                    onChange={() => toggleRowSelection(c.rowKey)}
+                    title="Tick this row for the batch buttons"
+                    style={{ accentColor: '#16a34a', cursor: 'pointer' }}
+                  />
+                </td>
                 <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca' }}>{c.day}</td>
                 <td style={{ padding: '6px 10px', textAlign: 'center', borderBottom: '1px solid #fecaca', fontWeight: 700 }}>{c.period}</td>
                 <td style={{ padding: '6px 10px', borderBottom: '1px solid #fecaca' }}>
@@ -1255,6 +1391,7 @@ const ClassTimetable = () => {
               </tr>
             ))}</tbody>
           </table>
+          )}
         </div>
       )}
 
