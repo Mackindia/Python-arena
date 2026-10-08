@@ -21,9 +21,18 @@ export async function connectDB() {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = mongoose
+      .connect(MONGODB_URI, {
+        serverSelectionTimeoutMS: 8000,
+        socketTimeoutMS: 20000,
+        bufferCommands: false,
+      })
+      .then((mongoose) => mongoose)
+      .catch((err) => {
+        // allow the next request to retry instead of reusing a rejected promise forever
+        cached.promise = null;
+        throw err;
+      });
   }
 
   cached.conn = await cached.promise;
