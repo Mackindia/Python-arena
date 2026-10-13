@@ -1,6 +1,7 @@
 export type NavLink = {
   label: string;
   href: string;
+  external?: boolean;
 };
 
 export type LearnCategory = {
@@ -16,6 +17,11 @@ export const primaryNavLinks: NavLink[] = [
   { label: "Videos", href: "/videos" },
   { label: "Practice", href: "/practice" },
   { label: "Resources", href: "/resources" },
+  {
+    label: "Notes & PDFs",
+    href: "https://drive.google.com/drive/folders/1waV5fFNl0f9r4169Yy4ZLcM8USCA6gEW?usp=drive_link",
+    external: true,
+  },
   { label: "Online Class", href: "/online-class" },
 ];
 

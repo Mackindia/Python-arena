@@ -136,16 +136,34 @@ export default function Navbar() {
 
           {/* Desktop Nav */}
           <nav className="hidden items-center gap-0.5 lg:flex">
-            {primaryNavLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={resolvePrimaryHref(link.href)}
-                className="group relative rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-gradient-to-r hover:from-indigo-50 hover:to-cyan-50 hover:text-indigo-700"
-              >
-                {link.label}
-                <span className="absolute bottom-0 left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 transition-all duration-300 group-hover:w-3/4"></span>
-              </Link>
-            ))}
+            {primaryNavLinks.map((link) =>
+              link.external ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`${link.label} (opens in a new tab)`}
+                  className="group relative inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-blue-500 px-3 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:from-indigo-600 hover:to-blue-600 hover:shadow-lg hover:shadow-indigo-500/40"
+                >
+                  <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75"></span>
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white"></span>
+                  </span>
+                  {link.label}
+                  <ExternalLink className="h-3 w-3 opacity-90 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={resolvePrimaryHref(link.href)}
+                  className="group relative rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-gradient-to-r hover:from-indigo-50 hover:to-cyan-50 hover:text-indigo-700"
+                >
+                  {link.label}
+                  <span className="absolute bottom-0 left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 transition-all duration-300 group-hover:w-3/4"></span>
+                </Link>
+              )
+            )}
 
             {/* Learn Dropdown */}
             <div className="relative" ref={learnRef}>
@@ -338,16 +356,35 @@ export default function Navbar() {
               className="mt-3 overflow-hidden lg:hidden"
             >
               <div className="max-h-[80vh] overflow-y-auto overscroll-contain space-y-1 border-t border-slate-100 pt-3 pb-2">
-                {primaryNavLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={resolvePrimaryHref(link.href)}
-                    onClick={handleMobileMenuClose}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-gradient-to-r hover:from-indigo-50 hover:to-cyan-50 hover:text-indigo-700"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {primaryNavLinks.map((link) =>
+                  link.external ? (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={handleMobileMenuClose}
+                      title={`${link.label} (opens in a new tab)`}
+                      className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-blue-500 px-3 py-2.5 text-left text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:from-indigo-600 hover:to-blue-600"
+                    >
+                      <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75"></span>
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white"></span>
+                      </span>
+                      {link.label}
+                      <ExternalLink className="h-3.5 w-3.5 opacity-90" />
+                    </a>
+                  ) : (
+                    <Link
+                      key={link.href}
+                      href={resolvePrimaryHref(link.href)}
+                      onClick={handleMobileMenuClose}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-gradient-to-r hover:from-indigo-50 hover:to-cyan-50 hover:text-indigo-700"
+                    >
+                      {link.label}
+                    </Link>
+                  )
+                )}
 
                 {/* Mobile Learn */}
                 <div className="space-y-1">
