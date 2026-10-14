@@ -1,0 +1,19 @@
+{
+  "name": "video-pipeline",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Script -> stock footage + TTS narration -> 10-20s MP4",
+  "scripts": {
+    "make": "node src/index.js",
+    "make:all": "node src/index.js --all",
+    "promo": "node src/promo.js",
+    "engine": "node src/engine.js",
+    "server": "node server.js"
+  },
+  "dependencies": {
+    "busboy": "^1.6.0",
+    "dotenv": "^16.4.5",
+    "msedge-tts": "^2.0.9"
+  }
+}
