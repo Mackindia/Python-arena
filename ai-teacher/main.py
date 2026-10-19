@@ -52,13 +52,13 @@ async def _prewarm_models():
         try:
             from app.retrieval.reranker import _get_cross_encoder, DEFAULT_RERANKER_MODEL
             _get_cross_encoder(DEFAULT_RERANKER_MODEL)
-            print("[startup] Reranker model loaded ✓")
+            print("[startup] Reranker model loaded OK")
         except Exception as e:
             print(f"[startup] Reranker pre-warm failed: {e}")
         try:
             from app.retrieval.indexer import get_embeddings_model
             get_embeddings_model()
-            print("[startup] Embedding model loaded ✓")
+            print("[startup] Embedding model loaded OK")
         except Exception as e:
             print(f"[startup] Embedding pre-warm failed: {e}")
 
@@ -73,6 +73,16 @@ class QuestionRequest(BaseModel):
 @app.get("/")
 def root():
     return {"status": "AI Teacher Assistant is running ✅"}
+
+
+@app.get("/health")
+def health():
+    """Liveness probe for supervisors, ServerConsole and the watchdog.
+
+    Anything that polls /health used to get a 404, which can be read as
+    "server down" and trigger needless restarts.
+    """
+    return {"status": "ok"}
 
 
 @app.get("/models")
